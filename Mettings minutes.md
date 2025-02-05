@@ -1,4 +1,4 @@
-# Sprint 1 (January 28, 2025 to February 12, 2025)
+# Sprint 1 (January 28, 2025 to February 07, 2025)
 
 ## Meeting 1.1
 
@@ -87,5 +87,5 @@
 5. Created repository and the organization (Liyan, Sarah).
 6. Started user stories (Marco).
 
-[Back to Top](#sprint-1-january-28-2025-to-february-12-2025)
+[Back to Top](#sprint-1-january-28-2025-to-february-07-2025)
 
