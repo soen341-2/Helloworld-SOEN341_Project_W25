@@ -1,4 +1,4 @@
-#SOEN 341 - SOFTWARE PROCESS
+# SOEN 341 - SOFTWARE PROCESS
 
 CHAT HAVEN is an online discussion platform that allows users to communicate through direct messages, connect with a team at work, or engage with a community. Users can create channels on different topics, share media, and chat with others in real time. The administrator is responsible for assigning users to the most appropriate groups for a better organization. Both users and administrators will have the same interface, but the administrator will have additional privileges.
 The platform will feature a clean interface for an intuitive user experience and robust privacy settings to ensure secure conversations. Firebase authentication will be used to manage user logins securely.
