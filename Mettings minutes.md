@@ -87,5 +87,46 @@
 5. Created repository and the organization (Liyan, Sarah).
 6. Started user stories (Marco).
 
+
+<table>
+  <tr>
+    <td>
+
+### Meeting Information
+<table>
+  <tr>
+    <td><strong>Meeting Date:</strong> February 1, 2025</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Time:</strong> 11:00 AM</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Format:</strong> Online</td>
+  </tr>
+</table>
+
+  </td>
+  <td>
+
+### Roll Call
+<table>
+  <tr>
+    <td><strong>✅ Present:</strong> Liyan Al-Mosaria, Sarah Amani, Alexia Mucciacciaro, Prathiksha Kandiah, Marco Greco</td>
+  </tr>
+  <tr>
+    <td><strong>❌ Absent:</strong> -</td>
+  </tr>
+</table>
+
+  </td>
+  </tr>
+</table>
+
+### Discussion
+- The goal of the first meeting was to separate the user stories created the day before in the lab.
+- Update our team sheet log.
+
+
+
 [Back to Top](#sprint-1-january-28-2025-to-february-07-2025)
 
