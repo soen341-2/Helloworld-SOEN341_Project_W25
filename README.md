@@ -7,11 +7,12 @@ The platform will feature a clean interface for an intuitive user experience and
 To complete this project, our team is divided into two distinct groups. The Scrum Master, Sarah Amani, will ensure that the Scrum process is followed effectively, guiding the team in adhering to the Scrum methodology and keeping the development team focused on sprint goals. The development team consists of Liyan Al-Mosaria, Prathiksha Kandiah, Alexia Mucciacciaro, and Marco Greco. Their role is to work collaboratively so that the backend and frontend of the project align seamlessly while ensuring the efficiency, organization, and maintainability of the codebase. Together, we aim to complete this project by early April while adhering to the given instructions and methodologies. 
 
 
+## TEAM MEMBERS AND ROLES
 
-
-| MEMBER NAME| STUDENT ID | GIT NAME|
-|-------------|------------|-----------|
-| Liyan Al-mosaria  | 40251099 | lalmosa|
+| MEMBER NAME| STUDENT ID | GIT NAME| 
+|---------------|--------------|-------------|
+| Liyan Al-mosaria  | 40251099 | lalmosa| 
 | Sarah Amani  | 40226234  | Sassamani  |
-| Marco Greco  | 40285114  | marcog2004  |
-
+| Marco Greco  | 40285114  | marcog2004 | 
+| Alexia Mucciacciaro  | 40250572 | marcog2004 | 
+| Prathiksha Kandiah  | 40190782  | marcog2004 | 
