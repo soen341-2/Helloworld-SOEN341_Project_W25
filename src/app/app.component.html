@@ -1,0 +1,15 @@
+<div>
+  <label for="user-select">Choisir un utilisateur :</label>
+  <select id="user-select" [(ngModel)]="selectedUser">
+    <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+  </select>
+</div>
+
+<div>
+  <label for="channel-select">Choisir un canal :</label>
+  <select id="channel-select" [(ngModel)]="selectedChannel">
+    <option *ngFor="let channel of channels" [value]="channel.id">{{ channel.name }}</option>
+  </select>
+</div>
+
+<button (click)="assignUser()">Assigner</button>
