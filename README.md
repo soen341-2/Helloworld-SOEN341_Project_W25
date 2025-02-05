@@ -14,5 +14,5 @@ To complete this project, our team is divided into two distinct groups. The Scru
 | Liyan Al-mosaria  | 40251099 | lalmosa| 
 | Sarah Amani  | 40226234  | Sassamani  |
 | Marco Greco  | 40285114  | marcog2004 | 
-| Alexia Mucciacciaro  | 40250572 | marcog2004 | 
+| Alexia Mucciacciaro  | 40250572 | alemucc | 
 | Prathiksha Kandiah  | 40190782  | marcog2004 | 
