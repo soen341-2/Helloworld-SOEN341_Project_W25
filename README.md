@@ -21,10 +21,31 @@ To complete this project, our team is divided into two distinct groups. The Scru
 
 ## TECHNOLOGIES
 
-### Frontend
+#### Frontend
 - Angular
 - HTML
 - CSS
 - Bootstrap
 - Firebase SDK
+
+#### Backend
+- Node.js
+- Express.js
+- Firebase Admin SDK
+
+#### Database
+- Firebase Firestore
+
+## MEETING MINUTES
+
+You can view a detailed record of the meetings conducted by the team through the following: (add link to meeting minutes here)
+
+## PROGRESS 
+
+- [x] Sprint 1
+- [ ] Sprint 2
+- [ ] Sprint 3
+- [ ] Sprint 4
+
+
 
