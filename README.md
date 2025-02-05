@@ -38,7 +38,7 @@ To complete this project, our team is divided into two distinct groups. The Scru
 
 ## MEETING MINUTES
 
-You can view a detailed record of the meetings conducted by the team through the following: (add link to meeting minutes here)
+You can view a detailed record of the meetings conducted by the team through the following: Mettings minutes.md 
 
 ## PROGRESS 
 
