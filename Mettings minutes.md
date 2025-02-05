@@ -2,11 +2,17 @@
 
 ## Meeting 1.1
 
-| Meeting Information | Roll Call |
-|---------------------|----------|
-| **Meeting Date:** 24/01/2025 | **✅ Present:** Liyan Al-Mosaria, Sarah Amani, Marco Greco, Prathiksha Kandiah, Alexia Mucciacciaro|
-| **Meeting Time:** 2:45PM - 4:25PM | **❌ Absent:** - |
-| **Meeting Format:** In Person |  |
+### Meeting Information
+| Meeting Date  | 24/01/2024 |
+|--------------|------------|
+| **Meeting Time**  | 2:45 PM - 4:25 PM |
+| **Meeting Format**  | In Person |
+
+### Roll Call
+| Status | Attendee |
+|--------|---------|
+| ✅ Present | Sarah, Alexia, Liyan, Marco |
+| ❌ Absent | - |
 
 ### Discussion
 1. Make a team, chose team name, formed team on moodle forum (everyone)
