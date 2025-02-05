@@ -87,12 +87,12 @@
 5. Created repository and the organization (Liyan, Sarah).
 6. Started user stories (Marco).
 
-
+## Meeting 1.3
 <table>
   <tr>
     <td>
 
-## Meeting 1.3
+
 
 
 ### Meeting Information
