@@ -1,0 +1,55 @@
+/* Dropdown Button */
+.profileButton {
+  background-color: #3498DB;
+  color: white;
+  padding: 0;
+  font-size: 0;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  margin-left: 95%;
+
+}
+
+.profileImage{
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}
+
+/* Dropdown button on hover & focus */
+.profileButton:hover, .profileButton:focus, .profileImage:hover {
+  background-color: #2980B9;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdownMenu {
+  position: relative;
+  display: inline-block;
+
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdownMenu-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  margin-left: 92%;
+}
+
+/* Links inside the dropdown */
+.dropdownMenu-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdownMenu-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
