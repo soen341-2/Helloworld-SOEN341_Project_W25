@@ -130,6 +130,49 @@
 - Update our team sheet log.
 
 
+## Meeting 1.4
+<table>
+  <tr>
+    <td>
+
+
+
+
+### Meeting Information
+<table>
+  <tr>
+    <td><strong>Meeting Date:</strong> February 5, 2025</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Time:</strong> 2:00PM-4:00PM and 6:00PM-8:30PM</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Format:</strong> Online</td>
+  </tr>
+</table>
+
+  </td>
+  <td>
+
+### Roll Call
+<table>
+  <tr>
+    <td><strong>✅ Present:</strong> Liyan Al-Mosaria, Sarah Amani, Alexia Mucciacciaro, Prathiksha Kandiah, Marco Greco</td>
+  </tr>
+  <tr>
+    <td><strong>❌ Absent:</strong> -</td>
+  </tr>
+</table>
+
+  </td>
+  </tr>
+</table>
+
+### Discussion
+-Debugged and optimized code
+-Restructured/organized the code
+-Worked on the repository
+
 
 [Back to Top](#sprint-1-january-28-2025-to-february-07-2025)
 
