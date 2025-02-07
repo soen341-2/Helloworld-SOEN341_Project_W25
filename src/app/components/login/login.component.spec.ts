@@ -1,23 +1,14 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+const signUpButton=document.getElementById('signUpButton');
+const signInButton=document.getElementById('signInButton');
+const signInForm=document.getElementById('signIn');
+const signUpForm=document.getElementById('signUp');
 
-import { LoginComponent } from './login.component';
+signUpButton.addEventListener('click', function(){
+    signInForm.style.display="none";
+    signUpForm.style.display="block";
+})
 
-describe('LoginComponent', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [LoginComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(LoginComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+signInButton.addEventListener('click',function(){
+    signInForm.style.display="block";
+    signUpForm.style.display="none";
+})
