@@ -17,7 +17,7 @@ To complete this project, our team is divided into two distinct groups. The Scru
 | Sarah Amani  | 40226234  | Sassamani  |
 | Marco Greco  | 40285114  | marcog2004 | 
 | Alexia Mucciacciaro  | 40250572 | alemucc | 
-| Prathiksha Kandiah  | 40190782  | NA | 
+| Prathiksha Kandiah  | 40190782  | thikshaa | 
 
 ## TECHNOLOGIES
 
