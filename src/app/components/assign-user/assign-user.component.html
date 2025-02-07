@@ -1,2 +1,36 @@
-<p>assign2!!</p>
-<p>ddd !</p>
+<h2>Assign Users to Channel</h2>
+
+<label for="user">User:</label>
+<select id="user" [(ngModel)]="selectedUser">
+  <option *ngFor="let user of users$ | async" [value]="user.id">
+    {{ user.name }}
+  </option>
+</select>
+
+<label for="channel">Channel:</label>
+<select id="channel" [(ngModel)]="selectedChannel">
+  <option *ngFor="let channel of channels$ | async" [value]="channel.id">
+    {{ channel.name }}
+  </option>
+</select>
+
+<button (click)="assignUserToChannel()" [disabled]="!selectedUser || !selectedChannel">
+    Assigner
+</button>
+
+<h3>Users and Channels</h3>
+<table border="1">
+  <tr>
+    <th>Users</th>
+    <th>Assigned Channel</th>
+    <th>Actions</th>
+  </tr>
+  <tr *ngFor="let user of users$ | async">
+    <td>{{ user.name }}</td>
+    <td>{{ user.channelId ? (channelsMap[user.channelId] || 'Unknown channel') : 'Non assign' }}</td>
+    <td>
+      <button *ngIf="user.channelId" (click)="unassignUser(user.id)">Deassign</button>
+    </td>
+  </tr>
+</table>
+
