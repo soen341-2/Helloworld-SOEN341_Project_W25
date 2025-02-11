@@ -174,5 +174,48 @@
 -Worked on the repository
 
 
+## Meeting 1.5
+<table>
+  <tr>
+    <td>
+
+
+
+
+### Meeting Information
+<table>
+  <tr>
+    <td><strong>Meeting Date:</strong> February 7, 2025</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Time:</strong>2:45PM-4:25PM</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Format:</strong>In Person</td>
+  </tr>
+</table>
+
+  </td>
+  <td>
+
+### Roll Call
+<table>
+  <tr>
+    <td><strong>✅ Present:</strong> Liyan Al-Mosaria, Sarah Amani, Alexia Mucciacciaro, Prathiksha Kandiah, Marco Greco</td>
+  </tr>
+  <tr>
+    <td><strong>❌ Absent:</strong> -</td>
+  </tr>
+</table>
+
+  </td>
+  </tr>
+</table>
+
+### Discussion
+-Sprint 1
+-Assigned roles for sprint 2
+
+
 [Back to Top](#sprint-1-january-28-2025-to-february-07-2025)
 
