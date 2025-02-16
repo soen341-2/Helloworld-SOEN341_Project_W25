@@ -1,0 +1,51 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="text-primary">Channel Selector</h2>
+    
+    <div>
+      <button *ngIf="isAdmin" (click)="goToAdminDashboard()" class="btn btn-outline-primary me-2">
+        Admin Dashboard
+      </button>
+      
+      <button (click)="logOut()" class="btn btn-outline-danger">Log Out</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card bg-dark text-white shadow">
+        <div class="card-header text-center">
+          <h4>Channels</h4>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li *ngFor="let channel of channels; index as i" class="list-group-item bg-dark border-0">
+              <div class="d-flex justify-content-between align-items-center">
+                <button (click)="selectChannel(i)" class="btn btn-primary btn-sm w-75">
+                  {{ channel.title }}
+                </button>
+                <button *ngIf="isAdmin" (click)="deleteChannel(i)" 
+                        class="btn btn-outline-light btn-sm ms-2">
+                  Delete
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="isAdmin" class="card-footer">
+          <input class="form-control mb-2" [(ngModel)]="newChannelTitle" placeholder="New Channel Name">
+          <button (click)="addChannel()" class="btn btn-success w-100">Create Channel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="text-center">{{ currentChannel.title || 'Select a Channel' }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
