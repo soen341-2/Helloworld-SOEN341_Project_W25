@@ -1,0 +1,223 @@
+import { Component, OnInit } from '@angular/core';
+import { Firestore, collection, doc, updateDoc, getDocs, getDoc } from '@angular/fire/firestore';
+import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-admin-dashboard',
+  standalone: false,
+  templateUrl: './admin-dashboard.component.html',
+  styleUrl: './admin-dashboard.component.css'
+})
+export class AdminDashboardComponent implements OnInit {
+  users: any[] = [];
+  channels: any[] = [];
+  currentUser: any = null;
+
+  constructor(private firestore: Firestore, private auth: Auth, private router: Router) {
+    onAuthStateChanged(this.auth, (user) => {
+      if (user) {
+        console.log("User signed in:", user.email);
+        this.getCurrentUser();
+      } else {
+        console.log("No user signed in.");
+        this.currentUser = null;
+      }
+    });
+  }
+  
+
+  async ngOnInit() {
+    console.log("Checking Firebase authentication state...");
+  
+    onAuthStateChanged(this.auth, async (user: User | null) => {
+      if (user) {
+        console.log("Authenticated user:", user.email);
+        await this.getCurrentUser();
+      } else {
+        console.log("No authenticated user detected.");
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  getChannelName(channelId: string): string {
+    const channel = this.channels.find(ch => ch.id === channelId);
+    return channel ? channel.title : "Unknown Channel";
+  }
+  
+
+  goToChannelSelector() {
+    this.router.navigate(['/channels']);
+  }
+  
+  logOut() {
+    this.auth.signOut().then(() => {
+      this.router.navigate(['/login']);
+    }).catch(error => {
+      console.error("Error logging out:", error);
+    });
+  }
+  
+  getSelectedValue(event: Event): string {
+    return (event.target as HTMLSelectElement).value;
+  }
+
+  async loadUsers() {
+    if (!this.currentUser) {
+      return;
+    }
+
+    console.log("Fetching users...");
+    const usersRef = collection(this.firestore, 'users');
+    const usersSnapshot = await getDocs(usersRef);
+    
+    this.users = usersSnapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(user => user.id !== this.currentUser.id);
+
+    console.log("Users loaded (excluding current user):", this.users);
+  }
+
+  async loadChannels() {
+    console.log("Fetching channels...");
+    const channelsRef = collection(this.firestore, 'channels');
+    const channelsSnapshot = await getDocs(channelsRef);
+    this.channels = channelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    console.log("Channels loaded:", this.channels);
+  }
+
+  async getCurrentUser() {
+    if (!this.auth.currentUser) {
+      console.log("No authenticated user detected.");
+      return;
+    }
+
+    console.log("Fetching current user:", this.auth.currentUser.email);
+  
+    const userRef = doc(this.firestore, 'users', this.auth.currentUser.uid);
+    const userSnapshot = await getDoc(userRef);
+
+    if (userSnapshot.exists()) {
+      this.currentUser = { id: this.auth.currentUser.uid, ...userSnapshot.data() };
+      console.log("Firestore User Data:", this.currentUser);
+      
+      await this.loadUsers();
+      await this.loadChannels();
+
+    } else {
+      console.log("Firestore user document not found.");
+    }
+  }
+
+  async assignUserToChannel(userId: string, channelId: string) {
+    if (!this.currentUser?.isAdmin && !this.currentUser?.isSuperAdmin) {
+      alert("Only Admins or SuperAdmins can assign users to channels!");
+      return;
+    }
+
+    if (!channelId) {
+      alert("Please select a channel before assigning.");
+      return;
+    }
+
+    try {
+      console.log(`Assigning user ${userId} to channel ${channelId}...`);
+      const userRef = doc(this.firestore, 'users', userId);
+      const userSnapshot = await getDoc(userRef);
+
+      if (userSnapshot.exists()) {
+        let userData = userSnapshot.data();
+        let updatedChannels = userData['assignedChannels'] || [];
+
+        if (!updatedChannels.includes(channelId)) {
+          updatedChannels.push(channelId);
+          await updateDoc(userRef, { assignedChannels: updatedChannels });
+          console.log("User assigned to channel!");
+          await this.loadUsers();
+        } else {
+          alert("User is already assigned to this channel!");
+        }
+      }
+    } catch (error) {
+      console.error("Error assigning user to channel:", error);
+    }
+  }
+
+  async toggleUserChannel(userId: string, channelId: string) {
+    if (!this.currentUser?.isAdmin && !this.currentUser?.isSuperAdmin) {
+      alert("Only Admins or SuperAdmins can manage channels!");
+      return;
+    }
+
+    if (!channelId) {
+      alert("Please select a channel before proceeding.");
+      return;
+    }
+
+    try {
+      console.log(`Toggling user ${userId} for channel ${channelId}...`);
+      const userRef = doc(this.firestore, 'users', userId);
+      const userSnapshot = await getDoc(userRef);
+
+      if (userSnapshot.exists()) {
+        let userData = userSnapshot.data();
+        let updatedChannels = userData['assignedChannels'] || [];
+
+        if (updatedChannels.includes(channelId)) {
+          updatedChannels = updatedChannels.filter((ch: string) => ch !== channelId);
+          console.log("User deassigned from channel!");
+        } else {
+          updatedChannels.push(channelId);
+          console.log("User assigned to channel!");
+        }
+
+        await updateDoc(userRef, { assignedChannels: updatedChannels });
+        await this.loadUsers();
+      }
+    } catch (error) {
+      console.error("Error toggling user channel:", error);
+    }
+  }
+
+  async makeAdmin(userId: string) {
+    if (!this.currentUser?.isSuperAdmin) {
+        alert("Only SuperAdmins can assign admins!");
+        return;
+    }
+
+    try {
+        console.log(`Making ${userId} an admin...`);
+        const userRef = doc(this.firestore, 'users', userId);
+        await updateDoc(userRef, { isAdmin: true });
+
+        const channelsRef = collection(this.firestore, 'channels');
+        const channelsSnapshot = await getDocs(channelsRef);
+        const allChannelIds = channelsSnapshot.docs.map(doc => doc.id);
+
+        await updateDoc(userRef, { assignedChannels: allChannelIds });
+
+        console.log("User is now an admin!");
+        await this.loadUsers();
+    } catch (error) {
+        console.error("Error making user admin:", error);
+    }
+}
+
+  async removeAdmin(userId: string) {
+    if (!this.currentUser?.isSuperAdmin) {
+      alert("Only SuperAdmins can remove admins!");
+      return;
+    }
+
+    try {
+      console.log(`Removing ${userId} as admin...`);
+      const userRef = doc(this.firestore, 'users', userId);
+      await updateDoc(userRef, { isAdmin: false });
+      console.log("User is no longer an admin!");
+      await this.loadUsers();
+    } catch (error) {
+      console.error("Error removing admin:", error);
+    }
+  }
+}

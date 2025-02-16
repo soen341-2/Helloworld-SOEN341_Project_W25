@@ -1,0 +1,83 @@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="text-center flex-grow-1">Admin Dashboard</h2>
+      <div>
+        <button (click)="goToChannelSelector()" class="btn btn-outline-primary me-2">
+          Channel Selector
+        </button>
+        <button (click)="logOut()" class="btn btn-outline-danger">
+          Log Out
+        </button>
+      </div>
+    </div>
+    <div *ngIf="currentUser?.isSuperAdmin" class="mb-4">
+      <h4 class="mb-3">Manage Admins</h4>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Admin Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge" [ngClass]="{'badge-success': user.isAdmin, 'badge-danger': !user.isAdmin}">
+                {{ user.isAdmin ? '✅' : '❌' }}
+              </span>
+            </td>
+            <td>
+              <button *ngIf="!user.isAdmin" class="btn btn-primary btn-sm" (click)="makeAdmin(user.id)">
+                Promote to Admin
+              </button>
+              <button *ngIf="user.isAdmin" class="btn btn-danger btn-sm" (click)="removeAdmin(user.id)">
+                Demote from Admin
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h4 class="mb-3" *ngIf="currentUser?.isSuperAdmin || currentUser?.isAdmin">Assign Users to Channels</h4>
+    <table class="table table-striped table-bordered" *ngIf="currentUser?.isSuperAdmin || currentUser?.isAdmin">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Assigned Channels</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.email }}</td>
+          <td>
+            <span *ngIf="user.assignedChannels?.length > 0">
+              {{ user.assignedChannels.join(', ') }}
+            </span>
+          </td>
+          <td>
+            <div *ngIf="!user.isAdmin">
+              <select [(ngModel)]="user.selectedChannel" class="form-control">
+                <option value="">Select a channel</option>
+                <option *ngFor="let channel of channels" [value]="channel.id">
+                  {{ channel.title }}
+                </option>
+              </select>
+              <button class="btn btn-sm mt-2"
+                      (click)="toggleUserChannel(user.id, user.selectedChannel)"
+                      [disabled]="!user.selectedChannel"
+                      [ngClass]="user.assignedChannels?.includes(user.selectedChannel) ? 'btn-danger' : 'btn-success'">
+                {{ user.assignedChannels?.includes(user.selectedChannel) ? "Deassign" : "Assign" }} Channel
+              </button>
+            </div>
+            <span *ngIf="user.isAdmin" class="text-muted">Admins are assigned to all channels</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  has context menu
+  
+  
