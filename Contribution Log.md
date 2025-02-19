@@ -1,0 +1,3 @@
+## CONTRIBUTION LOG
+
+### SPRINT 1
