@@ -3,10 +3,9 @@
 ### SPRINT 1
 
 #### Marco Greco 40285114
-
-- Wrote user stories for Sprint 1
-  -> Started on January 31, 2025
-  -> Wrote 7 user stories based on “User Authentication and Management” Requirements
+* Wrote user stories for Sprint 1
+* Sub Started on January 31, 2025,
+   Wrote 7 user stories based on “User Authentication and Management” Requirements
   -> 30 minutes
   
 - Created and set up Angular Project
