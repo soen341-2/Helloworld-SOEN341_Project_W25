@@ -5,19 +5,19 @@
 #### Marco Greco 40285114
 
 - Wrote user stories for Sprint 1
-  -Started on January 31, 2025
-  -Wrote 7 user stories based on “User Authentication and Management” Requirements
-  -30 minutes
+  -> Started on January 31, 2025
+  -> Wrote 7 user stories based on “User Authentication and Management” Requirements
+  -> 30 minutes
   
 - Created and set up Angular Project
-  -Initialized the project to start writing code
-  -Added channel-selector component
-  -Includes HTML, CSS, and TypeScript code for contributions
-  -Added Channel and activeChannel interfaces
-    -Channel has a string ID and string Title
-    -activeChannel has the ID and Title of the channel selected by the user
-  -Set up Firebase environment file
-  -2 hours
+  -> Initialized the project to start writing code
+  -> Added channel-selector component
+  -> Includes HTML, CSS, and TypeScript code for contributions
+  -> Added Channel and activeChannel interfaces
+    -> Channel has a string ID and string Title
+    -> activeChannel has the ID and Title of the channel selected by the user
+  -> Set up Firebase environment file
+  -> 2 hours
   
 - Created UI for channel list (including “Add Channel” button and “Channel Title” form)
   -Started on February 2, 2025
