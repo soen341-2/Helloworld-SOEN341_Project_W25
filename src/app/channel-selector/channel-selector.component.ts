@@ -3,13 +3,23 @@ import { Channel } from '../models/channel';
 import { activeChannel } from '../models/active-channel';
 import { initializeApp } from '@angular/fire/app';
 import { environment } from '../../environments/environment.development';
-import { getFirestore, setDoc, doc, collection, getDocs, deleteDoc, onSnapshot, getDoc, updateDoc } from '@angular/fire/firestore';
-import { getAuth, onAuthStateChanged, signOut, User } from '@angular/fire/auth';
+import { getFirestore, setDoc, doc, collection, getDocs, deleteDoc, onSnapshot, getDoc, updateDoc, collectionData,addDoc} from '@angular/fire/firestore';
+import { getAuth, onAuthStateChanged, signOut, User, UserProfile } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
+import * as firestore from '@angular/fire/firestore';
+
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { startWith, map, switchMap } from 'rxjs/operators';
+import { ChatMessage } from '../models/chat-message';
+
+
 
 const app = initializeApp(environment.firebaseConfig);
 const db=getFirestore(app);
+
+
 
 @Component({
   selector: 'app-channel-selector',
@@ -23,7 +33,17 @@ export class ChannelSelectorComponent implements OnInit {
   currentUser: User | null = null;
   assignedChannels: string[] = [];
   isAdmin: boolean = false;
-
+  searchText: string = ''; 
+  usernames$: Observable<string[]> = new Observable<string[]>();
+  filteredUsernames$: Observable<string[]> = new Observable<string[]>();
+  selectedUser: string | null = null;
+  selectedUsername: string | null = null;
+  messages: ChatMessage[] = [];
+  newMessage: string = "";
+  activeConversations: { username: string }[] = []; 
+  
+  //sarah part
+  searchControl=new FormControl;
   constructor(private router: Router) {}
 
   async ngOnInit() {
@@ -31,7 +51,6 @@ export class ChannelSelectorComponent implements OnInit {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
-        const db = getFirestore();
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
@@ -39,11 +58,131 @@ export class ChannelSelectorComponent implements OnInit {
           const userData = userSnap.data();
           this.isAdmin = userData['isAdmin'] || false;
           this.assignedChannels = userData['assignedChannels'] || [];
+          this.activeConversations = userData['activeConversations'] || [];
           this.showChannels();
         }
+        
       }
     });
+    
+    this.usernames$ = this.getAllUsernames();
+    this.filteredUsernames$ = this.searchControl.valueChanges.pipe(
+      startWith(''),
+      switchMap(searchTerm =>
+        this.usernames$.pipe(
+          map(usernames =>
+            usernames.filter(username => username.toLowerCase().includes(searchTerm.toLowerCase()))
+          )
+        )
+      )
+    );
   }
+
+  getAllUsernames(): Observable<string[]> {
+    const ref = collection(db, 'users');
+    return collectionData(ref).pipe(
+      map(users => users.map(user => (user as { username?: string }).username || ''))
+    );
+  }
+  async selectUser(username: string) {
+    console.log("Choix de l'utilisateur :", username);
+    this.selectedUsername = username;
+    const usersRef = collection(db, "users");
+    const usersSnapshot = await getDocs(usersRef);
+
+    let userId: string | null = null;
+    usersSnapshot.forEach(doc => {
+        const userData = doc.data();
+        if (userData['username'] === username) {
+            userId = doc.id; 
+        }
+    });
+
+    if (!userId) {
+        console.error("Impossible de charger l'utilisateur !");
+        return;
+    }
+
+    this.selectedUser = userId;
+    console.log("Utilisateur sélectionné - UID :", userId);
+
+    this.mergeChats(this.currentUser!.uid, userId);
+    this.loadMessages(userId);
+    
+    if (!this.activeConversations.some(convo => convo.username === username)) {
+        this.activeConversations.push({ username });
+    }
+}
+  loadMessages(userId: string) {
+    console.log("load messages", userId);
+    const chatId = this.getChatId(this.currentUser!.uid, userId);
+    const messagesRef = collection(db, `chats/${chatId}/messages`);
+    const messagesQuery = firestore.query(
+      messagesRef,
+      firestore.orderBy("timestamp", "asc") // Trie chronologiquement
+    );
+
+    onSnapshot(messagesQuery, (snapshot) => {
+      this.messages = snapshot.docs
+      .map(doc => doc.data() as ChatMessage)
+      .filter(msg => 
+        msg.senderId === this.currentUser!.uid || msg.receiverId === this.currentUser!.uid
+      );
+      console.log("load messages :", this.messages);
+    });
+  }
+  getChatId(user1: string, user2: string): string {
+    return [user1, user2].sort().join("_"); 
+    
+  }
+  selectActiveConversation(username: string) {
+    console.log("conversation with", username);
+    this.selectedUser = username;
+    this.selectedUsername = username;
+    this.loadMessages(username);
+  }
+
+  async mergeChats(user1: string, user2: string) {
+    const correctChatId = this.getChatId(user1, user2);
+    const wrongChatId = `${user2}_${user1}`;
+
+    if (correctChatId === wrongChatId) return;
+
+    console.log(`Fusion de ${wrongChatId} → ${correctChatId}`);
+
+    const wrongMessagesRef = collection(db, `chats/${wrongChatId}/messages`);
+    const correctMessagesRef = collection(db, `chats/${correctChatId}/messages`);
+
+    const messagesSnapshot = await getDocs(wrongMessagesRef);
+
+    messagesSnapshot.forEach(async (msgDoc) => {
+      await setDoc(doc(correctMessagesRef, msgDoc.id), msgDoc.data());
+    });
+
+    await deleteDoc(doc(db, "chats", wrongChatId));
+    console.log(`Chat ${wrongChatId} supprimé après fusion.`);
+  }
+  sendMessage() {
+    if (!this.newMessage.trim()) return;
+
+    const chatId = this.getChatId(this.currentUser!.uid!, this.selectedUser!);
+    const messagesRef = collection(db, `chats/${chatId}/messages`);
+
+    const newChatMessage: ChatMessage = {
+      senderId: this.currentUser!.uid!,
+      receiverId: this.selectedUser!,
+      message: this.newMessage,
+      timestamp: Date.now(),
+    };
+
+    addDoc((messagesRef), newChatMessage)
+      .then(() => {
+        console.log("Message sent !",this.selectUser);
+        this.newMessage = "";
+      })
+      .catch(error => console.error("Error:", error));
+  }
+ 
 
   goToAdminDashboard() {
     this.router.navigate(['/admin-dashboard']);
@@ -71,8 +210,6 @@ export class ChannelSelectorComponent implements OnInit {
   
   
   channels: Channel[] = []
-
-
 
   addChannel(){
     if(this.newChannelTitle.trim().length > 0){

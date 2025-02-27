@@ -1,7 +1,6 @@
 <div class="container-fluid p-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="text-primary">Channel Selector</h2>
-    
     <div>
       <button *ngIf="isAdmin" (click)="goToAdminDashboard()" class="btn btn-outline-primary me-2">
         Admin Dashboard
@@ -12,6 +11,7 @@
   </div>
 
   <div class="row">
+    
     <div class="col-md-3">
       <div class="card bg-dark text-white shadow">
         <div class="card-header text-center">
@@ -41,9 +41,61 @@
     </div>
 
     <div class="col-md-9">
-      <div class="card shadow-sm">
+      <div class="card shadow-sm mb-3">
         <div class="card-body">
           <h3 class="text-center">{{ currentChannel.title || 'Select a Channel' }}</h3>
+        </div>
+      </div>
+
+      <!-- Chat List Section -->
+      <div class="container d-flex">
+        <div class="chat-list mat-elevation-z5">
+          <div class="search-input">
+            <mat-form-field>
+              <mat-label>Search for users</mat-label>
+              <input 
+                matInput
+                placeholder="Search for users..."
+                [formControl]="searchControl"
+                [matAutocomplete]="auto"
+              />
+            </mat-form-field>
+      
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let username of filteredUsernames$ | async"
+              [value]="username"
+              (click)="selectUser(username)">
+              {{ username }}
+            </mat-option>
+              
+            </mat-autocomplete>
+          </div>
+
+          <div class="active-conversations">
+            <h5>Active Chats</h5>
+            <ul>
+              <li *ngFor="let convo of activeConversations" (click)="selectUser(convo.username)" class="conversation-item">
+                {{ convo.username }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="messages mat-elevation-z5">
+           <h4>Chat avec {{ selectedUsername }}</h4>
+          <div class="chat-box">
+            <div *ngFor="let msg of messages" 
+                 [ngClass]="{'sent': msg.senderId === currentUser?.uid, 'received': msg.senderId !== currentUser?.uid}">
+                 <div class="message-bubble">
+                  <strong *ngIf="msg.senderId === currentUser?.uid">Me:</strong>
+                  <strong *ngIf="msg.senderId !== currentUser?.uid">{{ selectedUsername }}:</strong>
+                  <p>{{ msg.message }}</p>
+                  <span class="timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
+            </div>
+            </div>
+          </div>
+          <input type="text" [(ngModel)]="newMessage" placeholder="Type a message" class="form-control" />
+          <button (click)="sendMessage()" class="btn btn-primary mt-2">send</button>
         </div>
       </div>
     </div>
