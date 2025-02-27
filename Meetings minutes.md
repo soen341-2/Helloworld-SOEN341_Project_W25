@@ -336,9 +336,49 @@
 </table>
 
 ### Discussion
+1. Discussed user stories/tasks for sprint 2.
+
+## Meeting 2.4
+
+<table>
+  <tr>
+    <td>
+
+### Meeting Information
+<table>
+  <tr>
+    <td><strong>Meeting Date:</strong> February 21, 2025</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Time:</strong> 2:45 PM - 4:25 PM</td>
+  </tr>
+  <tr>
+    <td><strong>Meeting Format:</strong> In Person</td>
+  </tr>
+</table>
+
+  </td>
+  <td>
+
+### Roll Call
+<table>
+  <tr>
+    <td><strong>✅ Present:</strong> Sarah, Liyan, Prathiksha, Marco, Alexia</td>
+  </tr>
+  <tr>
+    <td><strong>❌ Absent: </strong> -</td>
+  </tr>
+</table>
+
+  </td>
+  </tr>
+</table>
+
+### Discussion
 1. Assigned user stories for sprint 2.
 
 ---
+
 
 
 [Back to Top](#sprint-1-january-28-2025-to-february-07-2025)
