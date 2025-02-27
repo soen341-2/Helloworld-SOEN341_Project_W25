@@ -1,1 +1,94 @@
 ul { list-style-type: none; padding: 0; }
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around; 
+    align-items: stretch; 
+    height: calc(100vh - 10px);
+    width: 95vw;
+    padding: 16px;
+}
+
+.chat-list {
+    width: 30%; 
+    min-height: 80vh; 
+    background: rgb(162, 195, 226) !important; 
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.messages {
+    width: 65%;
+    min-height: 80vh;
+    background: rgba(142, 142, 143, 0.493);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.mat-autocomplete-panel {
+    background-color: white !important;
+    color: black !important;
+  }
+  .mat-form-field {
+    background-color: white !important;
+  }
+  
+  .mat-input-element {
+    color: black !important;
+  }
+  .message-bubble {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    margin-bottom: 15px;
+    background: #0e0438;
+    color: white;
+  }
+  .sent {
+    justify-content: flex-end;
+}
+  .sent .message-bubble {
+    background: #47475c;
+    color: rgb(248, 253, 248);
+    justify-content: flex-start;
+    align-self: flex-end;
+    border-radius: 15px 15px 0 15px;
+  }
+  
+  .received .message-bubble {
+    background: #865c5c;
+    justify-content: flex-start;
+    color: black;
+  }
+  .timestamp {
+    display: block;
+    font-size: 0.8em;
+    text-align: right;
+    margin-top: 5px;
+  }
+  .input-container {
+    display: flex;
+    padding: 10px;
+    background: rgb(99, 52, 52);
+  }
+  
+  .input-container input {
+    flex: 1;
+    margin-right: 10px;
+  }
+  .active-conversations {
+    margin-top: 15px;
+  }
+  .active-conversations ul {
+    list-style: none;
+    padding: 0;
+  }
+  .active-conversations li {
+    padding: 10px;
+    border-bottom: 1px solid #490505;
+    cursor: pointer;
+  }
+  .active-conversations li:hover {
+    background: #29af30;
+  }
