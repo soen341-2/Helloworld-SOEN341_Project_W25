@@ -42,6 +42,7 @@ export class ChannelSelectorComponent implements OnInit {
   newMessage: string = "";
   activeConversations: { username: string }[] = []; 
   
+
   //sarah part
   searchControl=new FormControl;
   constructor(private router: Router) {}
@@ -278,9 +279,9 @@ export class ChannelSelectorComponent implements OnInit {
     }
 }
 
-
-  selectChannel(index: number){
-    this.currentChannel.title = this.channels[index].title;
-  }
+selectChannel(channelIndex: number): void {
+  this.currentChannel = this.channels[channelIndex];
+  this.router.navigate(['/channel-area', this.currentChannel.id]);  // Navigate to chat
+}
 
 }
