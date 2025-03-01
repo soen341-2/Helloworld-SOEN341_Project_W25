@@ -19,7 +19,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -40,7 +39,11 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatInputModule,
     FormsModule,
     ReactiveFormsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+
+
+  
+   
   ],
   
   providers: [
