@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 //alexia add
-import { Firestore, doc, docData, collection, addDoc, serverTimestamp, query, orderBy } from '@angular/fire/firestore';
+import { Firestore, doc, docData, collection, addDoc, serverTimestamp, query, orderBy, deleteDoc } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
@@ -17,12 +17,12 @@ import { Auth } from '@angular/fire/auth';
 export class ChannelAreaComponent implements OnInit {
   channelId: string | null = null;
   channelName: string = '';
-  messages: { sender: string; message: string; timestamp: string }[] = [];
+  messages: { id:string; sender: string; message: string; timestamp: string }[] = [];
   newMessage: string = '';
   channels: any;
   currentChannel: any;
   messageService: any;
-  currentUser: { uid?: string; username?: string } = {};
+  currentUser: { uid?: string; username?: string; isSuperAdmin?:boolean } = {};
 
 
   constructor(private route: ActivatedRoute,private firestore: Firestore, private auth: Auth) {}
@@ -54,10 +54,13 @@ export class ChannelAreaComponent implements OnInit {
     const userDocRef = doc(this.firestore, `users/${userId}`);
     docData(userDocRef).subscribe((userDoc: any) => {
       console.log('Fetched userDoc:', userDoc); // For debugging
-      if (userDoc && userDoc.username) {
-        this.currentUser = { uid: userId, username: userDoc.username };
+      if (userDoc) {
+        this.currentUser = { 
+          uid: userId, 
+          username: userDoc.username || 'Unknown User',
+        isSuperAdmin: userDoc.isSuperAdmin || false };
       } else {
-        this.currentUser = { uid: userId, username: 'Unknown User' };
+        this.currentUser = { uid: userId, username: 'Unknown User', isSuperAdmin:false };
       }
     });
   }
@@ -73,20 +76,20 @@ export class ChannelAreaComponent implements OnInit {
       }
     });
   }
-  
+
   loadMessages(): void {
     if (!this.channelId) return;
     const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
     const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
     collectionData(messagesQuery, { idField: 'id' }).subscribe((msgs: any) => {
-      this.messages = msgs.map((m: { timestamp: { toDate: () => any; }; }) => {
-        return {
-          ...m,
-          timestamp: m.timestamp?.toDate() ?? null
-        };
-      });
+      this.messages = msgs.map((m: any) => ({
+        id: m.id, 
+        sender: m.sender,
+        message: m.message,
+        timestamp: m.timestamp?.toDate() ?? null
+      }));
     });
-  
   }
 
     sendMessage(): void {
@@ -106,8 +109,23 @@ export class ChannelAreaComponent implements OnInit {
           .catch(error => {
             console.error("Error sending message: ", error);
           });
+
+        }
       }
-    }
+          deleteMessage(messageId:string):void{
+            if(!this.channelId || !this.currentUser.isSuperAdmin) 
+              return; 
+            const messageRef = doc(this.firestore, `channels/${this.channelId}/messages/${messageId}`);
 
+            if(confirm("Are you sure you want to delete this message?")){
+              deleteDoc(messageRef).then(()=>{
+                console.log("Message deleted successfully");
+              })
+              .catch(error=>{
+                console.error("Error deleting message: ",error);
+              });
+            }
 
-}
+          }
+
+        }
