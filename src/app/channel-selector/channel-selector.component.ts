@@ -33,6 +33,7 @@ export class ChannelSelectorComponent implements OnInit {
   currentUser: User | null = null;
   assignedChannels: string[] = [];
   isAdmin: boolean = false;
+  currentUsername: string = "";
   searchText: string = ''; 
   usernames$: Observable<string[]> = new Observable<string[]>();
   filteredUsernames$: Observable<string[]> = new Observable<string[]>();
@@ -58,6 +59,7 @@ export class ChannelSelectorComponent implements OnInit {
         if (userSnap.exists()) {
           const userData = userSnap.data();
           this.isAdmin = userData['isAdmin'] || false;
+          this.currentUsername = userData['username'] || [];
           this.assignedChannels = userData['assignedChannels'] || [];
           this.activeConversations = userData['activeConversations'] || [];
           this.showChannels();
