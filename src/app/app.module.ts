@@ -37,7 +37,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     //sarah add
     MatFormFieldModule,
     MatInputModule,
-    FormsModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
 
