@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { initializeApp } from '@angular/fire/app';
 import { environment } from '../../environments/environment.development';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from '@angular/fire/auth';
-import { getFirestore, setDoc, doc } from '@angular/fire/firestore';
+import { getFirestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
 
 const app = initializeApp(environment.firebaseConfig);
 const auth = getAuth(app);
@@ -18,6 +18,7 @@ const db = getFirestore(app);
 export class UserAuthComponent {
   email: string = "";
   password: string = "";
+  username: string = "";
   currentUser: User | null = null;
 
   constructor(private router: Router) {
@@ -31,9 +32,17 @@ export class UserAuthComponent {
 
   async signUp() {
     if (this.email.trim() === "" || this.password.trim() === "") {
-      alert("Email and password are required");
+      alert("Email, username and password are required");
       return;
     }
+
+    let username = prompt("Please enter a username:");
+    if (!username || username.trim() === "") {
+      alert("Username is required for signup.");
+      return;
+    }
+
+    this.username = username.trim();
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
@@ -42,6 +51,7 @@ export class UserAuthComponent {
       const userRef = doc(db, "users", userCredential.user.uid);
       await setDoc(userRef, {
         email: this.email,
+        username: this.username,
         isAdmin: false,
         isSuperAdmin: false,
         createdAt: new Date()
@@ -64,7 +74,12 @@ export class UserAuthComponent {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, this.email, this.password);
-      console.log("✅ User logged in:", userCredential.user);
+      console.log("User logged in:", userCredential.user);
+      const userRef = doc(db, "users", userCredential.user.uid);
+      const userSnapshot = await getDoc(userRef);
+      if (userSnapshot.exists()) {
+        this.username = userSnapshot.data()['username'];
+      }
       this.clearFields();
       this.router.navigate(['/channels']);
     } catch (error: any) {
@@ -87,5 +102,6 @@ export class UserAuthComponent {
   clearFields() {
     this.email = "";
     this.password = "";
+    this.username = "";
   }
 }

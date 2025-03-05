@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 //alexia add
 import { Firestore, doc, docData, collection, addDoc, serverTimestamp, query, orderBy, deleteDoc } from '@angular/fire/firestore';
@@ -22,10 +23,10 @@ export class ChannelAreaComponent implements OnInit {
   channels: any;
   currentChannel: any;
   messageService: any;
-  currentUser: { uid?: string; username?: string; isSuperAdmin?:boolean } = {};
+  currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
 
 
-  constructor(private route: ActivatedRoute,private firestore: Firestore, private auth: Auth) {}
+  constructor(private route: ActivatedRoute,private firestore: Firestore, private auth: Auth, private router: Router) {}
 
   ngOnInit(): void {
 
@@ -58,9 +59,9 @@ export class ChannelAreaComponent implements OnInit {
         this.currentUser = { 
           uid: userId, 
           username: userDoc.username || 'Unknown User',
-        isSuperAdmin: userDoc.isSuperAdmin || false };
+        isAdmin: userDoc.isAdmin || false };
       } else {
-        this.currentUser = { uid: userId, username: 'Unknown User', isSuperAdmin:false };
+        this.currentUser = { uid: userId, username: 'Unknown User', isAdmin:false };
       }
     });
   }
@@ -113,7 +114,7 @@ export class ChannelAreaComponent implements OnInit {
         }
       }
           deleteMessage(messageId:string):void{
-            if(!this.channelId || !this.currentUser.isSuperAdmin) 
+            if(!this.channelId || !this.currentUser.isAdmin) 
               return; 
             const messageRef = doc(this.firestore, `channels/${this.channelId}/messages/${messageId}`);
 
@@ -126,6 +127,18 @@ export class ChannelAreaComponent implements OnInit {
               });
             }
 
+          }
+
+          goToChannelSelector() {
+            this.router.navigate(['/channels']);
+          }
+
+          logOut() {
+            this.auth.signOut().then(() => {
+              this.router.navigate(['/login']);
+            }).catch(error => {
+              console.error("Error logging out:", error);
+            });
           }
 
         }

@@ -1,4 +1,22 @@
+
+<nav class="navbar navbar-light bg-light px-3">
+  <a class="navbar-brand fw-bold text-primary">ChatHaven</a>
+  <div>
+    <button (click)="goToChannelSelector()" class="btn btn-outline-primary me-2">
+      Channel Selector
+    </button>
+    <button (click)="logOut()" class="btn btn-outline-danger">
+      Log Out
+    </button>
+  </div>
+</nav>
+
+
+
+
+
 <div class="container">
+  
   <h2>Channel Chat: {{ channelName }}</h2>
   <div class="messages">
     <div *ngFor="let msg of messages" class="message-bubble">
@@ -7,8 +25,8 @@
       <!--<span class="timestamp">{{ msg.timestamp }}</span>-->
       <span class="timestamp">{{ msg.timestamp | date:'h:mm a' }}</span>
 
-      <button *ngIf="currentUser.isSuperAdmin" (click)="deleteMessage(msg.id)" class="delete-btn">
-         Delete
+      <button *ngIf="currentUser.isAdmin" (click)="deleteMessage(msg.id)" class="delete-btn p-0 me-2">
+        ❌
       </button>
       
 
