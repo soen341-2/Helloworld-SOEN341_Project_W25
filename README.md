@@ -45,7 +45,7 @@ You can view a detailed record of the meetings conducted by the team through the
 ## PROGRESS 
 
 - [x] Sprint 1
-- [ ] Sprint 2
+- [x] Sprint 2
 - [ ] Sprint 3
 - [ ] Sprint 4
 
