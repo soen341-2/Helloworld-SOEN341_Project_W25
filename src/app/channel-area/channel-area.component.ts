@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 //alexia add
 import { Firestore, doc, docData, collection, addDoc, serverTimestamp, query, orderBy, deleteDoc } from '@angular/fire/firestore';
@@ -25,12 +26,7 @@ export class ChannelAreaComponent implements OnInit {
   currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
 
 
-  constructor(
-    private route: ActivatedRoute,
-    private firestore: Firestore, 
-    private auth: Auth, 
-    private router: Router
-  ) {}
+  constructor(private route: ActivatedRoute,private firestore: Firestore, private auth: Auth, private router: Router) {}
 
   ngOnInit(): void {
 
@@ -63,8 +59,7 @@ export class ChannelAreaComponent implements OnInit {
         this.currentUser = { 
           uid: userId, 
           username: userDoc.username || 'Unknown User',
-        isAdmin: userDoc.isAdmin || false 
-      };
+        isAdmin: userDoc.isAdmin || false };
       } else {
         this.currentUser = { uid: userId, username: 'Unknown User', isAdmin:false };
       }
@@ -85,31 +80,18 @@ export class ChannelAreaComponent implements OnInit {
 
   loadMessages(): void {
     if (!this.channelId) return;
-    
-    const channelRef = doc(this.firestore, `channels/${this.channelId}`);
+    const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
+    const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
 
-    docData(channelRef).subscribe((channelDoc: any) => {
-        if (channelDoc?.isPrivate && !channelDoc.allowedUsers.includes(this.currentUser?.uid)) {
-            alert("You don't have permission to access this conversation.");
-            this.router.navigate(['/channels']);
-            return;
-        }
-
-        // If user has access, fetch messages
-        const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
-        const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
-
-        collectionData(messagesQuery, { idField: 'id' }).subscribe((msgs: any) => {
-            this.messages = msgs.map((m: any) => ({
-                id: m.id, 
-                sender: m.sender,
-                message: m.message,
-                timestamp: m.timestamp?.toDate() ?? null
-            }));
-        });
+    collectionData(messagesQuery, { idField: 'id' }).subscribe((msgs: any) => {
+      this.messages = msgs.map((m: any) => ({
+        id: m.id, 
+        sender: m.sender,
+        message: m.message,
+        timestamp: m.timestamp?.toDate() ?? null
+      }));
     });
-}
-
+  }
 
     sendMessage(): void {
       if (this.newMessage.trim() !== '' && this.channelId) {
