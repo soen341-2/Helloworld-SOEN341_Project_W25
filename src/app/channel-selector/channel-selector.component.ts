@@ -88,8 +88,9 @@ export class ChannelSelectorComponent implements OnInit {
     );
   }
   async selectUser(username: string) {
-    console.log("Choix de l'utilisateur :", username);
+    console.log("Choosing user:", username);
     this.selectedUsername = username;
+   
     const usersRef = collection(db, "users");
     const usersSnapshot = await getDocs(usersRef);
 
@@ -102,14 +103,25 @@ export class ChannelSelectorComponent implements OnInit {
     });
 
     if (!userId) {
-        console.error("Impossible de charger l'utilisateur !");
+        console.error("Error loading user!");
         return;
     }
 
     this.selectedUser = userId;
-    console.log("Utilisateur sélectionné - UID :", userId);
+    console.log("Selected User ID:", userId);
 
-    this.mergeChats(this.currentUser!.uid, userId);
+    const chatId = this.getChatId(this.currentUser!.uid, userId);
+    const chatRef = doc(db, "channels", chatId);
+    const chatSnap = await getDoc(chatRef);
+      
+    if (!chatSnap.exists()){
+      await setDoc(chatRef, {
+        title: `Private chat: ${this.currentUser!.uid} & ${userId}`,
+        isPrivate: true,
+        allowedUsers: [this.currentUser!.uid, userId]
+      });
+    }
+
     this.loadMessages(userId);
     
     if (!this.activeConversations.some(convo => convo.username === username)) {
@@ -218,8 +230,10 @@ export class ChannelSelectorComponent implements OnInit {
     if(this.newChannelTitle.trim().length > 0){
       let newChannel: Channel = {
         title: this.newChannelTitle,
-        id: uuidv4()
-      }
+        id: uuidv4(),
+        isPrivate: false,
+        allowedUsers: []
+      };
       
       const channelRef = doc(db,"channels",newChannel.id);
       setDoc(channelRef, newChannel)
@@ -239,10 +253,13 @@ export class ChannelSelectorComponent implements OnInit {
       }));
 
       if (!this.isAdmin) {
-        this.channels = allChannels.filter(channel => this.assignedChannels.includes(channel.id));
-      } else {
+        this.channels = allChannels.filter((channel: Channel) => 
+            !channel.isPrivate || (Array.isArray(channel.allowedUsers) && channel.allowedUsers.includes(this.currentUser?.uid ?? ""))
+        );
+    } else {
         this.channels = allChannels;
-      }
+    }
+    
     }, (error) => {
       console.error('Error fetching channels:', error);
     });
