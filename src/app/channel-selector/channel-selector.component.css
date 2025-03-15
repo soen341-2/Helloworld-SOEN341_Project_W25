@@ -24,6 +24,8 @@ ul { list-style-type: none; padding: 0; }
     border-radius: 10px;
     padding: 16px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    position: relative;
 }
 .mat-autocomplete-panel {
     background-color: white !important;
@@ -92,3 +94,35 @@ ul { list-style-type: none; padding: 0; }
   .active-conversations li:hover {
     background: #29af30;
   }
+
+
+
+  .emoji-toggle-button {
+    background-color: #007bff; 
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-right: 8px;
+    margin-top: 8px;
+    transition: background-color 0.2s ease;
+    justify-content: flex-end;
+  }
+  .emoji-toggle-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .emoji-picker-container {
+    position: absolute;
+    bottom: 60px; 
+    left: 16px;  
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    z-index: 1000;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  

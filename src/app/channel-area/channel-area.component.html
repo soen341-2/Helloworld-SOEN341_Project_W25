@@ -11,10 +11,6 @@
   </div>
 </nav>
 
-
-
-
-
 <div class="container">
   
   <h2>Channel Chat: {{ channelName }}</h2>
@@ -34,6 +30,11 @@
   </div>
   <div class="input-container">
     <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
+    <button (click)="toggleEmojiPicker()" class="btn btn-secondary">😊</button>
     <button (click)="sendMessage()" class="btn btn-primary">Send</button>
+  </div>
+
+  <div *ngIf="showEmojiPicker" class="emoji-picker-container">
+    <emoji-picker (emoji-click)="addEmoji($event)"></emoji-picker>
   </div>
 </div>
