@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Firestore, doc, docData, collection, addDoc, serverTimestamp, query, orderBy, deleteDoc } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
+import 'emoji-picker-element';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class ChannelAreaComponent implements OnInit {
   messageService: any;
   currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
 
+  showEmojiPicker: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,6 +53,16 @@ export class ChannelAreaComponent implements OnInit {
     });
 
     
+  }
+
+  //alexia add
+
+  toggleEmojiPicker(): void {
+    this.showEmojiPicker = !this.showEmojiPicker;
+  }
+
+  addEmoji(event: any): void {
+    this.newMessage += event.detail.unicode;
   }
 
 

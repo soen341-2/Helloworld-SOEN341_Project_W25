@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Channel } from '../models/channel';
 import { activeChannel } from '../models/active-channel';
 import { initializeApp } from '@angular/fire/app';
@@ -13,6 +13,8 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
 import { ChatMessage } from '../models/chat-message';
+
+import 'emoji-picker-element';
 
 
 
@@ -42,7 +44,11 @@ export class ChannelSelectorComponent implements OnInit {
   messages: ChatMessage[] = [];
   newMessage: string = "";
   activeConversations: { username: string }[] = []; 
+
+  showEmojiPickerDirect: boolean = false;
   
+  @ViewChild('emojiPickerContainer', { static: false })
+  emojiPickerContainer!: ElementRef;
 
   //sarah part
   searchControl=new FormControl;
@@ -67,6 +73,7 @@ export class ChannelSelectorComponent implements OnInit {
         
       }
     });
+  
     
     this.usernames$ = this.getAllUsernames();
     this.filteredUsernames$ = this.searchControl.valueChanges.pipe(
@@ -79,6 +86,16 @@ export class ChannelSelectorComponent implements OnInit {
         )
       )
     );
+  }
+
+  toggleEmojiPickerDirect(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showEmojiPickerDirect = !this.showEmojiPickerDirect;
+  }
+
+  
+  addEmojiDirect(event: any): void {
+    this.newMessage += event.detail.unicode;
   }
 
   getAllUsernames(): Observable<string[]> {

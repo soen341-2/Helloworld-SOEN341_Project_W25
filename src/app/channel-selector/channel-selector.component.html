@@ -97,7 +97,12 @@
             </div>
           </div>
           <input type="text" [(ngModel)]="newMessage" placeholder="Type a message" class="form-control" />
-          <button (click)="sendMessage()" class="btn btn-primary mt-2">send</button>
+          <button (click)="toggleEmojiPickerDirect($event)" class="emoji-toggle-button">😊</button>
+          <button (click)="sendMessage()" class="btn btn-primary">send</button>
+        </div>
+
+        <div *ngIf="showEmojiPickerDirect" class="emoji-picker-container" #emojiPickerContainer>
+          <emoji-picker (emoji-click)="addEmojiDirect($event)"></emoji-picker>
         </div>
       </div>
   
