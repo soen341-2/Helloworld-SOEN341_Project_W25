@@ -47,6 +47,8 @@
         <tr>
           <th>Email</th>
           <th>Assigned Channels</th>
+          <th>Status</th>
+          <th>Last Seen</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -57,6 +59,26 @@
             <span *ngIf="user.assignedChannels?.length > 0">
               {{ user.assignedChannels.join(', ') }}
             </span>
+            <span *ngIf="!user.assignedChannels?.length" class="text-muted">No channels</span>
+          </td>
+          
+          <td>
+            <span [ngClass]="{
+                'text-success': user.status === 'online',
+                'text-warning': user.status === 'away',
+                'text-danger': user.status === 'offline'
+              }">
+              ● {{ user.status }}
+            </span>
+          </td>
+
+          <td>
+            <span *ngIf="user.lastSeen; else noLastSeen">
+              {{ user.lastSeen | date:'short' }}
+            </span>
+            <ng-template #noLastSeen>
+              <span class="text-muted">Never connected</span>
+            </ng-template>
           </td>
           <td>
             <div *ngIf="!user.isAdmin">

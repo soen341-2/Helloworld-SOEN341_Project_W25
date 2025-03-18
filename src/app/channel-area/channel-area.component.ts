@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { onSnapshot,QuerySnapshot, QueryDocumentSnapshot, DocumentData } from '@angular/fire/firestore';
 
 //alexia add
-import { Firestore, doc, docData, collection, addDoc, serverTimestamp, query, orderBy, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, doc, docData, collection, addDoc, updateDoc, serverTimestamp, query, orderBy, deleteDoc } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import 'emoji-picker-element';
@@ -24,6 +25,7 @@ export class ChannelAreaComponent implements OnInit {
   currentChannel: any;
   messageService: any;
   currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
+  channelUsers: { id: string; username: string; status: string; lastSeen?: Date }[] = [];
 
   showEmojiPicker: boolean = false;
 
@@ -47,6 +49,7 @@ export class ChannelAreaComponent implements OnInit {
       if (this.channelId) {
         this.getChannelName(this.channelId);
         this.loadMessages();
+        this.loadChannelUsers(); 
       } else {
         this.channelName = 'Unknown Channel';
       }
@@ -54,7 +57,59 @@ export class ChannelAreaComponent implements OnInit {
 
     
   }
+  loadChannelUsers(): void {
+    if (!this.channelId) return;
+  
+    const channelRef = doc(this.firestore, `channels/${this.channelId}`);
+    docData(channelRef).subscribe(async (channelDoc: any) => {
+      if (channelDoc && channelDoc.allowedUsers) {
+        const allowedUsers = channelDoc.allowedUsers;
+        
+        const usersRef = collection(this.firestore, "users");
 
+        onSnapshot(usersRef, (snapshot) => {
+          this.channelUsers = snapshot.docs
+            .map(docSnap => {
+              const userData = docSnap.data();
+              if (allowedUsers.includes(docSnap.id)) {
+                return {
+                  id: docSnap.id,
+                  username: userData['username'] || 'Unknown',
+                  status: userData['status'] || 'offline',
+                  lastSeen: userData['lastSeen']?.seconds
+                    ? new Date(userData['lastSeen'].seconds * 1000)
+                    : undefined
+                };
+              }
+              return null;
+            })
+            .filter(user => user !== null) as { id: string; username: string; status: string; lastSeen?: Date }[];
+  
+            console.log("Updated channelUsers:", JSON.stringify(this.channelUsers, null, 2));
+
+        });
+      }
+    });
+  }
+  
+  getUserStatusEmoji(username: string): string {
+    const user = this.channelUsers.find(u => u.username === username);
+    console.log("Checking status for:", username, "Found:", user?.status);
+    
+    if (!user) return '🔴';
+  
+    switch (user.status) {
+      case 'online':
+        return '🟢'; 
+      case 'away':
+        return '🟠';
+      case 'offline':
+      default:
+        return '🔴'; 
+    }
+  }
+  
+  
   //alexia add
 
   toggleEmojiPicker(): void {
@@ -123,26 +178,34 @@ export class ChannelAreaComponent implements OnInit {
 }
 
 
-    sendMessage(): void {
-      if (this.newMessage.trim() !== '' && this.channelId) {
-        const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
-        
-        const message = {
-          sender: this.currentUser?.username ?? 'Me', 
-          message: this.newMessage,
-          timestamp: serverTimestamp()
-        };
-  
-        addDoc(messagesRef, message)
-          .then(() => {
-            this.newMessage = '';
-          })
-          .catch(error => {
-            console.error("Error sending message: ", error);
-          });
+sendMessage(): void {
+  if (this.newMessage.trim() !== '' && this.channelId) {
+    const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
+    
+    const message = {
+      sender: this.currentUser?.username ?? 'Me', 
+      message: this.newMessage,
+      timestamp: serverTimestamp()
+    };
 
+    addDoc(messagesRef, message)
+      .then(async () => {
+        this.newMessage = '';
+        if (this.currentUser?.uid) {
+          const userRef = doc(this.firestore, `users/${this.currentUser.uid}`);
+          await updateDoc(userRef, {
+            status: 'online',
+            lastSeen: new Date()
+          });
         }
-      }
+      })
+      .catch(error => {
+        console.error("Error sending message: ", error);
+      });
+  }
+}
+
+
           deleteMessage(messageId:string):void{
             if(!this.channelId || !this.currentUser.isAdmin) 
               return; 

@@ -8,7 +8,7 @@ import { getAuth, onAuthStateChanged, signOut, User, UserProfile } from '@angula
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
 import * as firestore from '@angular/fire/firestore';
-
+import { Timestamp } from '@angular/fire/firestore';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
@@ -32,18 +32,26 @@ const db=getFirestore(app);
 })
 
 export class ChannelSelectorComponent implements OnInit {
+  private inactivityTimer: any;
+  private INACTIVITY_DELAY = 30000; 
+ 
   currentUser: User | null = null;
   assignedChannels: string[] = [];
   isAdmin: boolean = false;
   currentUsername: string = "";
-  searchText: string = ''; 
+  searchText: string = '';
   usernames$: Observable<string[]> = new Observable<string[]>();
   filteredUsernames$: Observable<string[]> = new Observable<string[]>();
   selectedUser: string | null = null;
   selectedUsername: string | null = null;
   messages: ChatMessage[] = [];
   newMessage: string = "";
-  activeConversations: { username: string }[] = []; 
+  activeConversations: { username: string }[] = [];
+  currentUserStatus: string = "offline";
+  selectedUserStatus: string = "offline";
+  selectedUserLastSeen: Date | null = null;
+  channelUsersMap: Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]> = new Map();
+
 
   showEmojiPickerDirect: boolean = false;
   
@@ -68,9 +76,12 @@ export class ChannelSelectorComponent implements OnInit {
           this.currentUsername = userData['username'] || [];
           this.assignedChannels = userData['assignedChannels'] || [];
           this.activeConversations = userData['activeConversations'] || [];
-          this.showChannels();
+          this.currentUserStatus = userData['status'] || "offline";
+          await this.updateUserStatus("online");
+          this.listenToUserStatus();
+          this.startInactivityTimer();
         }
-        
+        this.showChannels();
       }
     });
   
@@ -87,6 +98,107 @@ export class ChannelSelectorComponent implements OnInit {
       )
     );
   }
+  listenToUserStatus() {
+    if (!this.currentUser) return;
+
+    const userRef = doc(db, "users", this.currentUser.uid);
+    onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        this.currentUserStatus = docSnap.data()['status'] || "offline";
+      }
+    });
+  }
+  async updateUserStatus(status: string) {
+    if (this.currentUser) {
+      const userRef = doc(db, 'users', this.currentUser.uid);
+      await updateDoc(userRef, { status: status, lastSeen: new Date() });
+    }
+  }
+  startInactivityTimer() {
+    clearTimeout(this.inactivityTimer);
+    this.inactivityTimer = setTimeout(() => {
+      this.updateUserStatus("away");
+    
+    }, this.INACTIVITY_DELAY);
+  }
+
+  @HostListener('mousemove')
+  @HostListener('keydown')
+  @HostListener('click')
+  resetInactivityTimer() {
+    if (this.currentUserStatus !== "online") {
+      this.updateUserStatus("online");
+    
+    }
+    this.startInactivityTimer();
+  }
+  async selectUser(username: string) {
+    console.log("Choosing user:", username);
+    this.selectedUsername = username;
+
+    const usersRef = collection(db, "users");
+    const usersSnapshot = await getDocs(usersRef);
+
+    let userId: string | null = null;
+    let userStatus: string = "offline";
+    let userLastSeen: Date | null = null;
+
+    usersSnapshot.forEach(doc => {
+      const userData = doc.data();
+      if (userData['username'] === username) {
+        userId = doc.id;
+        userStatus = userData['status'] || "offline";
+        userLastSeen = userData['lastSeen'] ? new Date(userData['lastSeen']) : null;
+      }
+    });
+
+    if (!userId) {
+      console.error("Error loading user!");
+      return;
+    }
+
+    this.selectedUser = userId;
+    this.selectedUserStatus = userStatus;
+    this.selectedUserLastSeen = userLastSeen;
+    this.listenToSelectedUserStatus();
+    console.log("Selected User ID:", userId, "Status:", this.selectedUserStatus);
+
+    const chatId = this.getChatId(this.currentUser!.uid, userId);
+    const chatRef = doc(db, "channels", chatId);
+    const chatSnap = await getDoc(chatRef);
+
+    if (!chatSnap.exists()) {
+      await setDoc(chatRef, {
+        title: `Private chat: ${this.currentUser!.uid} & ${userId}`,
+        isPrivate: true,
+        allowedUsers: [this.currentUser!.uid, userId]
+      });
+    }
+
+    this.loadMessages(userId);
+    
+    if (!this.activeConversations.some(convo => convo.username === username)) {
+      this.activeConversations.push({ username });
+    }
+  }
+  listenToSelectedUserStatus() {
+    if (!this.selectedUser) return;
+
+    const userRef = doc(db, "users", this.selectedUser);
+    onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        this.selectedUserStatus = userData['status'] || "offline";
+        this.selectedUserLastSeen = userData['lastSeen'] && userData['lastSeen'].seconds
+        ? new Date(userData['lastSeen'].seconds * 1000)
+        : null;
+
+      }
+    });
+  }
+
+  
+
 
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
@@ -104,54 +216,14 @@ export class ChannelSelectorComponent implements OnInit {
       map(users => users.map(user => (user as { username?: string }).username || ''))
     );
   }
-  async selectUser(username: string) {
-    console.log("Choosing user:", username);
-    this.selectedUsername = username;
-   
-    const usersRef = collection(db, "users");
-    const usersSnapshot = await getDocs(usersRef);
-
-    let userId: string | null = null;
-    usersSnapshot.forEach(doc => {
-        const userData = doc.data();
-        if (userData['username'] === username) {
-            userId = doc.id; 
-        }
-    });
-
-    if (!userId) {
-        console.error("Error loading user!");
-        return;
-    }
-
-    this.selectedUser = userId;
-    console.log("Selected User ID:", userId);
-
-    const chatId = this.getChatId(this.currentUser!.uid, userId);
-    const chatRef = doc(db, "channels", chatId);
-    const chatSnap = await getDoc(chatRef);
-      
-    if (!chatSnap.exists()){
-      await setDoc(chatRef, {
-        title: `Private chat: ${this.currentUser!.uid} & ${userId}`,
-        isPrivate: true,
-        allowedUsers: [this.currentUser!.uid, userId]
-      });
-    }
-
-    this.loadMessages(userId);
-    
-    if (!this.activeConversations.some(convo => convo.username === username)) {
-        this.activeConversations.push({ username });
-    }
-}
+  
   loadMessages(userId: string) {
     console.log("load messages", userId);
     const chatId = this.getChatId(this.currentUser!.uid, userId);
     const messagesRef = collection(db, `chats/${chatId}/messages`);
     const messagesQuery = firestore.query(
       messagesRef,
-      firestore.orderBy("timestamp", "asc") // Trie chronologiquement
+      firestore.orderBy("timestamp", "asc") 
     );
 
     onSnapshot(messagesQuery, (snapshot) => {
@@ -221,17 +293,36 @@ export class ChannelSelectorComponent implements OnInit {
   }
   
   
-  logOut() {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        console.log("User logged out");
-        this.router.navigate(['/login']);
-      })
-      .catch(error => {
-        console.error("Error logging out:", error);
+  async logOut() {
+    if (!this.currentUser) return;
+    
+    const userRef = doc(db, "users", this.currentUser.uid);
+    try {
+
+      await updateDoc(userRef, {
+        status: "offline",
+        lastSeen:Timestamp.now()
       });
+  
+      const auth = getAuth();
+      await signOut(auth);
+  
+      this.router.navigate(['/login']);
+    } catch (error) {
+     
+    }
   }
+ @HostListener('window:beforeunload', ['$event'])
+ async handleBeforeUnload(event: Event) {
+  if (this.currentUser) {
+    const userRef = doc(db, "users", this.currentUser.uid);
+    await updateDoc(userRef, {
+      status: "offline",
+      lastSeen: new Date()
+    });
+  }
+}
+
 
   newChannelTitle : string = "";
 
@@ -261,26 +352,31 @@ export class ChannelSelectorComponent implements OnInit {
     alert("Channels Must Have a Name")
   }
 
+  
   showChannels() {
     const channelRef = collection(db, "channels");
 
     onSnapshot(channelRef, (snapshot) => {
-      let allChannels = snapshot.docs.map(doc => ({
-        ...doc.data() as Channel
-      }));
+        this.channels = snapshot.docs.map(doc => {
+            const channelData = doc.data() as Channel;
+            return {
+                ...channelData,  
+                id: channelData.id ?? doc.id  
+            };
+        });
 
-      if (!this.isAdmin) {
-        this.channels = allChannels.filter((channel: Channel) => 
-            !channel.isPrivate || (Array.isArray(channel.allowedUsers) && channel.allowedUsers.includes(this.currentUser?.uid ?? ""))
-        );
-    } else {
-        this.channels = allChannels;
-    }
-    
+        if (!this.isAdmin) {
+            this.channels = this.channels.filter((channel: Channel) => 
+                !channel.isPrivate || (Array.isArray(channel.allowedUsers) && channel.allowedUsers.includes(this.currentUser?.uid ?? ""))
+            );
+        }
+        
     }, (error) => {
-      console.error('Error fetching channels:', error);
+        console.error('Error fetching channels:', error);
     });
-  }
+}
+
+  
 
 
   async deleteChannel(index: number) {
