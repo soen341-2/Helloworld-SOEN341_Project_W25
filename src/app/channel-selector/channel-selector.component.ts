@@ -367,7 +367,7 @@ export class ChannelSelectorComponent implements OnInit {
 
         if (!this.isAdmin) {
             this.channels = this.channels.filter((channel: Channel) => 
-                !channel.isPrivate || (Array.isArray(channel.allowedUsers) && channel.allowedUsers.includes(this.currentUser?.uid ?? ""))
+              Array.isArray(this.assignedChannels) && this.assignedChannels.includes(channel.id)
             );
         }
         

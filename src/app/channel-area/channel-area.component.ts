@@ -130,7 +130,7 @@ export class ChannelAreaComponent implements OnInit {
         this.currentUser = { 
           uid: userId, 
           username: userDoc.username || 'Unknown User',
-        isAdmin: userDoc.isAdmin || false 
+          isAdmin: userDoc.isAdmin || false 
       };
       } else {
         this.currentUser = { uid: userId, username: 'Unknown User', isAdmin:false };
@@ -156,11 +156,13 @@ export class ChannelAreaComponent implements OnInit {
     const channelRef = doc(this.firestore, `channels/${this.channelId}`);
 
     docData(channelRef).subscribe((channelDoc: any) => {
-        if (channelDoc?.isPrivate && !channelDoc.allowedUsers.includes(this.currentUser?.uid)) {
+      if (!this.currentUser?.isAdmin) {
+        if (channelDoc.isPrivate && !channelDoc.allowedUsers.includes(this.currentUser?.uid)) {
             alert("You don't have permission to access this conversation.");
-            this.router.navigate(['/channels']);
+            this.router.navigate(['/channels']); 
             return;
         }
+    }
 
         // If user has access, fetch messages
         const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
