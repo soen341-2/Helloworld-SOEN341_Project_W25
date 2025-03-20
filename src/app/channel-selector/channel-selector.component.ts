@@ -363,7 +363,7 @@ export class ChannelSelectorComponent implements OnInit {
                 ...channelData,  
                 id: channelData.id ?? doc.id  
             };
-        });
+        }).filter((channel: Channel) => !channel.isPrivate);
 
         if (!this.isAdmin) {
             this.channels = this.channels.filter((channel: Channel) => 
