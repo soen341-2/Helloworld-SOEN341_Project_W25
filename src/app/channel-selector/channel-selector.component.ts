@@ -46,6 +46,7 @@ export class ChannelSelectorComponent implements OnInit {
   selectedUser: string | null = null;
   selectedUsername: string | null = null;
   messages: ChatMessage[] = [];
+  replyingToMessage: ChatMessage | null = null;
   newMessage: string = "";
   activeConversations: { username: string }[] = [];
   currentUserStatus: string = "offline";
@@ -237,8 +238,13 @@ export class ChannelSelectorComponent implements OnInit {
       }
     });
   }
- 
- 
+
+
+  reply(message: ChatMessage) {
+    this.replyingToMessage = message;
+  }
+
+
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
     this.showEmojiPickerDirect = !this.showEmojiPickerDirect;
@@ -255,7 +261,14 @@ export class ChannelSelectorComponent implements OnInit {
       map(users => users.map(user => (user as { username?: string }).username || ''))
     );
   }
- 
+
+  
+  getMessageById(id: string): ChatMessage | undefined {
+    return this.messages.find(msg => msg.id === id);
+  }
+  
+
+
   loadMessages(userId: string) {
     console.log("load messages", userId);
     const chatId = this.getChatId(this.currentUser!.uid, userId);
@@ -266,12 +279,14 @@ export class ChannelSelectorComponent implements OnInit {
     );
  
     onSnapshot(messagesQuery, (snapshot) => {
-      this.messages = snapshot.docs
-      .map(doc => doc.data() as ChatMessage)
-      .filter(msg =>
+
+      this.messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data() as ChatMessage
+      })).filter(msg => 
+
         msg.senderId === this.currentUser!.uid || msg.receiverId === this.currentUser!.uid
       );
-      console.log("load messages :", this.messages);
     });
   }
   getChatId(user1: string, user2: string): string {
@@ -316,12 +331,14 @@ export class ChannelSelectorComponent implements OnInit {
       receiverId: this.selectedUser!,
       message: this.newMessage,
       timestamp: Date.now(),
+      replyId: this.replyingToMessage ? this.replyingToMessage.id : "",
     };
  
     addDoc((messagesRef), newChatMessage)
       .then(() => {
         console.log("Message sent !",this.selectUser);
         this.newMessage = "";
+        this.replyingToMessage = null; 
       })
       .catch(error => console.error("Error:", error));
   }
