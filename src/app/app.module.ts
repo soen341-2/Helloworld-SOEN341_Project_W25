@@ -26,9 +26,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     ChannelAreaComponent,
     UserAuthComponent,
     AdminDashboardComponent,
-    
-
+  
   ],
+
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -40,8 +40,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     ReactiveFormsModule,
     MatAutocompleteModule,
 
-
-  
    
   ],
   

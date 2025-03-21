@@ -126,3 +126,11 @@ ul { list-style-type: none; padding: 0; }
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   
+  button.btn-success {
+    font-size: 12px; /* Smaller text */
+    padding: 3px 8px; /* Smaller padding */
+    margin-top: 3px; /* Reduce gap from input */
+  }
+  
+  
+  

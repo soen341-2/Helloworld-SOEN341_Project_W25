@@ -4,10 +4,10 @@
     <span class="navbar-text text-muted">
       Logged In As: <strong>{{ currentUsername || 'Guest' }}</strong>
       <p>
-        Status: 
+        Status:
         <span [ngClass]="{
-          'text-success': currentUserStatus === 'online', 
-          'text-danger': currentUserStatus === 'offline', 
+          'text-success': currentUserStatus === 'online',
+          'text-danger': currentUserStatus === 'offline',
           'text-warning': currentUserStatus === 'away'
         }">
           ● {{ currentUserStatus }}
@@ -15,7 +15,7 @@
       </p>
     </span>
   </div>
-  
+ 
   <div class="d-flex align-items-center">
     <button *ngIf="isAdmin" (click)="goToAdminDashboard()" class="btn btn-outline-primary me-2">
       Admin Dashboard
@@ -23,17 +23,34 @@
     <button (click)="logOut()" class="btn btn-outline-danger">Log Out</button>
   </div>
 </nav>
-
+ 
 <div class="container-fluid p-4">
   <div class="row">
-    
-  
+   
+ 
     <div class="col-md-3">
       <div class="card bg-dark text-white shadow">
         <div class="card-header text-center">
           <h4>Channels</h4>
         </div>
-
+        <div class="card mt-4" *ngIf="pendingInvites.length > 0">
+          <div class="card-header text-center bg-warning text-dark">
+          <h5>Pending Invitations</h5>
+          </div>
+          <div class="card-body">
+          <ul class="list-group">
+          <li *ngFor="let invite of pendingInvites" class="list-group-item d-flex justify-content-between align-items-center">
+          <span>
+          <strong>{{ invite.channelTitle }}</strong>
+          </span>
+          <div>
+          <button (click)="acceptInvite(invite.channelId)" class="btn btn-success btn-sm me-2">Accept</button>
+          <button (click)="declineInvite(invite.channelId)" class="btn btn-danger btn-sm">Decline</button>
+          </div>
+          </li>
+          </ul>
+          </div>
+          </div>
         <div class="card-body">
           <ul class="list-group">
             <li *ngFor="let channel of channels; index as i" class="list-group-item bg-dark border-0">
@@ -41,12 +58,21 @@
                 <div class="d-flex justify-content-between align-items-center">
                   <button (click)="selectChannel(i)" class="btn btn-primary btn-sm w-75">
                     {{ channel.title }}
+                    <span class="badge bg-secondary ms-2">
+                      {{ channel.isPrivate ? 'Private' : 'Public' }}
+                    </span>
                   </button>
-                  <button *ngIf="isAdmin" (click)="deleteChannel(i)" class="btn btn-outline-light btn-sm ms-2">
+                  
+                  <button *ngIf="isAdmin && !isDefaultChannel(channel.title)" (click)="deleteChannel(i)" class="btn btn-outline-light btn-sm ms-2">
                     Delete
                   </button>
+                  <button *ngIf="channel.isPrivate && channel.allowedUsers?.includes(currentUser?.uid!) && !isAdmin"
+                  (click)="leaveChannel(channel.id!)"
+                  class="btn btn-outline-danger btn-sm ms-2">
+                  Leave
+                </button>
                 </div>
-
+               
 
                 <div class="mt-2">
                   <strong>Users:</strong>
@@ -69,13 +95,27 @@
             </li>
           </ul>
         </div>
+ 
+   <!-- Input field for channel name (always visible) -->
+<input class="form-control mb-2" [(ngModel)]="newChannelTitle" placeholder="Enter Channel Name">
 
-        <div *ngIf="isAdmin" class="card-footer">
-          <input class="form-control mb-2" [(ngModel)]="newChannelTitle" placeholder="New Channel Name">
-          <button (click)="addChannel()" class="btn btn-success w-100">Create Channel</button>
-        </div>
+<!-- Admins can choose Public or Private -->
+<div *ngIf="isAdmin">
+  <select class="form-select mb-2" [(ngModel)]="newChannelPrivacy">
+    <option [value]="false">Public</option>
+    <option [value]="true">Private</option>
+  </select>
+  <button (click)="addChannel()" class="btn btn-success w-100">Create Channel</button>
+</div>
 
-    
+<!-- Regular Users: Only "Create Private Channel" Button -->
+<div *ngIf="!isAdmin">
+  <p class="text-muted">You can only create private channels.</p>
+  <button (click)="addChannel()" class="btn btn-success btn-sm w-100">Create Private Channel</button>
+</div>
+
+
+   
         <div class="card-header text-center">
           <h4>Active Chats</h4>
         </div>
@@ -92,12 +132,12 @@
         </div>
       </div>
     </div>
-
+ 
     <div class="col-md-9">
       <div class="messages mat-elevation-z5">
         <h4>Chat with {{ selectedUsername }}</h4>
         <h5 *ngIf="selectedUsername">
-          Status: 
+          Status:
           <span [ngClass]="{
               'text-success': selectedUserStatus === 'online',
               'text-warning': selectedUserStatus === 'away',
@@ -112,14 +152,14 @@
         <div class="search-input">
           <mat-form-field>
             <mat-label>Search for users</mat-label>
-            <input 
+            <input
               matInput
               placeholder="Search for users..."
               [formControl]="searchControl"
               [matAutocomplete]="auto"
             />
           </mat-form-field>
-    
+   
           <mat-autocomplete #auto="matAutocomplete">
             <mat-option *ngFor="let username of filteredUsernames$ | async"
             [value]="username"
@@ -129,7 +169,7 @@
           </mat-autocomplete>
         </div>
         <div class="chat-box">
-          <div *ngFor="let msg of messages" 
+          <div *ngFor="let msg of messages"
                 [ngClass]="{'sent': msg.senderId === currentUser?.uid, 'received': msg.senderId !== currentUser?.uid}">
                 <div class="message-bubble">
                 <strong *ngIf="msg.senderId === currentUser?.uid">Me:</strong>
@@ -151,10 +191,11 @@
         <button (click)="toggleEmojiPickerDirect($event)" class="emoji-toggle-button">😊</button>
         <button (click)="sendMessage()" class="btn btn-primary">Send</button>
       </div>
-
+ 
       <div *ngIf="showEmojiPickerDirect" class="emoji-picker-container" #emojiPickerContainer>
         <emoji-picker (emoji-click)="addEmojiDirect($event)"></emoji-picker>
       </div>
     </div>
   </div>
 </div>
+ 
