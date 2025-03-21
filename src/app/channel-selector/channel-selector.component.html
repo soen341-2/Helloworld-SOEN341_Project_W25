@@ -134,17 +134,17 @@
                 <div class="message-bubble">
                 <strong *ngIf="msg.senderId === currentUser?.uid">Me:</strong>
                 <strong *ngIf="msg.senderId !== currentUser?.uid">{{ selectedUsername }}:</strong>
-                <p *ngIf="msg.replyToMessageId" class="quoted-message">
-                  <em>Replying to: {{ getMessageById(msg.replyToMessageId)?.message }}</em>
+                <p *ngIf="msg.replyId" class="quoted-message">
+                  <em>Replying to: "{{ getMessageById(msg.replyId)?.message }}"</em>
                 </p>
                 <p>{{ msg.message }}</p>
                 <span class="timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
-                <button (click)="startReplying(msg)" class="btn btn-outline-light btn-sm ms-2">Reply</button>
+                <button (click)="reply(msg)" class="btn btn-outline-light btn-sm ms-2">Quote</button>
           </div>
           </div>
         </div>
         <div *ngIf="replyingToMessage" class="reply-context">
-          <p>Replying to: {{ replyingToMessage.message }}</p>
+          <p>Replying to: {{ replyingToMessage.message }} </p>
           <button (click)="replyingToMessage = null" class="btn btn-sm btn-outline-secondary">Cancel</button>
         </div>
         <input type="text" [(ngModel)]="newMessage" placeholder="Type a message" class="form-control" />

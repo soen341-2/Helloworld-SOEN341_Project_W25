@@ -198,11 +198,9 @@ export class ChannelSelectorComponent implements OnInit {
     });
   }
 
-  startReplying(message: ChatMessage) {
+  reply(message: ChatMessage) {
     this.replyingToMessage = message;
   }
-    
-
 
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
@@ -286,7 +284,7 @@ export class ChannelSelectorComponent implements OnInit {
       receiverId: this.selectedUser!,
       message: this.newMessage,
       timestamp: Date.now(),
-      replyToMessageId: this.replyingToMessage ? this.replyingToMessage.id : "",
+      replyId: this.replyingToMessage ? this.replyingToMessage.id : "",
     };
 
     addDoc((messagesRef), newChatMessage)
