@@ -51,8 +51,36 @@
 
 ---
 
-## Sarah Amani (40226234)
+## Sarah Amani
 
-  
+### Created and Assigned User Stories  
+- **March 7, 6:00PM – 7:30PM**  
+  - Created the user stories for the project  
+  - Assigned each user story to a team member  
 
----
+### Completed Implementation of User Story 4  
+- **March 11, 1:00PM – 7:00PM**  
+  - Implemented online, offline, and away indicators  
+  - Users marked as “away” after inactivity and “offline” when logged out  
+  - Real-time user presence status synced with Firebase  
+  - Added “Last seen” timestamp  
+  - Enabled direct messaging to offline users  
+  - Displayed user status on dashboard  
+
+### Tested and Demoed Feature  
+- **March 12, 2:00PM – 4:00PM**  
+  - Tested user presence feature  
+  - Demoed the feature and gathered feedback from the team  
+
+### Debugging and Sprint Finalization  
+- **March 19, 3:00PM – 6:00PM**  
+  - Collaborated with Liyan and Marco to debug issues  
+  - Fixed misunderstood or incomplete parts of prior work  
+
+### Documentation and Final Touches  
+- **March 20, 3:00PM – 4:00PM**  
+  - Worked on properly formatting documentation on GitHub  
+  - Added meeting minutes and user stories files  
+  - Completed product backlog and updated burndown chart  
+
+**Total Time: ~13.5 hours**
