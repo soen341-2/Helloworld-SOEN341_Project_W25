@@ -49,7 +49,7 @@
       <!--<span class="timestamp">{{ msg.timestamp }}</span>-->
       <span class="timestamp">{{ msg.timestamp | date:'h:mm a' }}</span>
 
-      <button (click)="reply(msg)" class="btn btn-outline-dark btn-sm ms-2">Quote</button>
+      <button (click)="reply(msg)" class="btn btn-outline-dark btn-sm ms-0">Quote</button>
 
       <button *ngIf="currentUser.isAdmin" (click)="deleteMessage(msg.id)" class="delete-btn p-0 me-2">
         ❌
