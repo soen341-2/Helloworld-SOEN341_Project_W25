@@ -34,6 +34,25 @@
           <h4>Channels</h4>
         </div>
 
+        <div class="card mt-4" *ngIf="pendingInvites.length > 0">
+          <div class="card-header text-center bg-warning text-dark">
+          <h5>Pending Invitations</h5>
+          </div>
+          <div class="card-body">
+          <ul class="list-group">
+          <li *ngFor="let invite of pendingInvites" class="list-group-item d-flex justify-content-between align-items-center">
+          <span>
+          <strong>{{ invite.channelTitle }}</strong>
+          </span>
+          <div>
+          <button (click)="acceptInvite(invite.channelId)" class="btn btn-success btn-sm me-2">Accept</button>
+          <button (click)="declineInvite(invite.channelId)" class="btn btn-danger btn-sm">Decline</button>
+          </div>
+          </li>
+          </ul>
+          </div>
+          </div>
+
         <div class="card-body">
           <ul class="list-group">
             <li *ngFor="let channel of channels; index as i" class="list-group-item bg-dark border-0">
@@ -41,10 +60,18 @@
                 <div class="d-flex justify-content-between align-items-center">
                   <button (click)="selectChannel(i)" class="btn btn-primary btn-sm w-75">
                     {{ channel.title }}
+                    <span class="badge bg-secondary ms-2">
+                      {{ channel.isPrivate ? 'Private' : 'Public' }}
+                    </span>
                   </button>
-                  <button *ngIf="isAdmin" (click)="deleteChannel(i)" class="btn btn-outline-light btn-sm ms-2">
+                  <button *ngIf="isAdmin && !isDefaultChannel(channel.title)" (click)="deleteChannel(i)" class="btn btn-outline-light btn-sm ms-2">
                     Delete
                   </button>
+                  <button *ngIf="channel.isPrivate && channel.allowedUsers?.includes(currentUser?.uid!) && !isAdmin"
+                  (click)="leaveChannel(channel.id!)"
+                  class="btn btn-outline-danger btn-sm ms-2">
+                  Leave
+                </button>
                 </div>
 
 
@@ -70,10 +97,25 @@
           </ul>
         </div>
 
-        <div *ngIf="isAdmin" class="card-footer">
-          <input class="form-control mb-2" [(ngModel)]="newChannelTitle" placeholder="New Channel Name">
-          <button (click)="addChannel()" class="btn btn-success w-100">Create Channel</button>
-        </div>
+        <!-- Input field for channel name (always visible) -->
+ <input class="form-control mb-2" [(ngModel)]="newChannelTitle" placeholder="Enter Channel Name">
+
+<!-- Admins can choose Public or Private -->
+<div *ngIf="isAdmin">
+  <select class="form-select mb-2" [(ngModel)]="newChannelPrivacy">
+    <option [value]="false">Public</option>
+    <option [value]="true">Private</option>
+  </select>
+  <button (click)="addChannel()" class="btn btn-success w-100">Create Channel</button>
+</div>
+
+<!-- Regular Users: Only "Create Private Channel" Button -->
+<div *ngIf="!isAdmin">
+  <p class="text-muted">You can only create private channels.</p>
+  <button (click)="addChannel()" class="btn btn-success btn-sm w-100">Create Private Channel</button>
+</div>
+
+
 
     
         <div class="card-header text-center">
