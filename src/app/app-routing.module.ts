@@ -5,6 +5,8 @@ import { UserAuthComponent } from './user-auth/user-auth.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { ChannelAreaComponent } from './channel-area/channel-area.component';
 
+
+
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: UserAuthComponent },
