@@ -16,17 +16,11 @@ import 'emoji-picker-element';
 export class ChannelAreaComponent implements OnInit {
   channelId: string | null = null;
   channelName: string = '';
-
-  messages: { id:string; sender: string; message: string; timestamp: string; replyId?: string | null; }[] = [];
-
+  messages: { id: string; sender: string; message: string; timestamp: string }[] = [];
   newMessage: string = '';
   channels: any;
   currentChannel: any;
   messageService: any;
-
-  replyingToMessage: { id: string; sender: string; message: string } | null = null;
-  currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
-
   channelUsers: { id: string; username: string; status: string; lastSeen?: Date }[] = [];
   users$: Observable<any[]> = new Observable();
   selectedUserToInvite: string | null = null;
@@ -151,14 +145,6 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
-
-  reply(message: { id: string; sender: string; message: string }): void {
-    this.replyingToMessage = message;
-  }
-
-
-  //alexia add
-
   getChannelName(channelId: string): void {
     const channelRef = doc(this.firestore, `channels/${channelId}`);
     docData(channelRef).subscribe((channelDoc: any) => {
@@ -191,55 +177,69 @@ export class ChannelAreaComponent implements OnInit {
         return;
       }
 
+      console.log("Firestore Channel Data:", channelDoc);
+      console.log(" Allowed Users from Firestore:", channelDoc?.allowedUsers);
+      console.log("Current User UID:", this.currentUser.uid);
 
-        // If user has access, fetch messages
-        const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
-        const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+      if (channelDoc?.isPrivate && !channelDoc.allowedUsers.includes(this.currentUser.uid)) {
+        alert("You don't have permission to access this conversation.");
+        this.router.navigate(['/channels']);
+        return;
+      }
 
-        collectionData(messagesQuery, { idField: 'id' }).subscribe((msgs: any) => {
-            this.messages = msgs.map((m: any) => ({
-                id: m.id, 
-                sender: m.sender,
-                message: m.message,
-                timestamp: m.timestamp?.toDate() ?? null,
-                replyId: m.replyId || null
-            }));
-        });
+      const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
+      const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
+      collectionData(messagesQuery, { idField: 'id' }).subscribe(async (msgs: any[]) => {
+        const updatedMessages = await Promise.all(msgs.map(async (m) => {
+          const userRef = doc(this.firestore, `users/${m.sender}`);
+          const userSnap = await getDoc(userRef);
+          const username = userSnap.exists() ? userSnap.data()['username'] : "Unknown User";
+     
+          return {
+            id: m.id,
+            sender: username,  
+            message: m.message,
+            timestamp: m.timestamp?.toDate() ?? null
+          };
+        }));
+     
+        this.messages = updatedMessages;
+      });
     });
-}
+  }
 
-getRepliedMessageContent(replyToMessageId: string): string {
-  const repliedMessage = this.messages.find(m => m.id === replyToMessageId);
-  return repliedMessage ? repliedMessage.message : 'Deleted message';
-}
+  loadAllUsers(): void {
+    const usersRef = collection(this.firestore, "users");
+    this.users$ = collectionData(usersRef, { idField: 'id' });
+  }
 
+  sendMessage(): void {
+    if (this.newMessage.trim() !== '' && this.channelId) {
+      const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
 
-sendMessage(): void {
-  if (this.newMessage.trim() !== '' && this.channelId) {
-    const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
-    
-    const message = {
-      sender: this.currentUser?.username ?? 'Me', 
-      message: this.newMessage,
-      timestamp: serverTimestamp(),
-      replyId: this.replyingToMessage ? this.replyingToMessage.id : null
-    };
+      const message = {
+        sender: this.currentUser?.uid || 'Unknown User',  
+        message: this.newMessage,
+        timestamp: serverTimestamp()
+      };
 
-    addDoc(messagesRef, message)
-      .then(async () => {
-        this.newMessage = '';
-        this.replyingToMessage = null;
-        if (this.currentUser?.uid) {
-          const userRef = doc(this.firestore, `users/${this.currentUser.uid}`);
-          await updateDoc(userRef, {
-            status: 'online',
-            lastSeen: new Date()
-          });
-        }
-      })
-      .catch(error => {
-        console.error("Error sending message: ", error);
-
+      addDoc(messagesRef, message)
+        .then(async () => {
+          this.newMessage = '';
+          if (this.currentUser?.uid) {
+            const userRef = doc(this.firestore, `users/${this.currentUser.uid}`);
+            await updateDoc(userRef, {
+              status: 'online',
+              lastSeen: new Date()
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error sending message: ", error);
+        });
+    }
+  }
 
   deleteMessage(messageId: string): void {
     if (!this.channelId || !this.currentUser.isAdmin)
