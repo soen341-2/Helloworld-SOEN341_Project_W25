@@ -16,7 +16,7 @@
 - **March 14, 1:00PM - 3:00PM**  
    
 ### Added option for users to leave any joined channel
-- **March 14, 3PM - 7PM 
+- **March 14, 3PM - 7PM**
 
 ### Designed UI elements to visually distinguish public vs private channels
 - **March 19, 4PM - 5PM** 
