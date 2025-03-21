@@ -8,18 +8,24 @@
 
 ### Implemented functionality for admins to create default public channels
 - e.g., #all-general, accessible to all registered users by default.
+- Worked alongside Prathiksha.
 - **March 14, 12:00PM - 1:00PM**  
   
-
 ### Developed feature allowing users to create private channels
 - Users can specify a name and invite specific members.
+- Worked alongside Prathiksha.
 - **March 14, 1:00PM - 3:00PM**  
    
 ### Added option for users to leave any joined channel
 - **March 14, 3PM - 7PM**
 
 ### Designed UI elements to visually distinguish public vs private channels
-- **March 19, 4PM - 5PM** 
+- Worked alongside Prathiksha.
+- **March 19, 12PM - 1PM**
+
+### Debugging
+-Worked alongside Sarah and Marco to debug issues with the code. 
+- **March 19, 3:00PM – 6:00PM**  
 
 ### Implemented functionality to accept or decline join requests
 - **March 20, 4:30PM - 9PM**  
