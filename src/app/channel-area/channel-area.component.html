@@ -41,9 +41,15 @@
         <span>{{ getUserStatusEmoji(msg.sender) }}</span> 
       :</strong>
       
+      <div *ngIf="msg.replyId" class="quoted-message">
+        <em>Replying to: {{ getRepliedMessageContent(msg.replyId) }}</em>
+    </div>
+
       <p>{{ msg.message }}</p>
       <!--<span class="timestamp">{{ msg.timestamp }}</span>-->
       <span class="timestamp">{{ msg.timestamp | date:'h:mm a' }}</span>
+
+      <button (click)="reply(msg)" class="btn btn-outline-dark btn-sm ms-0">Quote</button>
 
       <button *ngIf="currentUser.isAdmin" (click)="deleteMessage(msg.id)" class="delete-btn p-0 me-2">
         ❌
@@ -52,6 +58,14 @@
 
     </div>
   </div>
+
+  <div *ngIf="replyingToMessage" class="reply-context">
+    <p>Replying to: {{ replyingToMessage.message }}</p>
+    <button (click)="replyingToMessage = null" class="btn btn-sm btn-outline-secondary">
+        Cancel Reply
+    </button>
+</div>
+
   <div class="input-container">
     <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
     <button (click)="toggleEmojiPicker()" class="btn btn-secondary">😊</button>

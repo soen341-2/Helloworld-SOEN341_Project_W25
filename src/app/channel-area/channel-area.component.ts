@@ -19,11 +19,12 @@ import 'emoji-picker-element';
 export class ChannelAreaComponent implements OnInit {
   channelId: string | null = null;
   channelName: string = '';
-  messages: { id:string; sender: string; message: string; timestamp: string }[] = [];
+  messages: { id:string; sender: string; message: string; timestamp: string; replyId?: string | null; }[] = [];
   newMessage: string = '';
   channels: any;
   currentChannel: any;
   messageService: any;
+  replyingToMessage: { id: string; sender: string; message: string } | null = null;
   currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
   channelUsers: { id: string; username: string; status: string; lastSeen?: Date }[] = [];
 
@@ -138,6 +139,10 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+  reply(message: { id: string; sender: string; message: string }): void {
+    this.replyingToMessage = message;
+  }
+
   //alexia add
   getChannelName(channelId: string): void {
     const channelRef = doc(this.firestore, `channels/${channelId}`);
@@ -173,12 +178,18 @@ export class ChannelAreaComponent implements OnInit {
                 id: m.id, 
                 sender: m.sender,
                 message: m.message,
-                timestamp: m.timestamp?.toDate() ?? null
+                timestamp: m.timestamp?.toDate() ?? null,
+                replyId: m.replyId || null
             }));
         });
     });
 }
 
+
+getRepliedMessageContent(replyToMessageId: string): string {
+  const repliedMessage = this.messages.find(m => m.id === replyToMessageId);
+  return repliedMessage ? repliedMessage.message : 'Deleted message';
+}
 
 sendMessage(): void {
   if (this.newMessage.trim() !== '' && this.channelId) {
@@ -187,12 +198,14 @@ sendMessage(): void {
     const message = {
       sender: this.currentUser?.username ?? 'Me', 
       message: this.newMessage,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      replyId: this.replyingToMessage ? this.replyingToMessage.id : null
     };
 
     addDoc(messagesRef, message)
       .then(async () => {
         this.newMessage = '';
+        this.replyingToMessage = null;
         if (this.currentUser?.uid) {
           const userRef = doc(this.firestore, `users/${this.currentUser.uid}`);
           await updateDoc(userRef, {
