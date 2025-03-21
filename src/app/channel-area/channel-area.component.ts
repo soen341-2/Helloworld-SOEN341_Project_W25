@@ -19,12 +19,25 @@ import 'emoji-picker-element';
 export class ChannelAreaComponent implements OnInit {
   channelId: string | null = null;
   channelName: string = '';
+<<<<<<< HEAD
   messages: { id:string; sender: string; message: string; timestamp: string }[] = [];
+=======
+
+  messages: { id:string; sender: string; message: string; timestamp: string; replyId?: string | null; }[] = [];
+
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
   newMessage: string = '';
   channels: any;
   currentChannel: any;
   messageService: any;
+<<<<<<< HEAD
   currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
+=======
+
+  replyingToMessage: { id: string; sender: string; message: string } | null = null;
+  currentUser: { uid?: string; username?: string; isAdmin?:boolean } = {};
+
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
   channelUsers: { id: string; username: string; status: string; lastSeen?: Date }[] = [];
 
   showEmojiPicker: boolean = false;
@@ -138,7 +151,18 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+<<<<<<< HEAD
   //alexia add
+=======
+
+  reply(message: { id: string; sender: string; message: string }): void {
+    this.replyingToMessage = message;
+  }
+
+
+  //alexia add
+
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
   getChannelName(channelId: string): void {
     const channelRef = doc(this.firestore, `channels/${channelId}`);
     docData(channelRef).subscribe((channelDoc: any) => {
@@ -164,21 +188,42 @@ export class ChannelAreaComponent implements OnInit {
         }
     }
 
+<<<<<<< HEAD
         // If user has access, fetch messages
         const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
         const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
 
+=======
+
+        // If user has access, fetch messages
+        const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
+        const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
         collectionData(messagesQuery, { idField: 'id' }).subscribe((msgs: any) => {
             this.messages = msgs.map((m: any) => ({
                 id: m.id, 
                 sender: m.sender,
                 message: m.message,
+<<<<<<< HEAD
                 timestamp: m.timestamp?.toDate() ?? null
+=======
+                timestamp: m.timestamp?.toDate() ?? null,
+                replyId: m.replyId || null
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
             }));
         });
     });
 }
 
+<<<<<<< HEAD
+=======
+getRepliedMessageContent(replyToMessageId: string): string {
+  const repliedMessage = this.messages.find(m => m.id === replyToMessageId);
+  return repliedMessage ? repliedMessage.message : 'Deleted message';
+}
+
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
 
 sendMessage(): void {
   if (this.newMessage.trim() !== '' && this.channelId) {
@@ -187,12 +232,21 @@ sendMessage(): void {
     const message = {
       sender: this.currentUser?.username ?? 'Me', 
       message: this.newMessage,
+<<<<<<< HEAD
       timestamp: serverTimestamp()
+=======
+      timestamp: serverTimestamp(),
+      replyId: this.replyingToMessage ? this.replyingToMessage.id : null
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
     };
 
     addDoc(messagesRef, message)
       .then(async () => {
         this.newMessage = '';
+<<<<<<< HEAD
+=======
+        this.replyingToMessage = null;
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
         if (this.currentUser?.uid) {
           const userRef = doc(this.firestore, `users/${this.currentUser.uid}`);
           await updateDoc(userRef, {
@@ -203,6 +257,7 @@ sendMessage(): void {
       })
       .catch(error => {
         console.error("Error sending message: ", error);
+<<<<<<< HEAD
       });
   }
 }
@@ -235,5 +290,8 @@ sendMessage(): void {
               console.error("Error logging out:", error);
             });
           }
+=======
+
+>>>>>>> 4cd51d44b6fda5c44e5d6b93197d98414d6cc181
 
         }
