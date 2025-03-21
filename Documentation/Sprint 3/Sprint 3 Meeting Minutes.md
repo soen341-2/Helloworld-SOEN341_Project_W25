@@ -37,7 +37,10 @@
 </table>
 
 ### Discussion
-1. Kickoff Sprint 3.
+
+1. Reviewed Sprint 2 progress and finalized remaining tasks.
+2. Defined key objectives for Sprint 3, including testing, documentation updates, and feature enhancements.
+3. Assigned initial user stories and responsibilities to team members.
 
 ## Meeting 3.2
 
@@ -76,8 +79,10 @@
 </table>
 
 ### Discussion
-1. Quick update on progress.
-2. Tested user stories 14 and 15.
+1. Provided a quick update on the progress made since the last meeting.
+2. Conducted detailed testing for user stories 14 and 15.
+3. Identified and resolved minor bugs related to user authentication and session management.
+4. Updated project documentation to reflect recent changes.
 
 ## Meeting 3.3
 
@@ -116,7 +121,11 @@
 </table>
 
 ### Discussion
-1. Tested user stories 12 and 13.
+1. Focused on testing user stories 12 and 13.
+2. Debugged issues related to user permissions and role-based access.
+3. Discussed improvements to UI elements based on initial test feedback.
+4. Logged issues for further review in the next meeting.
+
 
 ## Meeting 3.4
 
@@ -155,5 +164,9 @@
 </table>
 
 ### Discussion
-1. Tested all components.
+1. Conducted full integration testing for all components.
+2. Verified that all Sprint 3 features were functioning as expected.
+3. Identified final adjustments needed before sprint closure.
+4. Prepared a report summarizing the testing results and fixes implemented.
+
 
