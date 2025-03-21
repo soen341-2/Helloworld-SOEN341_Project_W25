@@ -137,8 +137,8 @@ export class ChannelAreaComponent implements OnInit {
         this.currentUser = {
           uid: userId,
           username: userDoc.username || 'Unknown User',
-          isAdmin: userDoc.isAdmin || false
-        };
+          isAdmin: userDoc.isAdmin || false 
+      };
       } else {
         this.currentUser = { uid: userId, username: 'Unknown User', isAdmin: false };
       }

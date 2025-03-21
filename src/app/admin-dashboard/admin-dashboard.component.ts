@@ -1,8 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, doc, updateDoc, getDocs, getDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, updateDoc, getDocs, getDoc, getFirestore } from '@angular/fire/firestore';
 import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { onSnapshot } from '@angular/fire/firestore';
+import { initializeApp } from '@angular/fire/app';
+import { environment } from '../../environments/environment.development';
+import { Channel } from '../models/channel';
+
+const app = initializeApp(environment.firebaseConfig);
+const db=getFirestore(app);
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: false,
@@ -81,6 +88,7 @@ export class AdminDashboardComponent implements OnInit {
         username: userData['username'] || 'Unknown',
         isAdmin: userData['isAdmin'] || false,
         isSuperAdmin: userData['isSuperAdmin'] || false,
+        assignedChannels: userData['assignedChannels'] || [],
         status: userData['status'] || 'offline',  
         lastSeen: userData['lastSeen'] ? new Date(userData['lastSeen'].seconds * 1000) : null
       };
@@ -110,11 +118,20 @@ export class AdminDashboardComponent implements OnInit {
   
 
   async loadChannels() {
-    console.log("Fetching channels...");
-    const channelsRef = collection(this.firestore, 'channels');
-    const channelsSnapshot = await getDocs(channelsRef);
-    this.channels = channelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    console.log("Channels loaded:", this.channels);
+    const channelRef = collection(db, "channels");
+    
+        onSnapshot(channelRef, (snapshot) => {
+            this.channels = snapshot.docs.map(doc => {
+                const channelData = doc.data() as Channel;
+                return {
+                    ...channelData,  
+                    id: channelData.id ?? doc.id  
+                };
+            }).filter((channel: Channel) => !channel.isPrivate);
+            
+        }, (error) => {
+            console.error('Error fetching channels:', error);
+        });
   }
 
   async getCurrentUser() {
@@ -164,7 +181,6 @@ export class AdminDashboardComponent implements OnInit {
           updatedChannels.push(channelId);
           await updateDoc(userRef, { assignedChannels: updatedChannels });
           console.log("User assigned to channel!");
-          await this.loadUsers();
         } else {
           alert("User is already assigned to this channel!");
         }
@@ -172,6 +188,9 @@ export class AdminDashboardComponent implements OnInit {
     } catch (error) {
       console.error("Error assigning user to channel:", error);
     }
+
+
+    
   }
 
   async toggleUserChannel(userId: string, channelId: string) {

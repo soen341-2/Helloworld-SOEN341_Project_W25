@@ -437,7 +437,6 @@ export class ChannelSelectorComponent implements OnInit {
           }
           return true; // Show public channels to everyone
         });
-  
     }, (error) => {
       console.error("Error fetching channels:", error);
     });
