@@ -38,14 +38,7 @@
 
 ## Alexia Mucciacciaro (40250572)
 
-## Worked on user story 15 (implementing Emoji Support)
-- Researched how to implement emojis. 
-- Installed Emoji package and imported it into project. (March 16th from 1:30-2pm)
-- Added a button to both channel area text and direct message text. Button is in the shape of an emoji. When clicked, users are able to select an emoji of their choice and send emojis in direct/channel messages. (March 16th from 2-3pm)
-- Implemented a function to display the emoji picker on screen allowing users to select the emoji of their choice and send it in their message. (March 16th from 3-4pm)
-- Implemented functions for both channel text area and direct message area. (March 16th from 4-5pm)
-- Reviewed code, testing (March 16th from 5-5:30pm)
-- Created a new branch, pushed code, added code to github. (March 16th from 5:30-6pm)
+ 
 
 ---
 

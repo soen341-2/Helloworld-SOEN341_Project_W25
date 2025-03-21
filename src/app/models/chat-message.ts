@@ -4,5 +4,4 @@ export interface ChatMessage {
     receiverId: string;
     message: string;
     timestamp: number;
-    replyId?: string;
   }
