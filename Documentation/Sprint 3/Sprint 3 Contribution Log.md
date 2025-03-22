@@ -2,17 +2,17 @@
 
 ## Marco Greco (40285114)
 
-###Fixed issue where new user has access to all channels
+### Fixed issue where new user has access to all channels
 - New users must be added to channels (that aren’t default channels)
 - Admins can add users or users can request to join channels
 - 2025/03/20
 - 16:00 - 18:30
-###Added Quoting feature
+### Added Quoting feature
 - Users can press “Quote” button to reply to chats
 - Replies quote chat so users can write and send their reply
 - 2025/03/21
 - 9:00 - 11:00
-###Fixed merge conflict
+### Fixed merge conflict
 - Merge conflict in channel-selector component and channel-area component.
 - Manually merged code.
 - 2025/03/21
