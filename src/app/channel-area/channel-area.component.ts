@@ -217,7 +217,8 @@ export class ChannelAreaComponent implements OnInit {
             id: m.id,
             sender: username,  
             message: m.message,
-            timestamp: m.timestamp?.toDate() ?? null
+            timestamp: m.timestamp?.toDate() ?? null,
+            replyId: m.replyId || null 
           };
         }));
      
@@ -235,8 +236,8 @@ export class ChannelAreaComponent implements OnInit {
   
 
 
-getRepliedMessageContent(replyToMessageId: string): string {
-  const repliedMessage = this.messages.find(m => m.id === replyToMessageId);
+getRepliedMessageContent(replyId: string): string {
+  const repliedMessage = this.messages.find(m => m.id === replyId);
   return repliedMessage ? repliedMessage.message : 'Deleted message';
 }
 
@@ -245,7 +246,7 @@ sendMessage(): void {
     const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
     
     const message = {
-      sender: this.currentUser?.username ?? 'Me', 
+      sender: this.currentUser?.uid ?? '', 
       message: this.newMessage,
       timestamp: serverTimestamp(),
       replyId: this.replyingToMessage ? this.replyingToMessage.id : null
