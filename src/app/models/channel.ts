@@ -3,4 +3,5 @@ export interface Channel {
     id: string;
     isPrivate?: boolean;
     allowedUsers?: string[];
+    isDM?: boolean;
 }
