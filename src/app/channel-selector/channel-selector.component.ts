@@ -209,6 +209,7 @@ export class ChannelSelectorComponent implements OnInit {
       await setDoc(chatRef, {
         title: `Private chat: ${this.currentUser!.uid} & ${userId}`,
         isPrivate: true,
+        isDM: true,
         allowedUsers: [this.currentUser!.uid, userId]
       });
     }
@@ -438,10 +439,16 @@ export class ChannelSelectorComponent implements OnInit {
         };
       })
       .filter((channel: Channel) => {
-        if (channel.isPrivate) {
-          return Array.isArray(channel.allowedUsers) && channel.allowedUsers.includes(this.currentUser?.uid ?? "");
+        if (channel.isDM) {
+          return false;
         }
-        return true; // Show public channels to everyone
+
+        if (channel.isPrivate) {
+          return Array.isArray(channel.allowedUsers) && 
+                 channel.allowedUsers.includes(this.currentUser?.uid ?? "");
+        }
+
+        return true;
       });
         
     }, (error) => {
