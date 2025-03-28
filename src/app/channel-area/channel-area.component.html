@@ -14,28 +14,29 @@
 <div class="container">
   
   <h2>Channel Chat: {{ channelName }}</h2>
-  <div class="channel-users">
-    <ul class="list-group">
-      <li *ngFor="let user of channelUsers" class="list-group-item d-flex justify-content-between align-items-center">
-        <span>
-          <strong>{{ user.username }}</strong> 
-          <small *ngIf="user.lastSeen">- Last seen: {{ user.lastSeen | date:'short' }}</small>
-        </span>
-        <span [ngClass]="{
-          'text-success': user.status === 'online',
-          'text-warning': user.status === 'away',
-          'text-danger': user.status === 'offline'
-        }">
-          ● {{ user.status }}
-          <span *ngIf="user.status === 'away' || user.status === 'offline'">
-            ({{ user.lastSeen ? (user.lastSeen | date:'short') : 'unknown' }})
-          </span>
-        </span>
-      </li>
-    </ul>
-  </div>
     <!--Invite User Section -->
     <div *ngIf="creatorId==currentUser.uid && isPrivate==true" class="invite-user-section">
+
+      <div class="channel-users">
+        <ul class="list-group">
+          <li *ngFor="let user of channelUsers" class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              <strong>{{ user.username }}</strong> 
+              <small *ngIf="user.lastSeen">- Last seen: {{ user.lastSeen | date:'short' }}</small>
+            </span>
+            <span [ngClass]="{
+              'text-success': user.status === 'online',
+              'text-warning': user.status === 'away',
+              'text-danger': user.status === 'offline'
+            }">
+              ● {{ user.status }}
+              <span *ngIf="user.status === 'away' || user.status === 'offline'">
+                ({{ user.lastSeen ? (user.lastSeen | date:'short') : 'unknown' }})
+              </span>
+            </span>
+          </li>
+        </ul>
+      </div>
       <h5>Invite a User to this Channel</h5>
   
   
@@ -52,6 +53,8 @@
         Invite User
       </button>
         <!--Invite button-->
+
+        
     </div>
     
   <div class="messages">
