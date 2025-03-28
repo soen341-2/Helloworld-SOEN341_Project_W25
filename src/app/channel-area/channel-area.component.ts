@@ -202,8 +202,8 @@ export class ChannelAreaComponent implements OnInit {
       console.log(" Allowed Users from Firestore:", channelDoc?.allowedUsers);
       console.log("Current User UID:", this.currentUser.uid);
 
-      if (channelDoc?.isPrivate && !channelDoc.allowedUsers.includes(this.currentUser.uid)) {
-        alert("You don't have permission to access this conversation.");
+      if (channelDoc?.isPrivate && !this.currentUser.isAdmin && !channelDoc.allowedUsers.includes(this.currentUser.uid)) {
+        alert("You don't have permission to access  conversation.");
         this.router.navigate(['/channels']);
         return;
       }

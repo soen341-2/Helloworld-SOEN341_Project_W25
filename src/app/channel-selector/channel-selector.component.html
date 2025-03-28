@@ -76,7 +76,7 @@
 
 
                 <div class="mt-2">
-                  <strong>Users:</strong>
+                  
                   <ul class="list-unstyled">
                     <li *ngFor="let user of channelUsersMap.get(channel.id)" class="small">
                       <span [ngClass]="{
@@ -103,8 +103,8 @@
 <!-- Admins can choose Public or Private -->
 <div *ngIf="isAdmin">
   <select class="form-select mb-2" [(ngModel)]="newChannelPrivacy">
-    <option [value]="false">Public</option>
-    <option [value]="true">Private</option>
+    <option [ngValue]="false">Public</option>
+    <option [ngValue]="true">Private</option>
   </select>
   <button (click)="addChannel()" class="btn btn-success w-100">Create Channel</button>
 </div>
