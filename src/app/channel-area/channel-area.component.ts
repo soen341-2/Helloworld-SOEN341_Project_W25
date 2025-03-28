@@ -48,7 +48,7 @@ export class ChannelAreaComponent implements OnInit {
 
     this.auth.onAuthStateChanged((user) => {
       if (user) {
-        
+        this.fetchUserData(user.uid);
         this.currentUser = {
           uid: user.uid ?? '',
           username: user.displayName ?? 'Unknown User',
