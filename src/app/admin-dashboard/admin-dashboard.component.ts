@@ -127,7 +127,7 @@ export class AdminDashboardComponent implements OnInit {
                     ...channelData,  
                     id: channelData.id ?? doc.id  
                 };
-            }).filter((channel: Channel) => !channel.isPrivate);
+            }).filter((channel: Channel) => (channel.isPrivate && !channel.isDM));
             
         }, (error) => {
             console.error('Error fetching channels:', error);
