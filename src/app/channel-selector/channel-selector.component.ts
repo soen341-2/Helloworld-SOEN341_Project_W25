@@ -758,6 +758,8 @@ async selectChannel(channelIndex: number): Promise<void> {
  
    }
  
+   this.showChannels();
+
  }
  
  listenToUserStatus() {
