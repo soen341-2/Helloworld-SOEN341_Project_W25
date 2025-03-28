@@ -64,7 +64,7 @@
                       {{ channel.isPrivate ? 'Private' : 'Public' }}
                     </span>
                   </button>
-                  <button *ngIf="isAdmin && !isDefaultChannel(channel.title)" (click)="deleteChannel(i)" class="btn btn-outline-light btn-sm ms-2">
+                  <button *ngIf="isAdmin" (click)="deleteChannel(i)" class="btn btn-outline-light btn-sm ms-2">
                     Delete
                   </button>
                   <button *ngIf="channel.isPrivate && channel.allowedUsers?.includes(currentUser?.uid!) && !isAdmin"

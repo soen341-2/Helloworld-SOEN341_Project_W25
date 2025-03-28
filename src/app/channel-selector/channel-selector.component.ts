@@ -70,7 +70,7 @@ export class ChannelSelectorComponent implements OnInit {
   searchControl=new FormControl;
   constructor(private router: Router, private cdRef: ChangeDetectorRef) {}
  
-  async createDefaultChannelsIfMissing() {
+  /*async createDefaultChannelsIfMissing() {
     const defaultChannelTitles = ['#all-general', '#announcements'];
     const channelsRef = collection(db, "channels");
     const snapshot = await getDocs(channelsRef);
@@ -99,7 +99,7 @@ export class ChannelSelectorComponent implements OnInit {
   isDefaultChannel(channelTitle: string): boolean {
     const defaultChannels = ['#all-general', '#announcements'];
     return defaultChannels.includes(channelTitle);
-  }  
+  }  */
 
   async ngOnInit() {
     const auth = getAuth();
@@ -125,9 +125,9 @@ export class ChannelSelectorComponent implements OnInit {
             this.loadPendingInvites();
           }
    
-          if (this.isAdmin) {
+         /* if (this.isAdmin) {
             await this.createDefaultChannelsIfMissing();
-          }
+          }*/
         }
         this.showChannels();
       }
