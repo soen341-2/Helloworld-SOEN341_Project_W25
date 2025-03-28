@@ -436,20 +436,13 @@ export class ChannelSelectorComponent implements OnInit {
         const channelData = doc.data() as Channel;
         return {
           ...channelData,
-          id: channelData.id ?? doc.id
+          id: channelData.id ?? doc.id,
+          isAccessible: !channelData.isPrivate || this.isAdmin ||
+                        (Array.isArray(channelData.allowedUsers) && channelData.allowedUsers.includes(this.currentUser?.uid ?? ""))
         };
       })
-      .filter((channel: Channel) => {
-        if (channel.isDM) {
-          return false;
-        }
-
-        if (channel.isPrivate) {
-          return Array.isArray(channel.allowedUsers) && 
-                 channel.allowedUsers.includes(this.currentUser?.uid ?? "");
-        }
-
-        return true;
+      .filter((channel: Channel & {isAccessible: boolean}) => {
+        return !channel.isDM;
       });
         
     }, (error) => {
@@ -502,7 +495,7 @@ async selectChannel(channelIndex: number): Promise<void> {
      const channelData = channelSnap.data() as Channel;
  
      // If channel is private, check if the current user is allowed
-     if (channelData.isPrivate && (!channelData.allowedUsers || !channelData.allowedUsers.includes(this.currentUser!.uid))) {
+     if (channelData.isPrivate && !this.isAdmin && (!channelData.allowedUsers || !channelData.allowedUsers.includes(this.currentUser!.uid))) {
        alert("You don't have permission to access this private channel.");
        return;
      }
