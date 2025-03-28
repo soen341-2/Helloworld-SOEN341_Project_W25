@@ -1,4 +1,6 @@
-ul { list-style-type: none; padding: 0; }
+ul { list-style-type: none; 
+  padding: 0; }
+
 .container {
     display: flex;
     flex-direction: row;
@@ -12,21 +14,24 @@ ul { list-style-type: none; padding: 0; }
 .chat-list {
     width: 30%; 
     min-height: 80vh; 
-    background: rgb(162, 195, 226) !important; 
+    background: rgb(0, 0, 0, 0.6) !important; 
+    backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 16px;
+    color: white;
 }
 
 .messages {
     width: 65%;
     min-height: 80vh;
-    background: rgba(142, 142, 143, 0.493);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
     border-radius: 10px;
     padding: 16px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     position: relative;
 }
+
 .mat-autocomplete-panel {
     background-color: white !important;
     color: black !important;
@@ -43,7 +48,6 @@ ul { list-style-type: none; padding: 0; }
     padding: 10px;
     border-radius: 15px;
     margin-bottom: 15px;
-    margin-bottom: 15px;
     background: #0e0438;
     color: white;
   }
@@ -53,52 +57,55 @@ ul { list-style-type: none; padding: 0; }
   .sent .message-bubble {
     background: #47475c;
     color: rgb(248, 253, 248);
-    justify-content: flex-start;
     align-self: flex-end;
     border-radius: 15px 15px 0 15px;
   }
   
   .received .message-bubble {
-    background: #865c5c;
-    justify-content: flex-start;
+    background: #bdbbbb;
     color: black;
   }
+
   .timestamp {
     display: block;
     font-size: 0.8em;
     text-align: right;
     margin-top: 5px;
   }
+
   .input-container {
     display: flex;
     padding: 10px;
-    background: rgb(99, 52, 52);
+    background: rgb(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.2)
   }
   
   .input-container input {
     flex: 1;
     margin-right: 10px;
   }
+
   .active-conversations {
     margin-top: 15px;
   }
+
   .active-conversations ul {
     list-style: none;
     padding: 0;
   }
+
   .active-conversations li {
     padding: 10px;
     border-bottom: 1px solid #490505;
     cursor: pointer;
   }
+
   .active-conversations li:hover {
     background: #29af30;
   }
 
-
-
   .emoji-toggle-button {
-    background-color: #007bff; 
+    background-color: hsla(200, 100%, 69%, 0.877); 
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -108,10 +115,10 @@ ul { list-style-type: none; padding: 0; }
     margin-right: 8px;
     margin-top: 8px;
     transition: background-color 0.2s ease;
-    justify-content: flex-end;
   }
+
   .emoji-toggle-button:hover {
-    background-color: #0056b3;
+    background-color: #2671d3;
   }
   
   .emoji-picker-container {
@@ -132,5 +139,40 @@ ul { list-style-type: none; padding: 0; }
     margin-top: 3px; /* Reduce gap from input */
   }
   
-  
+  /*
+  .channel-list {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+}*/
+
+button {
+  background-color: hsla(200, 100%, 69%, 0.877);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin: 4px 0;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #2671d3;
+}
+
+.leave-button {
+  background-color: #ff4d4d;
+  padding: 4px 10px;
+  margin-left: 10px;
+}
+
+.brand-title {
+  font-family: 'Juan Montoreano', bold;
+  font-size: 32px;
+  color: #0c1888; /* Or whatever color you like */
+}
+
+
   
