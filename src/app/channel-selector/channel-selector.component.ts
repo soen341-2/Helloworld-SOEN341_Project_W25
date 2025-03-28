@@ -83,7 +83,8 @@ export class ChannelSelectorComponent implements OnInit {
           title,
           id: uuidv4(),
           isPrivate: false,
-          allowedUsers: [] // public means all users can see it
+          allowedUsers: [], // public means all users can see it
+          creatorId: ""
         };
   
         const channelRef = doc(db, "channels", newChannel.id);
@@ -407,7 +408,7 @@ export class ChannelSelectorComponent implements OnInit {
         isPrivate: isPrivate, //Users can ONLY create private channels
         allowedUsers: [this.currentUser!.uid], // Ensure creator is added
         creatorId: this.currentUser!.uid
-      }as any;
+      };
       
       console.log("Creating Channel:", newChannel); 
     

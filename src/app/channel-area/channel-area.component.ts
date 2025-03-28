@@ -18,6 +18,8 @@ import 'emoji-picker-element';
 export class ChannelAreaComponent implements OnInit {
   channelId: string | null = null;
   channelName: string = '';
+  isPrivate: boolean = false;
+  creatorId: string = '';
   messages: { id:string; sender: string; message: string; timestamp: string; replyId?: string | null; }[] = [];
   newMessage: string = '';
   channels: any;
@@ -181,6 +183,8 @@ export class ChannelAreaComponent implements OnInit {
       if (channelDoc) {
         this.channelName = channelDoc.title;
         this.allowedUsers = channelDoc.allowedUsers || [];
+        this.creatorId = channelDoc.creatorId;
+        this.isPrivate = channelDoc.isPrivate;
       }
     });
   }

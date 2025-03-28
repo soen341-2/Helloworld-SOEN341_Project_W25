@@ -35,7 +35,7 @@
     </ul>
   </div>
     <!--Invite User Section -->
-    <div class="invite-user-section">
+    <div *ngIf="creatorId==currentUser.uid && isPrivate==true" class="invite-user-section">
       <h5>Invite a User to this Channel</h5>
   
   
@@ -44,13 +44,16 @@
         <option *ngFor="let user of users$ | async" [value]="user.id">
           {{ user.username }}
         </option>
+        
   
       </select>
+
+      <button (click)="inviteUser()" class="btn btn-outline-primary me-2">
+        Invite User
+      </button>
         <!--Invite button-->
     </div>
-    <button (click)="inviteUser()" class="btn btn-outline-primary me-2">
-      Invite User
-    </button>
+    
   <div class="messages">
     <div *ngFor="let msg of messages" class="message-bubble">
       <strong>
