@@ -15,8 +15,7 @@
   
   <h2>Channel Chat: {{ channelName }}</h2>
     <!--Invite User Section -->
-    <div *ngIf="creatorId==currentUser.uid && isPrivate==true" class="invite-user-section">
-
+    <div *ngIf="isPrivate==true" class="invite-user-section">
       <div class="channel-users">
         <ul class="list-group">
           <li *ngFor="let user of channelUsers" class="list-group-item d-flex justify-content-between align-items-center">
@@ -38,6 +37,10 @@
         </ul>
       </div>
       <br>
+    </div>
+    <div *ngIf="creatorId==currentUser.uid" class="invite-user-section">
+
+      
       <h5>Invite a User to this Channel</h5>
   
   
