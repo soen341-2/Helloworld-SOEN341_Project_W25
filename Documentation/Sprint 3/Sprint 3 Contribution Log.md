@@ -66,7 +66,24 @@
 
 ## Prathiksha Kandiah (40190782)
 
+### Implemented functionality for admins to create default public channels
+- e.g., #all-general, accessible to all registered users by default.
+- Worked alongside Liyan.
+- March 14, 12:00PM - 1:00PM
 
+### Developed feature allowing users to create private channels
+- Users can specify a name and invite specific members.
+- Worked alongside Liyan.
+- March 14, 1:00PM - 3:00PM
+
+### Designed UI elements to visually distinguish public vs private channels
+- Worked alongside Liyan.
+- March 19, 12PM - 1PM
+- created new files to make separate functions
+- March 20, 11PM - 1AM next day
+
+### Debugging
+- March 21, 10:00PM – 12:00PM
 
 ---
 
