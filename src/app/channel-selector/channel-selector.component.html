@@ -136,7 +136,17 @@
     </div>
 
     <div class="col-md-9">
-      <div class="messages mat-elevation-z5">
+      <div class="form-group mt-3">
+        <label for="dmBgColor">Chat Background Color:</label>
+        <input 
+          type="color"
+          id="dmBgColor"
+          [value]="chatBackgroundColor"
+          (change)="onColorChange($event)"
+          class="form-control form-control-color mt-2"
+      />
+      <div class="messages mat-elevation-z5"
+      [ngStyle]="{ 'background-color': chatBackgroundColor }">
         <h4>Chat with {{ selectedUsername }}</h4>
         <h5 *ngIf="selectedUsername">
           Status: 

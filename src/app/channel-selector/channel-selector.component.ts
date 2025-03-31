@@ -54,6 +54,8 @@ export class ChannelSelectorComponent implements OnInit {
   selectedUserLastSeen: Date | null = null;
   channelUsersMap: Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]> = new Map();
 
+  // Default background color (can be any valid hex color)
+  chatBackgroundColors: { [username: string]: string } = {};
 
   newChannelPrivacy: boolean = false;
   pendingInvites: {
@@ -103,6 +105,10 @@ export class ChannelSelectorComponent implements OnInit {
 
   async ngOnInit() {
     const auth = getAuth();
+    const savedColors = localStorage.getItem('dmBgColors');
+    if (savedColors) {
+      this.chatBackgroundColors = JSON.parse(savedColors);
+    }
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
@@ -241,7 +247,28 @@ export class ChannelSelectorComponent implements OnInit {
     this.replyingToMessage = message;
   }
     
+  //ADDED RN
+  onColorChange(event: Event): void {
+    const newColor = (event.target as HTMLInputElement).value;
+  
+    if (this.selectedUsername) {
+      this.chatBackgroundColors[this.selectedUsername] = newColor;
+      localStorage.setItem('dmBgColors', JSON.stringify(this.chatBackgroundColors));
+    }
+  }
+  
+  
+  
+  get chatBackgroundColor(): string {
+    return this.selectedUsername && this.chatBackgroundColors[this.selectedUsername]
+      ? this.chatBackgroundColors[this.selectedUsername]
+      : '#ffffff'; // default
+  }
 
+  saveBackgroundColors(): void {
+    localStorage.setItem('dmBgColors', JSON.stringify(this.chatBackgroundColors));
+  }
+  
 
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
