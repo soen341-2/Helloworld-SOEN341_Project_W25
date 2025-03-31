@@ -1,0 +1,46 @@
+<div class="channel-management">
+    <h2>Channel Management</h2>
+   
+    <h3>Create Public Channel</h3>
+    <input type="text" [(ngModel)]="newPublicChannelTitle" placeholder="Enter channel name">
+    <button (click)="createPublicChannel(newPublicChannelTitle)">Create Public Channel</button>
+   
+    <h3>Create Private Channel</h3>
+    <input type="text" [(ngModel)]="newPrivateChannelTitle" placeholder="Enter private channel name">
+    <input type="text" [(ngModel)]="invitedUsers" placeholder="Enter user IDs (comma-separated)">
+    <button (click)="createPrivateChannel(newPrivateChannelTitle, invitedUsers.split(','))">Create Private Channel</button>
+   
+    <h3>Pending Join Requests</h3>
+    <ul *ngIf="joinRequests.length > 0; else noRequests">
+      <li *ngFor="let request of joinRequests">
+        <span>{{ request.username }} wants to join {{ request.channelName }}</span>
+        <button (click)="acceptJoinRequest(request.id, request.userId, request.channelId)">✅ Accept</button>
+        <button (click)="declineJoinRequest(request.id)">❌ Decline</button>
+      </li>
+    </ul>
+    <ng-template #noRequests>
+      <p>No pending requests.</p>
+    </ng-template>
+   
+    <h3>Available Channels</h3>
+    <ul>
+      <li *ngFor="let channel of channels">
+        <span [ngClass]="{'public-channel': !channel.isPrivate, 'private-channel': channel.isPrivate}">{{ channel.title }}</span>
+        <button *ngIf="channel.isPrivate && !channel.allowedUsers?.includes(currentUser?.id)" (click)="requestToJoin(channel.id)">
+          🔒 Request to Join
+        </button>
+        <button *ngIf="!channel.isPrivate || channel.allowedUsers?.includes(currentUser?.id)" (click)="enterChannel(channel.id)">
+          🔓 Enter
+        </button>
+        <button *ngIf="channel.allowedUsers?.includes(currentUser?.id)" (click)="leaveChannel(channel.id)">🚪 Leave</button>
+      </li>
+    </ul>
+    <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Search for users">
+    <h3>All Users (Debugging)</h3>
+    <ul>
+      <li *ngFor="let user of users">
+        {{ user.username }} ({{ user.id }})
+      </li>
+    </ul>
+    
+  </div>

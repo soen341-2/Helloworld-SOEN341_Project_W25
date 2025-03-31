@@ -11,19 +11,72 @@
   </div>
 </nav>
 
-
-
-
-
 <div class="container">
   
   <h2>Channel Chat: {{ channelName }}</h2>
+    <!--Invite User Section -->
+    <div *ngIf="isPrivate==true" class="invite-user-section">
+      <div class="channel-users">
+        <ul class="list-group">
+          <li *ngFor="let user of channelUsers" class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              <strong>{{ user.username }}</strong> 
+              <small *ngIf="user.lastSeen">- Last seen: {{ user.lastSeen | date:'short' }}</small>
+            </span>
+            <span [ngClass]="{
+              'text-success': user.status === 'online',
+              'text-warning': user.status === 'away',
+              'text-danger': user.status === 'offline'
+            }">
+              ● {{ user.status }}
+              <span *ngIf="user.status === 'away' || user.status === 'offline'">
+                ({{ user.lastSeen ? (user.lastSeen | date:'short') : 'unknown' }})
+              </span>
+            </span>
+          </li>
+        </ul>
+      </div>
+      <br>
+    </div>
+    <div *ngIf="creatorId==currentUser.uid && isPrivate==true" class="invite-user-section">
+
+      
+      <h5>Invite a User to this Channel</h5>
+  
+  
+      <!-- Dropdown for selecting users -->
+      <select class="form-select mb-2" [(ngModel)]="selectedUserToInvite">
+        <option *ngFor="let user of users$ | async" [value]="user.id">
+          {{ user.username }}
+        </option>
+        
+  
+      </select>
+
+      <button (click)="inviteUser()" class="btn btn-outline-primary me-2">
+        Invite User
+      </button>
+        <!--Invite button-->
+
+        
+    </div>
+    
   <div class="messages">
     <div *ngFor="let msg of messages" class="message-bubble">
-      <strong>{{ msg.sender }}:</strong>
+      <strong>
+        {{ msg.sender }} 
+        <span>{{ getUserStatusEmoji(msg.sender) }}</span> 
+      :</strong>
+      
+      <div *ngIf="msg.replyId" class="quoted-message">
+        <em>Replying to: {{ getRepliedMessageContent(msg.replyId) }}</em>
+    </div>
+
       <p>{{ msg.message }}</p>
       <!--<span class="timestamp">{{ msg.timestamp }}</span>-->
       <span class="timestamp">{{ msg.timestamp | date:'h:mm a' }}</span>
+
+      <button (click)="reply(msg)" class="btn btn-outline-dark btn-sm ms-0">Quote</button>
 
       <button *ngIf="currentUser.isAdmin" (click)="deleteMessage(msg.id)" class="delete-btn p-0 me-2">
         ❌
@@ -32,8 +85,21 @@
 
     </div>
   </div>
+
+  <div *ngIf="replyingToMessage" class="reply-context">
+    <p>Replying to: {{ replyingToMessage.message }}</p>
+    <button (click)="replyingToMessage = null" class="btn btn-sm btn-outline-secondary">
+        Cancel Reply
+    </button>
+</div>
+
   <div class="input-container">
     <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
+    <button (click)="toggleEmojiPicker()" class="btn btn-secondary">😊</button>
     <button (click)="sendMessage()" class="btn btn-primary">Send</button>
+  </div>
+
+  <div *ngIf="showEmojiPicker" class="emoji-picker-container">
+    <emoji-picker (emoji-click)="addEmoji($event)"></emoji-picker>
   </div>
 </div>
