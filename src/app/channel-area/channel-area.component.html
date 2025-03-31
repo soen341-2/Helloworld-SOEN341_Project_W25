@@ -60,8 +60,21 @@
 
         
     </div>
+  
     
-  <div class="messages">
+
+  <div class="form-group mt-3">
+    <label for="channelBgColor">Channel Background Color:</label>
+    <input 
+      type="color"
+      id="channelBgColor"
+      [value]="channelBackgroundColor"
+      (change)="onChannelColorChange($event)"
+      class="form-control form-control-color mt-2"
+    />
+  </div>    
+  <div class="messages"
+  [ngStyle]="{ 'background-color': channelBackgroundColor }">
     <div *ngFor="let msg of messages" class="message-bubble">
       <strong>
         {{ msg.sender }} 
