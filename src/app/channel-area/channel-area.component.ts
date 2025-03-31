@@ -36,6 +36,8 @@ export class ChannelAreaComponent implements OnInit {
     isAdmin: false
   };
 
+  channelBackgroundColors: { [channelName: string]: string } = {};
+
   showEmojiPicker: boolean = false;
   pendingInvites: string[] = [];
 
@@ -47,6 +49,11 @@ export class ChannelAreaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
+    const savedColors = localStorage.getItem('channelBgColors');
+    if (savedColors) {
+      this.channelBackgroundColors = JSON.parse(savedColors);
+    }
 
     this.auth.onAuthStateChanged((user) => {
       if (user) {
@@ -133,6 +140,20 @@ export class ChannelAreaComponent implements OnInit {
   
   
   //alexia add
+
+  get channelBackgroundColor(): string {
+    return this.channelName && this.channelBackgroundColors[this.channelName]
+      ? this.channelBackgroundColors[this.channelName]
+      : '#ffffff';
+  }
+  
+  onChannelColorChange(event: Event): void {
+    const color = (event.target as HTMLInputElement).value;
+    if (this.channelName) {
+      this.channelBackgroundColors[this.channelName] = color;
+      localStorage.setItem('channelBgColors', JSON.stringify(this.channelBackgroundColors));
+    }
+  }
 
   toggleEmojiPicker(): void {
     this.showEmojiPicker = !this.showEmojiPicker;
