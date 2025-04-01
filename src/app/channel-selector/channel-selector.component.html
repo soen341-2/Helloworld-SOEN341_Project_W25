@@ -20,6 +20,10 @@
     <button *ngIf="isAdmin" (click)="goToAdminDashboard()" class="btn btn-outline-primary me-2">
       Admin Dashboard
     </button>
+    <button (click)="toggleDarkMode()" class="btn btn-outline-secondary me-2">
+      {{ isDarkMode ? 'ligh mode' : 'dark mode' }}
+    </button>
+    
     <button (click)="logOut()" class="btn btn-outline-danger">Log Out</button>
   </div>
 </nav>

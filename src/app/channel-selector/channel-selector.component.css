@@ -1,6 +1,9 @@
 ul { list-style-type: none; 
   padding: 0; }
 
+ 
+  
+
 .container {
     display: flex;
     flex-direction: row;
@@ -171,7 +174,29 @@ button:hover {
 .brand-title {
   font-family: 'Juan Montoreano', bold;
   font-size: 32px;
-  color: #0c1888; /* Or whatever color you like */
+  color: #0c1888;
+}
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .chat-window {
+  background-color: #1e1e1e !important;
+  color: #fff !important;
+}
+
+body.dark-mode button {
+  background-color: #333 !important;
+  color: #fff !important;
+  border: none;
+}
+
+body.dark-mode input,
+body.dark-mode textarea {
+  background-color: #2c2c2c !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
 }
 
 

@@ -53,6 +53,8 @@ export class ChannelSelectorComponent implements OnInit {
   selectedUserStatus: string = "offline";
   selectedUserLastSeen: Date | null = null;
   channelUsersMap: Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]> = new Map();
+  isDarkMode: boolean = false;
+
 
   // Default background color (can be any valid hex color)
   chatBackgroundColors: { [username: string]: string } = {};
@@ -109,6 +111,12 @@ export class ChannelSelectorComponent implements OnInit {
     if (savedColors) {
       this.chatBackgroundColors = JSON.parse(savedColors);
     }
+    // Add this to your existing ngOnInit method
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'enabled') {
+       this.isDarkMode = true;
+     document.body.classList.add('dark-mode');
+     }
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
@@ -452,6 +460,18 @@ export class ChannelSelectorComponent implements OnInit {
         console.error("Error creating channel:", error);
       }
   }
+getChatBoxStyle(): any {
+  const bgColor = this.chatBackgroundColor;
+  if (bgColor !== '#ffffff') {
+    return { 'background-color': bgColor };
+  }
+ 
+  if (this.isDarkMode) {
+    return { 'background-color': 'rgba(0, 0, 0, 0.65)' };
+  }
+
+  return { 'background-color': '#ffffff' };
+}
 
   
   showChannels() {
@@ -788,6 +808,18 @@ async selectChannel(channelIndex: number): Promise<void> {
    this.showChannels();
 
  }
+ toggleDarkMode() {
+  this.isDarkMode = !this.isDarkMode;
+  
+  // Apply dark mode to document body
+  if (this.isDarkMode) {
+    document.body.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', 'disabled');
+  }
+}
  
  listenToUserStatus() {
    if (!this.currentUser) return;
@@ -805,6 +837,8 @@ async selectChannel(channelIndex: number): Promise<void> {
        }
      }
    });
+   
 }
+
 
 }
