@@ -1,14 +1,136 @@
-/* You can add global styles to this file, and also import other style files */
-body {
-    background-image: url('assets/niceskye.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
 
+body {
+  background-image: url('assets/niceskye.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #111; 
+}
+
+
+body.dark-mode {
+  background-image: url('assets/darkmode.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  color: #e0e0e0 !important; 
+  transition: background-image 0.5s ease, color 0.3s ease;
+}
+
+body.dark-mode .card,
+
+body.dark-mode .messages{
+
+    background-color: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    padding: 16px;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
   
+}
+body.dark-mode .navbar,
+body.dark-mode .col-md-6,
+body.dark-mode .col-md-9 {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+body.dark-mode .container,
+body.dark-mode .container-fluid,
+body.dark-mode .row {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+
+body.dark-mode .form-control,
+body.dark-mode input,
+body.dark-mode input[type="text"],
+body.dark-mode textarea {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  border: 1px solid #444 !important;
+  border-radius: 6px !important;
+}
+
+body.dark-mode .form-control::placeholder,
+body.dark-mode input::placeholder {
+  color: #aaaaaa !important;
+}
+
+
+body.dark-mode .mat-form-field-infix {
+  background-color: #2a2a2a !important;
+  color: white !important;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+body.dark-mode .mat-input-element {
+  color: white !important;
+}
+
+body.dark-mode .mat-form-field-label {
+  color: #bbb !important;
+}
+
+body.dark-mode .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #888 !important;
+  border-color: #444 !important;
+}
+body.dark-mode .btn,
+body.dark-mode .btn-success {
+  background-color: #4caf50 !important;
+  color: white !important;
+  border: none !important;
+}
+
+body.dark-mode .btn:hover {
+  background-color: #66bb6a !important;
+}
+
+
+body.dark-mode .emoji-toggle-button {
+  background-color: #666 !important;
+  color: white !important;
+}
+
+body.dark-mode .sent .message-bubble {
+  background-color: #333 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .received .message-bubble {
+  background-color: #444 !important;
+  color: #fff !important;
+}
+
+body.dark-mode .navbar .navbar-brand,
+body.dark-mode .navbar .navbar-text {
+  color: #ffffff !important;
+}
+body.dark-mode .text-muted {
+  color: #4caf50 !important;
+  font-weight: 500;
+}
+
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: #ffffff !important;
+}
+
+
