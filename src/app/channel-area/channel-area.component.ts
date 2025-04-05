@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { onSnapshot } from '@angular/fire/firestore';
-import { Firestore, doc, docData, collection, addDoc, updateDoc, serverTimestamp, query, orderBy, deleteDoc, getDoc } from '@angular/fire/firestore';
+import { Firestore, doc, docData, collection, addDoc, updateDoc, serverTimestamp, query, orderBy, deleteDoc, getDoc, getDocs, DocumentData } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { Auth, getAuth, signOut } from '@angular/fire/auth';
  import { Observable } from 'rxjs';
@@ -269,7 +269,10 @@ getRepliedMessageContent(replyId: string): string {
 sendMessage(): void {
   if (this.newMessage.trim() !== '' && this.channelId) {
     const messagesRef = collection(this.firestore, `channels/${this.channelId}/messages`);
+    const mentionedUsernames = this.extractMentions(this.newMessage);
     
+    console.log("Mentioned usernames:", mentionedUsernames);
+
     const message = {
       sender: this.currentUser?.uid ?? '', 
       message: this.newMessage,
@@ -281,6 +284,13 @@ sendMessage(): void {
       .then(async () => {
         this.newMessage = '';
         this.replyingToMessage = null;
+        
+      
+        for (const username of mentionedUsernames) {
+          console.log(`Processing mention notification for: ${username}`);
+          await this.sendMentionNotification(username, this.newMessage);
+        }
+        
         if (this.currentUser?.uid) {
           const userRef = doc(this.firestore, `users/${this.currentUser.uid}`);
           await updateDoc(userRef, {
@@ -394,5 +404,65 @@ sendMessage(): void {
            
             alert("You declined the invitation.");
           }
+          extractMentions(text: string): string[] {
+            const mentionRegex = /@(\w+)/g;
+            const mentions: string[] = [];
+            let match;
+            
+            console.log("Extracting mentions from:", text);
+            
+            while ((match = mentionRegex.exec(text)) !== null) {
+              mentions.push(match[1]);
+              console.log("Found mention:", match[1]);
+            }
+            
+            return mentions;
+          }
+          
+          async sendMentionNotification(username: string, messageContent: string) {
+
+            console.log(`Attempting to notify user: ${username} from channel ${this.channelId}`);
+            const usersRef = collection(this.firestore, "users");
+            const q = query(usersRef);
+            
+            try {
+          
+              const querySnapshot = await getDocs(q);
+              let targetUserId: string | null = null;
+              
+              querySnapshot.forEach((doc) => {
+                const userData = doc.data();
+                if (userData['username'] === username) {
+                  targetUserId = doc.id;
+                  console.log(`Found target user: ${username} with ID: ${targetUserId}`);
+                }
+              });
+              
+              if (!targetUserId) {
+                console.error(`Cannot find user with username: ${username}`);
+                return;
+              }
+              
+         
+              const notifRef = collection(this.firestore, `users/${targetUserId}/notifications`);
+              const notificationData = {
+                from: this.currentUser.username,
+                message: `@${this.currentUser.username} mentioned you in ${this.channelName}: "${messageContent}"`,
+                timestamp: serverTimestamp(),
+                read: false,
+                channelId: this.channelId,
+                isFromChannel: true  
+              };
+              
+              console.log("Sending notification:", notificationData);
+              
+              await addDoc(notifRef, notificationData);
+              console.log(`Notification sent to ${username} successfully!`);
+            } catch (error) {
+              console.error("Error sending mention notification:", error);
+            }
+          }
+          
+          
 
         }

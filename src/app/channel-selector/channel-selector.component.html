@@ -17,15 +17,49 @@
   </div>
   
   <div class="d-flex align-items-center">
+    <div style="position: relative; display: inline-block;">
+    
+      <button (click)="openNotifications()" class="notif-btn">
+        🔔
+        <span *ngIf="unreadNotifications.length > 0" class="notif-badge">
+          {{ unreadNotifications.length > 99 ? '99+' : unreadNotifications.length }}
+        </span>
+      </button>
+      
+      <div *ngIf="showNotificationPanel" class="notif-dropdown">
+        <h4 class="notif-title">Notifications</h4>
+        <ul *ngIf="unreadNotifications.length > 0; else noNotif">
+          <li *ngFor="let notif of unreadNotifications">
+            <span>
+              <strong>{{ notif.from }}</strong>: "{{ notif.message }}"
+              <span *ngIf="notif.isFromChannel" class="channel-badge">Channel</span>
+              <span *ngIf="!notif.isFromChannel" class="dm-badge">Direct</span>
+            </span>
+            <br />
+            <small>{{ notif.timestamp?.toDate() | date:'short' }}</small>
+            <br />
+            <button (click)="deleteNotification(notif.id)" class="notif-delete">Delete</button>
+          </li>
+        </ul>
+        <ng-template #noNotif>
+          <p class="notif-empty">No new notifications</p>
+        </ng-template>
+        <button (click)="markAllNotificationsAsRead()" class="notif-read-all">
+          Marked as read
+        </button>
+      </div>
+    </div>
+    
     <button *ngIf="isAdmin" (click)="goToAdminDashboard()" class="btn btn-outline-primary me-2">
       Admin Dashboard
     </button>
     <button (click)="toggleDarkMode()" class="btn btn-outline-secondary me-2">
-      {{ isDarkMode ? 'ligh mode' : 'dark mode' }}
+      {{ isDarkMode ? 'light mode' : 'dark mode' }}
     </button>
     
     <button (click)="logOut()" class="btn btn-outline-danger">Log Out</button>
   </div>
+
 </nav>
 
 <div class="container-fluid p-4">

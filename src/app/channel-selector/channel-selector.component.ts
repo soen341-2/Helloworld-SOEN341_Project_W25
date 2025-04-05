@@ -13,6 +13,9 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
 import { ChatMessage } from '../models/chat-message';
+import { Notification } from '../models/notification';
+
+
 
 import 'emoji-picker-element';
 import { ChangeDetectorRef } from '@angular/core';
@@ -54,6 +57,8 @@ export class ChannelSelectorComponent implements OnInit {
   selectedUserLastSeen: Date | null = null;
   channelUsersMap: Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]> = new Map();
   isDarkMode: boolean = false;
+  showNotificationPanel: boolean = false;
+
 
 
   // Default background color (can be any valid hex color)
@@ -124,6 +129,7 @@ export class ChannelSelectorComponent implements OnInit {
          console.log("Current User UID:", this.currentUser.uid);
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
+        this.listenToNotifications(); 
 
         if (userSnap.exists()) {
           const userData = userSnap.data();
@@ -351,32 +357,62 @@ export class ChannelSelectorComponent implements OnInit {
   }
   sendMessage() {
     if (!this.newMessage.trim()) return;
-
+  
     const chatId = this.getChatId(this.currentUser!.uid!, this.selectedUser!);
     const messagesRef = collection(db, `chats/${chatId}/messages`);
-
+    
+    const mentionedUsernames = this.getMentions(this.newMessage);
+  
     const newChatMessage: ChatMessage = {
       senderId: this.currentUser!.uid!,
       receiverId: this.selectedUser!,
       message: this.newMessage,
       timestamp: Date.now(),
       replyId: this.replyingToMessage ? this.replyingToMessage.id : "",
+      mentions: mentionedUsernames 
     };
-
+  
     addDoc((messagesRef), newChatMessage)
-      .then(() => {
-        console.log("Message sent !",this.selectUser);
+      .then(async () => {
         this.newMessage = "";
-        this.replyingToMessage = null; 
+        this.replyingToMessage = null;
+  
+    
+        for (const mentionedUsername of mentionedUsernames) {
+          await this.sendMentionNotification(mentionedUsername, newChatMessage);
+        }
       })
       .catch(error => console.error("Error:", error));
   }
- 
+  
+  
 
   goToAdminDashboard() {
     this.router.navigate(['/admin-dashboard']);
   }
   
+  async sendMentionNotification(username: string, message: ChatMessage) {
+    const usersRef = collection(db, "users");
+    const snapshot = await getDocs(usersRef);
+    let targetUserId = null;
+  
+    snapshot.forEach(doc => {
+      if (doc.data()['username'] === username) {
+        targetUserId = doc.id;
+      }
+    });
+  
+    if (!targetUserId) return;
+  
+    const notifRef = collection(db, `users/${targetUserId}/notifications`);
+    await addDoc(notifRef, {
+      from: this.currentUsername,
+      message: message.message,
+      timestamp: Timestamp.now(),
+      read: false,
+      chatId: this.getChatId(this.currentUser!.uid, targetUserId),
+    });
+  }
   
   async logOut() {
     if (!this.currentUser) return;
@@ -839,6 +875,86 @@ async selectChannel(channelIndex: number): Promise<void> {
    });
    
 }
+unreadNotifications: any[] = [];
+
+listenToNotifications() {
+  if (!this.currentUser) return;
+
+  const notifRef = collection(db, `users/${this.currentUser.uid}/notifications`);
+
+  onSnapshot(notifRef, (snapshot) => {
+    this.unreadNotifications = snapshot.docs
+      .map(doc => {
+        const data = doc.data() as Notification;
+        return { id: doc.id, ...data };
+      })
+      .filter(notif => !notif.read);
+    
+    console.log("All unread notifications:", this.unreadNotifications);
+    const channelNotifs = this.unreadNotifications.filter(n => n.isFromChannel === true);
+    console.log("Channel notifications:", channelNotifs);
+  });
+}
+
+
+markAllNotificationsAsRead() {
+  const notifRef = collection(db, `users/${this.currentUser!.uid}/notifications`);
+  this.unreadNotifications.forEach(async notif => {
+    const notifDoc = doc(notifRef, notif.id);
+    await updateDoc(notifDoc, { read: true });
+  });
+}
+
+openNotifications() {
+  this.showNotificationPanel = !this.showNotificationPanel;
+}
+
+getMentions(message: string): string[] {
+  const mentionRegex = /@(\w+)/g;
+  const mentions = [];
+  let match;
+  while ((match = mentionRegex.exec(message)) !== null) {
+    mentions.push(match[1]);
+  }
+  return mentions;
+}
+async deleteNotification(notifId: string) {
+  const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notifId}`);
+  try {
+    await deleteDoc(notifRef);
+    this.unreadNotifications = this.unreadNotifications.filter(n => n.id !== notifId);
+    console.log(`Notification ${notifId} supprimée.`);
+  } catch (error) {
+    console.error("Erreur suppression notification :", error);
+  }
+}
+handleNotificationClick(notification: Notification) {
+  if (notification.isFromChannel && notification.channelId) {
+    this.router.navigate(['/channel-area', notification.channelId]);
+  } else if (notification.chatId) {
+    const userIds = notification.chatId.split('_');
+    const otherUserId = userIds[0] === this.currentUser!.uid ? userIds[1] : userIds[0];
+    this.findUsernameById(otherUserId).then(username => {
+      if (username) {
+        this.selectUser(username);
+      }
+    });
+  }
+
+  const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notification.id}`);
+  updateDoc(notifRef, { read: true });
+}
+
+async findUsernameById(userId: string): Promise<string | null> {
+  const userRef = doc(db, "users", userId);
+  const userSnap = await getDoc(userRef);
+  
+  if (userSnap.exists()) {
+    return userSnap.data()['username'] || null;
+  }
+  return null;
+}
+
 
 
 }
