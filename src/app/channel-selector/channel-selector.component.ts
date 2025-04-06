@@ -14,6 +14,8 @@ import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
 import { ChatMessage } from '../models/chat-message';
 import { Notification } from '../models/notification';
+import { AfterViewChecked} from '@angular/core';
+
  
  
  
@@ -35,7 +37,7 @@ const db=getFirestore(app);
   styleUrl: './channel-selector.component.css'
 })
  
-export class ChannelSelectorComponent implements OnInit {
+export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   private inactivityTimer: any;
   private INACTIVITY_DELAY = 30000;
  
@@ -75,6 +77,8 @@ export class ChannelSelectorComponent implements OnInit {
   @ViewChild('emojiPickerContainer', { static: false })
   emojiPickerContainer!: ElementRef;
  
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+
   //sarah part
   searchControl=new FormControl;
   constructor(private router: Router, private cdRef: ChangeDetectorRef) {}
@@ -322,6 +326,8 @@ export class ChannelSelectorComponent implements OnInit {
         msg.senderId === this.currentUser!.uid || msg.receiverId === this.currentUser!.uid
       );
       console.log("load messages :", this.messages);
+      this.cdRef.detectChanges(); 
+      this.scrollToBottom();      
     });
   }
   getChatId(user1: string, user2: string): string {
@@ -377,7 +383,9 @@ export class ChannelSelectorComponent implements OnInit {
         this.newMessage = "";
         this.replyingToMessage = null;
  
-   
+        this.cdRef.detectChanges();
+        this.scrollToBottom();
+
         for (const mentionedUsername of mentionedUsernames) {
           await this.sendMentionNotification(mentionedUsername, newChatMessage);
         }
@@ -976,6 +984,24 @@ async findUsernameById(userId: string): Promise<string | null> {
   return null;
 }
  
+ngAfterViewChecked(): void {
+  this.scrollToBottom();
+}
+
+private scrollToBottom(): void {
+  try {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      // Use setTimeout to ensure DOM has finished updating
+      setTimeout(() => {
+        this.scrollContainer.nativeElement.scrollTop = 
+          this.scrollContainer.nativeElement.scrollHeight;
+      }, 0);
+    }
+  } catch (err) {
+    console.error('Error scrolling to bottom:', err);
+  }
+}
+
  
  
 }

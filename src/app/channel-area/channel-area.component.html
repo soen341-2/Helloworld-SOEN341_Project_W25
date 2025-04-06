@@ -101,14 +101,16 @@
           <button (click)="replyingToMessage = null" class="btn btn-sm btn-outline-secondary">Cancel Reply</button>
         </div>
       
-        <div class="input-container">
-          <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
-          <button (click)="toggleEmojiPicker()" class="btn btn-secondary">😊</button>
-          <button (click)="sendMessage()" class="btn btn-primary">Send</button>
+        <div class="input-container-wrapper position-relative">
+          <div class="input-container">
+            <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
+            <button (click)="toggleEmojiPicker()" class="btn btn-secondary">😊</button>
+            <button (click)="sendMessage()" class="btn btn-primary">Send</button>
+          </div>
+        
+          <div *ngIf="showEmojiPicker" class="emoji-picker-container">
+            <emoji-picker (emoji-click)="addEmoji($event)"></emoji-picker>
+          </div>
         </div>
-      
-        <div *ngIf="showEmojiPicker" class="emoji-picker-container">
-          <emoji-picker (emoji-click)="addEmoji($event)"></emoji-picker>
-        </div>
-      </div>
+        
       

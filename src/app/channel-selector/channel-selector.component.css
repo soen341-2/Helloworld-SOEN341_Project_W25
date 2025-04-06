@@ -90,6 +90,7 @@ ul { list-style-type: none;
   border-radius: 12px;
   padding: 8px 12px;
   max-width: 70%;
+  min-width: 300px;
   word-wrap: break-word;
 }
 
@@ -163,17 +164,22 @@ ul { list-style-type: none;
     background-color: #2671d3;
   }
   
+  .input-container-wrapper {
+    position: relative;
+  }
+  
   .emoji-picker-container {
     position: absolute;
-    bottom: 60px; 
-    left: 16px;  
+    bottom: 50px; /* Distance from input */
+    right: 0; /* Align to right edge of input */
+    z-index: 1000;
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 8px;
-    z-index: 1000;
     padding: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
+  
   
   button.btn-success {
     font-size: 12px; 
@@ -393,6 +399,10 @@ body.dark-mode .create-channel-btn:hover {
   flex-grow: 1;
   overflow-y: auto;
   margin-bottom: 12px;
+  max-height: 60vh;
+  padding-right: 10px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 :host-context(.dark-mode) .notif-dropdown {
