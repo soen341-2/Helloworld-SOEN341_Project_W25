@@ -31,18 +31,48 @@
 }
 
 .message-bubble {
-  background-color: #e0e0e0;
-  border-radius: 12px;
-  padding: 10px;
+
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    padding: 6px 10px; 
+    margin-bottom: 10px;
+    position: relative;
+    max-width: 60%; 
+    word-wrap: break-word;
+    font-size: 0.9em; 
+  
+}
+
+.messages-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 400px; /* or 100%, or calc(100vh - headerHeight), depending on layout */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.messages-scrollable {
+  flex-grow: 1;
+  overflow-y: auto;
   margin-bottom: 12px;
-  position: relative;
-  max-width: 80%;
-  word-wrap: break-word;
+}
+
+/* Keep your existing styles for .message-bubble, .timestamp, .input-container, etc. */
+
+
+.message-wrapper.sent {
+  justify-content: flex-end;
 }
 
 .message-bubble.sent {
-  background-color: #d1ecf1;
-  margin-left: auto;
+  
+    background-color: #cce5ff; 
+    margin-left: auto; 
+    border: 1px solid #007bff;
+    color: #003366;
+  
 }
 
 .message-bubble strong {
@@ -122,6 +152,5 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   color: #333;
 }
-
 
 

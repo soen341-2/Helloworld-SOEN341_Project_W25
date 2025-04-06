@@ -13,28 +13,31 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
 import { ChatMessage } from '../models/chat-message';
-
+import { Notification } from '../models/notification';
+ 
+ 
+ 
 import 'emoji-picker-element';
 import { ChangeDetectorRef } from '@angular/core';
-
-
-
+ 
+ 
+ 
 const app = initializeApp(environment.firebaseConfig);
 const db=getFirestore(app);
-
-
-
+ 
+ 
+ 
 @Component({
   selector: 'app-channel-selector',
   standalone: false,
-  
+ 
   templateUrl: './channel-selector.component.html',
   styleUrl: './channel-selector.component.css'
 })
-
+ 
 export class ChannelSelectorComponent implements OnInit {
   private inactivityTimer: any;
-  private INACTIVITY_DELAY = 30000; 
+  private INACTIVITY_DELAY = 30000;
  
   currentUser: User | null = null;
   assignedChannels: string[] = [];
@@ -54,22 +57,24 @@ export class ChannelSelectorComponent implements OnInit {
   selectedUserLastSeen: Date | null = null;
   channelUsersMap: Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]> = new Map();
   isDarkMode: boolean = false;
-
-
+  showNotificationPanel: boolean = false;
+ 
+ 
+ 
   // Default background color (can be any valid hex color)
   chatBackgroundColors: { [username: string]: string } = {};
-
+ 
   newChannelPrivacy: boolean = false;
   pendingInvites: {
     id: any;
-    username: any; channelId: string; channelTitle: string 
+    username: any; channelId: string; channelTitle: string
     }[] = [];
-
+ 
   showEmojiPickerDirect: boolean = false;
-  
+ 
   @ViewChild('emojiPickerContainer', { static: false })
   emojiPickerContainer!: ElementRef;
-
+ 
   //sarah part
   searchControl=new FormControl;
   constructor(private router: Router, private cdRef: ChangeDetectorRef) {}
@@ -78,9 +83,9 @@ export class ChannelSelectorComponent implements OnInit {
     const defaultChannelTitles = ['#all-general', '#announcements'];
     const channelsRef = collection(db, "channels");
     const snapshot = await getDocs(channelsRef);
-  
+ 
     const existingTitles = snapshot.docs.map(doc => (doc.data() as Channel).title);
-  
+ 
     for (const title of defaultChannelTitles) {
       if (!existingTitles.includes(title)) {
         const newChannel: Channel = {
@@ -90,7 +95,7 @@ export class ChannelSelectorComponent implements OnInit {
           allowedUsers: [], // public means all users can see it
           creatorId: ""
         };
-  
+ 
         const channelRef = doc(db, "channels", newChannel.id);
         await setDoc(channelRef, newChannel);
         console.log(`Default channel created: ${title}`);
@@ -99,12 +104,12 @@ export class ChannelSelectorComponent implements OnInit {
       }
     }
   }
-
+ 
   isDefaultChannel(channelTitle: string): boolean {
     const defaultChannels = ['#all-general', '#announcements'];
     return defaultChannels.includes(channelTitle);
   }  */
-
+ 
   async ngOnInit() {
     const auth = getAuth();
     const savedColors = localStorage.getItem('dmBgColors');
@@ -124,7 +129,8 @@ export class ChannelSelectorComponent implements OnInit {
          console.log("Current User UID:", this.currentUser.uid);
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-
+        this.listenToNotifications();
+ 
         if (userSnap.exists()) {
           const userData = userSnap.data();
           this.isAdmin = !!userData['isAdmin'] || false;
@@ -146,8 +152,8 @@ export class ChannelSelectorComponent implements OnInit {
         this.showChannels();
       }
     });
-  
-    
+ 
+   
     this.usernames$ = this.getAllUsernames();
     this.filteredUsernames$ = this.searchControl.valueChanges.pipe(
       startWith(''),
@@ -171,31 +177,31 @@ export class ChannelSelectorComponent implements OnInit {
     clearTimeout(this.inactivityTimer);
     this.inactivityTimer = setTimeout(() => {
       this.updateUserStatus("away");
-    
+   
     }, this.INACTIVITY_DELAY);
   }
-
+ 
   @HostListener('mousemove')
   @HostListener('keydown')
   @HostListener('click')
   resetInactivityTimer() {
     if (this.currentUserStatus !== "online") {
       this.updateUserStatus("online");
-    
+   
     }
     this.startInactivityTimer();
   }
   async selectUser(username: string) {
     console.log("Choosing user:", username);
     this.selectedUsername = username;
-
+ 
     const usersRef = collection(db, "users");
     const usersSnapshot = await getDocs(usersRef);
-
+ 
     let userId: string | null = null;
     let userStatus: string = "offline";
     let userLastSeen: Date | null = null;
-
+ 
     usersSnapshot.forEach(doc => {
       const userData = doc.data();
       if (userData['username'] === username) {
@@ -204,22 +210,22 @@ export class ChannelSelectorComponent implements OnInit {
         userLastSeen = userData['lastSeen'] ? new Date(userData['lastSeen']) : null;
       }
     });
-
+ 
     if (!userId) {
       console.error("Error loading user!");
       return;
     }
-
+ 
     this.selectedUser = userId;
     this.selectedUserStatus = userStatus;
     this.selectedUserLastSeen = userLastSeen;
     this.listenToSelectedUserStatus();
     console.log("Selected User ID:", userId, "Status:", this.selectedUserStatus);
-
+ 
     const chatId = this.getChatId(this.currentUser!.uid, userId);
     const chatRef = doc(db, "channels", chatId);
     const chatSnap = await getDoc(chatRef);
-
+ 
     if (!chatSnap.exists()) {
       await setDoc(chatRef, {
         title: `Private chat: ${this.currentUser!.uid} & ${userId}`,
@@ -228,16 +234,16 @@ export class ChannelSelectorComponent implements OnInit {
         allowedUsers: [this.currentUser!.uid, userId]
       });
     }
-
+ 
     this.loadMessages(userId);
-    
+   
     if (!this.activeConversations.some(convo => convo.username === username)) {
       this.activeConversations.push({ username });
     }
   }
   listenToSelectedUserStatus() {
     if (!this.selectedUser) return;
-
+ 
     const userRef = doc(db, "users", this.selectedUser);
     onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -246,68 +252,68 @@ export class ChannelSelectorComponent implements OnInit {
         this.selectedUserLastSeen = userData['lastSeen'] && userData['lastSeen'].seconds
         ? new Date(userData['lastSeen'].seconds * 1000)
         : null;
-
+ 
       }
     });
   }
-
+ 
   reply(message: ChatMessage) {
     this.replyingToMessage = message;
   }
-    
+   
   //ADDED RN
   onColorChange(event: Event): void {
     const newColor = (event.target as HTMLInputElement).value;
-  
+ 
     if (this.selectedUsername) {
       this.chatBackgroundColors[this.selectedUsername] = newColor;
       localStorage.setItem('dmBgColors', JSON.stringify(this.chatBackgroundColors));
     }
   }
-  
-  
-  
+ 
+ 
+ 
   get chatBackgroundColor(): string {
     return this.selectedUsername && this.chatBackgroundColors[this.selectedUsername]
       ? this.chatBackgroundColors[this.selectedUsername]
       : '#ffffff'; // default
   }
-
+ 
   saveBackgroundColors(): void {
     localStorage.setItem('dmBgColors', JSON.stringify(this.chatBackgroundColors));
   }
-  
-
+ 
+ 
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
     this.showEmojiPickerDirect = !this.showEmojiPickerDirect;
   }
-
-  
+ 
+ 
   addEmojiDirect(event: any): void {
     this.newMessage += event.detail.unicode;
   }
-
+ 
   getAllUsernames(): Observable<string[]> {
     const ref = collection(db, 'users');
     return collectionData(ref).pipe(
       map(users => users.map(user => (user as { username?: string }).username || ''))
     );
   }
-  
+ 
   getMessageById(id: string): ChatMessage | undefined {
     return this.messages.find(msg => msg.id === id);
   }
-
+ 
   loadMessages(userId: string) {
     console.log("load messages", userId);
     const chatId = this.getChatId(this.currentUser!.uid, userId);
     const messagesRef = collection(db, `chats/${chatId}/messages`);
     const messagesQuery = firestore.query(
       messagesRef,
-      firestore.orderBy("timestamp", "asc") 
+      firestore.orderBy("timestamp", "asc")
     );
-
+ 
     onSnapshot(messagesQuery, (snapshot) => {
       this.messages = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -319,8 +325,8 @@ export class ChannelSelectorComponent implements OnInit {
     });
   }
   getChatId(user1: string, user2: string): string {
-    return [user1, user2].sort().join("_"); 
-    
+    return [user1, user2].sort().join("_");
+   
   }
   selectActiveConversation(username: string) {
     console.log("conversation with", username);
@@ -328,79 +334,109 @@ export class ChannelSelectorComponent implements OnInit {
     this.selectedUsername = username;
     this.loadMessages(username);
   }
-
+ 
   async mergeChats(user1: string, user2: string) {
     const correctChatId = this.getChatId(user1, user2);
     const wrongChatId = `${user2}_${user1}`;
-
+ 
     if (correctChatId === wrongChatId) return;
-
+ 
     console.log(`Fusion de ${wrongChatId} → ${correctChatId}`);
-
+ 
     const wrongMessagesRef = collection(db, `chats/${wrongChatId}/messages`);
     const correctMessagesRef = collection(db, `chats/${correctChatId}/messages`);
-
+ 
     const messagesSnapshot = await getDocs(wrongMessagesRef);
-
+ 
     messagesSnapshot.forEach(async (msgDoc) => {
       await setDoc(doc(correctMessagesRef, msgDoc.id), msgDoc.data());
     });
-
+ 
     await deleteDoc(doc(db, "chats", wrongChatId));
     console.log(`Chat ${wrongChatId} supprimé après fusion.`);
   }
   sendMessage() {
     if (!this.newMessage.trim()) return;
-
+ 
     const chatId = this.getChatId(this.currentUser!.uid!, this.selectedUser!);
     const messagesRef = collection(db, `chats/${chatId}/messages`);
-
+   
+    const mentionedUsernames = this.getMentions(this.newMessage);
+ 
     const newChatMessage: ChatMessage = {
       senderId: this.currentUser!.uid!,
       receiverId: this.selectedUser!,
       message: this.newMessage,
       timestamp: Date.now(),
       replyId: this.replyingToMessage ? this.replyingToMessage.id : "",
+      mentions: mentionedUsernames
     };
-
+ 
     addDoc((messagesRef), newChatMessage)
-      .then(() => {
-        console.log("Message sent !",this.selectUser);
+      .then(async () => {
         this.newMessage = "";
-        this.replyingToMessage = null; 
+        this.replyingToMessage = null;
+ 
+   
+        for (const mentionedUsername of mentionedUsernames) {
+          await this.sendMentionNotification(mentionedUsername, newChatMessage);
+        }
       })
       .catch(error => console.error("Error:", error));
   }
  
-
+ 
+ 
   goToAdminDashboard() {
     this.router.navigate(['/admin-dashboard']);
   }
-  
-  
+ 
+  async sendMentionNotification(username: string, message: ChatMessage) {
+    const usersRef = collection(db, "users");
+    const snapshot = await getDocs(usersRef);
+    let targetUserId = null;
+ 
+    snapshot.forEach(doc => {
+      if (doc.data()['username'] === username) {
+        targetUserId = doc.id;
+      }
+    });
+ 
+    if (!targetUserId) return;
+ 
+    const notifRef = collection(db, `users/${targetUserId}/notifications`);
+    await addDoc(notifRef, {
+      from: this.currentUsername,
+      message: message.message,
+      timestamp: Timestamp.now(),
+      read: false,
+      chatId: this.getChatId(this.currentUser!.uid, targetUserId),
+    });
+  }
+ 
   async logOut() {
     if (!this.currentUser) return;
-    
+   
     const userRef = doc(db, "users", this.currentUser.uid);
     try {
-
+ 
       await updateDoc(userRef, {
         status: "offline",
         lastSeen:Timestamp.now()
       });
-  
+ 
       const auth = getAuth();
       await signOut(auth);
-
+ 
       console.log("User logged out successfully.");
-    
+   
        
        this.currentUser = null;
        this.isAdmin = false;
        this.currentUsername = "Guest";
        this.currentUserStatus = "offline";
        this.cdRef.detectChanges();
-  
+ 
       this.router.navigate(['/login']);
     } catch (error) {
       console.error("Error logging out:", error);
@@ -416,27 +452,27 @@ export class ChannelSelectorComponent implements OnInit {
     });
   }
 }
-
-
+ 
+ 
   newChannelTitle : string = "";
-
+ 
   currentChannel: activeChannel = {
     id: "0",
     title: ""
   }
-
+ 
   channels: Channel[] = []
-  
+ 
    async addChannel() {
      if (this.newChannelTitle.trim().length === 0) {
        alert("Channels must have a name");
        return;
      }
-
+ 
       //Users can only create private channels, Admins can choose
       const isPrivate = this.isAdmin ? this.newChannelPrivacy : true;
-  
-  
+ 
+ 
       let newChannel: Channel = {
         title: this.newChannelTitle,
         id: uuidv4(),
@@ -444,16 +480,16 @@ export class ChannelSelectorComponent implements OnInit {
         allowedUsers: [this.currentUser!.uid], // Ensure creator is added
         creatorId: this.currentUser!.uid
       };
-      
-      console.log("Creating Channel:", newChannel); 
-    
+     
+      console.log("Creating Channel:", newChannel);
+   
       try {
         const channelRef = doc(db, "channels", newChannel.id);
         await setDoc(channelRef, newChannel);
-    
+   
         console.log(`Channel created: ${newChannel.title} (Private: ${newChannel.isPrivate})`);
         console.log(`Allowed Users: `, newChannel.allowedUsers);
-    
+   
         this.newChannelTitle = "";
         this.newChannelPrivacy = false;
       } catch (error) {
@@ -469,14 +505,14 @@ getChatBoxStyle(): any {
   if (this.isDarkMode) {
     return { 'background-color': 'rgba(0, 0, 0, 0.65)' };
   }
-
+ 
   return { 'background-color': '#ffffff' };
 }
-
-  
+ 
+ 
   showChannels() {
     const channelRef = collection(db, "channels");
-
+ 
     onSnapshot(channelRef, (snapshot) => {
       this.channels = snapshot.docs
       .map(doc => {
@@ -491,47 +527,47 @@ getChatBoxStyle(): any {
       .filter((channel: Channel & {isAccessible: boolean}) => {
         return !channel.isDM;
       });
-        
+       
     }, (error) => {
       console.error("Error fetching channels:", error);
     });
 }
-
-  
-
-
+ 
+ 
+ 
+ 
   async deleteChannel(index: number) {
     const channelId = this.channels[index].id;
     const channelRef = doc(db, "channels", channelId);
-
+ 
     try {
         console.log(`Deleting channel ${channelId}...`);
         await deleteDoc(channelRef);
         console.log("Channel deleted successfully!");
-
+ 
         const usersRef = collection(db, "users");
         const usersSnapshot = await getDocs(usersRef);
-
+ 
         const batchUpdates = usersSnapshot.docs.map(async (userDoc) => {
             const userRef = doc(db, "users", userDoc.id);
             const userData = userDoc.data();
-
+ 
             if (userData['assignedChannels']?.includes(channelId)) {
                 const updatedChannels = userData['assignedChannels'].filter((id: string) => id !== channelId);
                 await updateDoc(userRef, { assignedChannels: updatedChannels });
-
+ 
                 console.log(`Removed channel ${channelId} from user ${userDoc.id}`);
             }
         });
-
+ 
         await Promise.all(batchUpdates);
         console.log("All affected users updated!");
-
+ 
     } catch (error) {
         console.error("Error deleting channel:", error);
     }
 }
-
+ 
 async selectChannel(channelIndex: number): Promise<void> {
   this.currentChannel = this.channels[channelIndex];
    // Fetch latest channel data from Firestore
@@ -559,7 +595,7 @@ async selectChannel(channelIndex: number): Promise<void> {
  }
  loadPendingInvites(): void {
    if (!this.currentUser) return;
-  
+ 
    const channelsRef = collection(db, 'channels');
  
    onSnapshot(channelsRef, (snapshot) => {
@@ -570,8 +606,8 @@ async selectChannel(channelIndex: number): Promise<void> {
      snapshot.docs.forEach(docSnap => {
        const data = docSnap.data();
        
-       if (Array.isArray(data['pendingInvites']) && 
-           data['pendingInvites'].includes(this.currentUser!.uid) && 
+       if (Array.isArray(data['pendingInvites']) &&
+           data['pendingInvites'].includes(this.currentUser!.uid) &&
            data['creatorId'] !== this.currentUser!.uid) {
          
          // Add to pendingInvites array with just the properties in your type definition
@@ -583,32 +619,32 @@ async selectChannel(channelIndex: number): Promise<void> {
          });
        }
      });
-  
+ 
      console.log("Pending invites (only for current user):", this.currentUser?.uid, this.pendingInvites);
    });
  }
-  
+ 
  async acceptInvite(channelId: string) {
    if (!this.currentUser) return;
-  
+ 
    const channelRef = doc(db, `channels/${channelId}`);
    const channelSnap = await getDoc(channelRef);
-  
+ 
    if (!channelSnap.exists()) {
      console.error("Channel not found!");
      return;
    }
-  
+ 
    try {
      const channelData = channelSnap.data();
      const updatedAllowedUsers = [...(channelData['allowedUsers'] || []), this.currentUser.uid];
      const updatedPendingInvites = (channelData['pendingInvites'] || []).filter((uid: string) => uid !== this.currentUser!.uid);
-  
+ 
      await updateDoc(channelRef, {
        allowedUsers: updatedAllowedUsers,
        pendingInvites: updatedPendingInvites
      });
-  
+ 
      console.log(`User ${this.currentUser.uid} has joined channel ${channelId}`);
      this.pendingInvites = this.pendingInvites.filter(invite => invite.channelId !== channelId);
      this.loadPendingInvites();
@@ -622,23 +658,23 @@ async selectChannel(channelIndex: number): Promise<void> {
      console.error("No user logged in.");
      return;
    }
-  
+ 
    const channelRef = doc(db, `channels/${channelId}`);
    const channelSnap = await getDoc(channelRef);
-  
+ 
    if (!channelSnap.exists()) {
      console.error("Channel not found!");
      return;
    }
-  
+ 
    try {
      const channelData = channelSnap.data();
      const updatedPendingInvites = (channelData['pendingInvites'] || []).filter((uid: string) => uid !== this.currentUser!.uid);
-  
+ 
      await updateDoc(channelRef, {
        pendingInvites: updatedPendingInvites
      });
-  
+ 
      console.log(`User ${this.currentUser.uid} has declined invitation to channel ${channelId}`);
      this.pendingInvites = this.pendingInvites.filter(invite => invite.channelId !== channelId);
      this.loadPendingInvites();
@@ -656,11 +692,11 @@ async selectChannel(channelIndex: number): Promise<void> {
      return;
  
    }
-  
+ 
    const channelRef = doc(db, `channels/${channelId}`);
  
    const channelSnap = await getDoc(channelRef);
-  
+ 
    if (!channelSnap.exists()) {
  
      console.error("Channel not found!");
@@ -668,13 +704,13 @@ async selectChannel(channelIndex: number): Promise<void> {
      return;
  
    }
-  
+ 
    try {
  
      const channelData = channelSnap.data();
  
      const channelCreator = channelData['creatorId'];
-  
+ 
      if (channelCreator === this.currentUser.uid) {
  
        // If user is the creator, delete the entire channel
@@ -761,7 +797,7 @@ async selectChannel(channelIndex: number): Promise<void> {
  
        const messagesSnapshot = await getDocs(messagesRef);
  
-       const deleteMessagePromises = messagesSnapshot.docs.map(doc => 
+       const deleteMessagePromises = messagesSnapshot.docs.map(doc =>
  
          deleteDoc(doc.ref)
  
@@ -788,13 +824,13 @@ async selectChannel(channelIndex: number): Promise<void> {
        console.log(`User ${this.currentUser.uid} has left channel ${channelId}`);
  
      }
-  
+ 
      // Update local channels list
  
      this.channels = this.channels.filter(channel => channel.id !== channelId);
  
      console.log("Updated channel list after leaving:", this.channels);
-  
+ 
      // Navigate to channels list
  
      this.router.navigate(['/channels']);
@@ -806,11 +842,11 @@ async selectChannel(channelIndex: number): Promise<void> {
    }
  
    this.showChannels();
-
+ 
  }
  toggleDarkMode() {
   this.isDarkMode = !this.isDarkMode;
-  
+ 
   // Apply dark mode to document body
   if (this.isDarkMode) {
     document.body.classList.add('dark-mode');
@@ -819,18 +855,39 @@ async selectChannel(channelIndex: number): Promise<void> {
     document.body.classList.remove('dark-mode');
     localStorage.setItem('darkMode', 'disabled');
   }
+   // Fix text colors in dark mode
+  this.updateDarkModeTextColors();
+}
+
+// Add this new method to update text colors in dark mode
+updateDarkModeTextColors() {
+  setTimeout(() => {
+    // Target all headers in dm-header
+    const dmHeaders = document.querySelectorAll('.dm-header h4, .dm-header h5');
+    
+    dmHeaders.forEach(header => {
+      if (this.isDarkMode) {
+        (header as HTMLElement).style.color = '#FFFFFF';
+      } else {
+        (header as HTMLElement).style.color = '#333333';
+      }
+    });
+    
+    // Force change detection
+    this.cdRef.detectChanges();
+  }, 0);
 }
  
  listenToUserStatus() {
    if (!this.currentUser) return;
-  
+ 
    const userRef = doc(db, "users", this.currentUser.uid);
    onSnapshot(userRef, (docSnap) => {
      if (docSnap.exists()) {
        const userData = docSnap.data();
        this.currentUserStatus = userData['status'] || "offline";
        console.log("User status updated in real-time:", this.currentUserStatus);
-  
+ 
      
        if (this.currentUserStatus === "offline") {
          this.router.navigate(['/login']);
@@ -839,6 +896,86 @@ async selectChannel(channelIndex: number): Promise<void> {
    });
    
 }
-
-
+unreadNotifications: any[] = [];
+ 
+listenToNotifications() {
+  if (!this.currentUser) return;
+ 
+  const notifRef = collection(db, `users/${this.currentUser.uid}/notifications`);
+ 
+  onSnapshot(notifRef, (snapshot) => {
+    this.unreadNotifications = snapshot.docs
+      .map(doc => {
+        const data = doc.data() as Notification;
+        return { id: doc.id, ...data };
+      })
+      .filter(notif => !notif.read);
+   
+    console.log("All unread notifications:", this.unreadNotifications);
+    const channelNotifs = this.unreadNotifications.filter(n => n.isFromChannel === true);
+    console.log("Channel notifications:", channelNotifs);
+  });
+}
+ 
+ 
+markAllNotificationsAsRead() {
+  const notifRef = collection(db, `users/${this.currentUser!.uid}/notifications`);
+  this.unreadNotifications.forEach(async notif => {
+    const notifDoc = doc(notifRef, notif.id);
+    await updateDoc(notifDoc, { read: true });
+  });
+}
+ 
+openNotifications() {
+  this.showNotificationPanel = !this.showNotificationPanel;
+}
+ 
+getMentions(message: string): string[] {
+  const mentionRegex = /@(\w+)/g;
+  const mentions = [];
+  let match;
+  while ((match = mentionRegex.exec(message)) !== null) {
+    mentions.push(match[1]);
+  }
+  return mentions;
+}
+async deleteNotification(notifId: string) {
+  const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notifId}`);
+  try {
+    await deleteDoc(notifRef);
+    this.unreadNotifications = this.unreadNotifications.filter(n => n.id !== notifId);
+    console.log(`Notification ${notifId} supprimée.`);
+  } catch (error) {
+    console.error("Erreur suppression notification :", error);
+  }
+}
+handleNotificationClick(notification: Notification) {
+  if (notification.isFromChannel && notification.channelId) {
+    this.router.navigate(['/channel-area', notification.channelId]);
+  } else if (notification.chatId) {
+    const userIds = notification.chatId.split('_');
+    const otherUserId = userIds[0] === this.currentUser!.uid ? userIds[1] : userIds[0];
+    this.findUsernameById(otherUserId).then(username => {
+      if (username) {
+        this.selectUser(username);
+      }
+    });
+  }
+ 
+  const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notification.id}`);
+  updateDoc(notifRef, { read: true });
+}
+ 
+async findUsernameById(userId: string): Promise<string | null> {
+  const userRef = doc(db, "users", userId);
+  const userSnap = await getDoc(userRef);
+ 
+  if (userSnap.exists()) {
+    return userSnap.data()['username'] || null;
+  }
+  return null;
+}
+ 
+ 
+ 
 }

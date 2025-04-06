@@ -5,4 +5,5 @@ export interface ChatMessage {
     message: string;
     timestamp: number;
     replyId?: string;
+    mentions: string[];
   }
