@@ -33,7 +33,6 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
   
-
   async ngOnInit() {
     console.log("Checking Firebase authentication state...");
   
@@ -49,16 +48,18 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  /*finding an already existing channel*/
   getChannelName(channelId: string): string {
     const channel = this.channels.find(ch => ch.id === channelId);
     return channel ? channel.title : "Unknown Channel";
   }
   
-
+  /*changing to the page to the channel selector page*/
   goToChannelSelector() {
     this.router.navigate(['/channels']);
   }
   
+  /*logout of current account and goes back to login/sign up page*/
   logOut() {
     this.auth.signOut().then(() => {
       this.router.navigate(['/login']);
@@ -67,10 +68,12 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
   
+  /*getting selected option value from a dropdown change event */
   getSelectedValue(event: Event): string {
     return (event.target as HTMLSelectElement).value;
   }
 
+  /*loading the current user, with user information*/
   async loadUsers() {
     if (!this.currentUser) {
       return;
@@ -97,6 +100,7 @@ export class AdminDashboardComponent implements OnInit {
     console.log("Users loaded with status and lastSeen:", this.users);
   }
 
+  /* using firebase, getting the user status + the last time they were active*/
   listenToUserStatuses() {
     const usersRef = collection(this.firestore, "users");
   
@@ -110,13 +114,11 @@ export class AdminDashboardComponent implements OnInit {
             : null;
         }
       });
-  
       console.log("User statuses updated in real-time.");
     });
   }
-  
-  
 
+//getting the information from the firestore
   async loadChannels() {
     const channelRef = collection(db, "channels");
     
@@ -152,12 +154,16 @@ export class AdminDashboardComponent implements OnInit {
       await this.loadUsers();
       await this.loadChannels();
 
-    } else {
+    } 
+    else {
       console.log("Firestore user document not found.");
     }
   }
 
+  //access to certain channels can only be given by the admin
   async assignUserToChannel(userId: string, channelId: string) {
+    
+    //checking for rights
     if (!this.currentUser?.isAdmin && !this.currentUser?.isSuperAdmin) {
       alert("Only Admins or SuperAdmins can assign users to channels!");
       return;
@@ -170,6 +176,8 @@ export class AdminDashboardComponent implements OnInit {
 
     try {
       console.log(`Assigning user ${userId} to channel ${channelId}...`);
+      
+      //firestore
       const userRef = doc(this.firestore, 'users', userId);
       const userSnapshot = await getDoc(userRef);
 
@@ -177,6 +185,7 @@ export class AdminDashboardComponent implements OnInit {
         let userData = userSnapshot.data();
         let updatedChannels = userData['assignedChannels'] || [];
 
+        //add channel if user not assigned
         if (!updatedChannels.includes(channelId)) {
           updatedChannels.push(channelId);
           await updateDoc(userRef, { assignedChannels: updatedChannels });
@@ -185,20 +194,17 @@ export class AdminDashboardComponent implements OnInit {
           alert("User is already assigned to this channel!");
         }
       }
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error assigning user to channel:", error);
     }
-
-
-    
   }
-
+//only for admins -- assigning user to channel
   async toggleUserChannel(userId: string, channelId: string) {
     if (!this.currentUser?.isAdmin && !this.currentUser?.isSuperAdmin) {
       alert("Only Admins or SuperAdmins can manage channels!");
       return;
     }
-
     if (!channelId) {
       alert("Please select a channel before proceeding.");
       return;
@@ -206,6 +212,8 @@ export class AdminDashboardComponent implements OnInit {
 
     try {
       console.log(`Toggling user ${userId} for channel ${channelId}...`);
+      
+      //from firestore
       const userRef = doc(this.firestore, 'users', userId);
       const userSnapshot = await getDoc(userRef);
 
@@ -216,25 +224,26 @@ export class AdminDashboardComponent implements OnInit {
         if (updatedChannels.includes(channelId)) {
           updatedChannels = updatedChannels.filter((ch: string) => ch !== channelId);
           console.log("User deassigned from channel!");
-        } else {
+        } 
+        else {
           updatedChannels.push(channelId);
           console.log("User assigned to channel!");
         }
-
         await updateDoc(userRef, { assignedChannels: updatedChannels });
         await this.loadUsers();
       }
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error toggling user channel:", error);
     }
   }
 
+  //admins can assign other admins
   async makeAdmin(userId: string) {
     if (!this.currentUser?.isSuperAdmin) {
         alert("Only SuperAdmins can assign admins!");
         return;
     }
-
     try {
         console.log(`Making ${userId} an admin...`);
         const userRef = doc(this.firestore, 'users', userId);
@@ -248,7 +257,8 @@ export class AdminDashboardComponent implements OnInit {
 
         console.log("User is now an admin!");
         await this.loadUsers();
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error making user admin:", error);
     }
 }
@@ -258,14 +268,14 @@ export class AdminDashboardComponent implements OnInit {
       alert("Only SuperAdmins can remove admins!");
       return;
     }
-
     try {
       console.log(`Removing ${userId} as admin...`);
       const userRef = doc(this.firestore, 'users', userId);
       await updateDoc(userRef, { isAdmin: false });
       console.log("User is no longer an admin!");
       await this.loadUsers();
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Error removing admin:", error);
     }
   }
