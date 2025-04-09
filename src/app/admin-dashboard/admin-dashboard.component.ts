@@ -12,7 +12,7 @@ const db=getFirestore(app);
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: false,
+  
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
@@ -174,8 +174,8 @@ export class AdminDashboardComponent implements OnInit {
       const userSnapshot = await getDoc(userRef);
 
       if (userSnapshot.exists()) {
-        let userData = userSnapshot.data();
-        let updatedChannels = userData['assignedChannels'] || [];
+        const userData = userSnapshot.data();
+        const updatedChannels = userData['assignedChannels'] || [];
 
         if (!updatedChannels.includes(channelId)) {
           updatedChannels.push(channelId);
@@ -210,7 +210,7 @@ export class AdminDashboardComponent implements OnInit {
       const userSnapshot = await getDoc(userRef);
 
       if (userSnapshot.exists()) {
-        let userData = userSnapshot.data();
+        const userData = userSnapshot.data();
         let updatedChannels = userData['assignedChannels'] || [];
 
         if (updatedChannels.includes(channelId)) {

@@ -31,7 +31,7 @@ const db=getFirestore(app);
  
 @Component({
   selector: 'app-channel-selector',
-  standalone: false,
+  
  
   templateUrl: './channel-selector.component.html',
   styleUrl: './channel-selector.component.css'
@@ -43,36 +43,36 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
  
   currentUser: User | null = null;
   assignedChannels: string[] = [];
-  isAdmin: boolean = false;
-  currentUsername: string = "";
-  searchText: string = '';
+  isAdmin = false;
+  currentUsername = "";
+  searchText = '';
   usernames$: Observable<string[]> = new Observable<string[]>();
   filteredUsernames$: Observable<string[]> = new Observable<string[]>();
   selectedUser: string | null = null;
   selectedUsername: string | null = null;
   messages: ChatMessage[] = [];
   replyingToMessage: ChatMessage | null = null;
-  newMessage: string = "";
+  newMessage = "";
   activeConversations: { username: string }[] = [];
-  currentUserStatus: string = "offline";
-  selectedUserStatus: string = "offline";
+  currentUserStatus = "offline";
+  selectedUserStatus = "offline";
   selectedUserLastSeen: Date | null = null;
-  channelUsersMap: Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]> = new Map();
-  isDarkMode: boolean = false;
-  showNotificationPanel: boolean = false;
+  channelUsersMap = new Map<string, { id: string; username: string; status: string; lastSeen?: Date }[]>();
+  isDarkMode = false;
+  showNotificationPanel = false;
  
  
  
   // Default background color (can be any valid hex color)
-  chatBackgroundColors: { [username: string]: string } = {};
+  chatBackgroundColors: Record<string, string> = {};
  
-  newChannelPrivacy: boolean = false;
+  newChannelPrivacy = false;
   pendingInvites: {
     id: any;
     username: any; channelId: string; channelTitle: string
     }[] = [];
  
-  showEmojiPickerDirect: boolean = false;
+  showEmojiPickerDirect = false;
  
   @ViewChild('emojiPickerContainer', { static: false })
   emojiPickerContainer!: ElementRef;
@@ -203,7 +203,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     const usersSnapshot = await getDocs(usersRef);
  
     let userId: string | null = null;
-    let userStatus: string = "offline";
+    let userStatus = "offline";
     let userLastSeen: Date | null = null;
  
     usersSnapshot.forEach(doc => {
@@ -462,7 +462,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
 }
  
  
-  newChannelTitle : string = "";
+  newChannelTitle  = "";
  
   currentChannel: activeChannel = {
     id: "0",
@@ -481,7 +481,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       const isPrivate = this.isAdmin ? this.newChannelPrivacy : true;
  
  
-      let newChannel: Channel = {
+      const newChannel: Channel = {
         title: this.newChannelTitle,
         id: uuidv4(),
         isPrivate: isPrivate, //Users can ONLY create private channels
