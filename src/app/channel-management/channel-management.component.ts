@@ -6,7 +6,7 @@ import { onSnapshot } from '@angular/fire/firestore';
  
 @Component({
   selector: 'app-channel-management',
-  
+  standalone: false,
   templateUrl: './channel-management.component.html',
   styleUrls: ['./channel-management.component.css']
 })

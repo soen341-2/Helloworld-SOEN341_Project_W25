@@ -11,7 +11,7 @@ const db = getFirestore(app);
 
 @Component({
   selector: 'app-user-auth',
-  
+  standalone: false,
   templateUrl: './user-auth.component.html',
   styleUrl: './user-auth.component.css'
 })

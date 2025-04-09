@@ -31,7 +31,7 @@ const db=getFirestore(app);
  
 @Component({
   selector: 'app-channel-selector',
-  
+  standalone: false,
  
   templateUrl: './channel-selector.component.html',
   styleUrl: './channel-selector.component.css'

@@ -10,7 +10,7 @@ import 'emoji-picker-element';
  
 @Component({
   selector: 'app-channel-area',
-  
+  standalone: false,
  
   templateUrl: './channel-area.component.html',
   styleUrl: './channel-area.component.css'
