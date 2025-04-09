@@ -12,7 +12,6 @@ import { ChannelAreaComponent } from './channel-area/channel-area.component';
 import { UserAuthComponent } from './user-auth/user-auth.component';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
-//sarah add
 import { MatFormFieldModule} from '@angular/material/form-field'
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
