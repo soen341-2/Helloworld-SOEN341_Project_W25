@@ -196,7 +196,7 @@ export class ChannelAreaComponent implements OnInit {
     this.newMessage += event.detail.unicode;
   }
 
-  
+  //fetches information of user (username)
   fetchUserData(userId: string): void {
     const userDocRef = doc(this.firestore, `users/${userId}`);
     docData(userDocRef).subscribe((userDoc: any) => {
@@ -221,6 +221,7 @@ export class ChannelAreaComponent implements OnInit {
     this.replyingToMessage = message;
   }
 
+  //fetches channel name
   getChannelName(channelId: string): void {
     const channelRef = doc(this.firestore, `channels/${channelId}`);
     docData(channelRef).subscribe((channelDoc: any) => {
@@ -232,6 +233,7 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+  //fetches channel related data
   getChannelData(): void {
     if (!this.channelId) return;
     const channelRef = doc(this.firestore, `channels/${this.channelId}`);
@@ -245,6 +247,7 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+  //loads messages from firestore
   loadMessages(): void {
     if (!this.channelId) return;
     const channelRef = doc(this.firestore, `channels/${this.channelId}`);
@@ -258,6 +261,7 @@ export class ChannelAreaComponent implements OnInit {
       console.log(' Allowed Users from Firestore:', channelDoc?.allowedUsers);
       console.log('Current User UID:', this.currentUser.uid);
 
+      //orders messages in ascending order
       const messagesRef = collection(
         this.firestore,
         `channels/${this.channelId}/messages`
@@ -290,16 +294,19 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+  //loads all users
   loadAllUsers(): void {
     const usersRef = collection(this.firestore, 'users');
     this.users$ = collectionData(usersRef, { idField: 'id' });
   }
 
+  //retrieves content of message
   getRepliedMessageContent(replyId: string): string {
     const repliedMessage = this.messages.find((m) => m.id === replyId);
     return repliedMessage ? repliedMessage.message : 'Deleted message';
   }
 
+  //sends a message to the channel chat
   sendMessage(): void {
     if (this.newMessage.trim() !== '' && this.channelId) {
       const messagesRef = collection(
@@ -317,11 +324,13 @@ export class ChannelAreaComponent implements OnInit {
         replyId: this.replyingToMessage ? this.replyingToMessage.id : null,
       };
 
+      //stores message in Firestore
       addDoc(messagesRef, message)
         .then(async () => {
           this.newMessage = '';
           this.replyingToMessage = null;
 
+          //mention notification
           for (const username of mentionedUsernames) {
             console.log(`Processing mention notification for: ${username}`);
             await this.sendMentionNotification(username, this.newMessage);
@@ -344,6 +353,7 @@ export class ChannelAreaComponent implements OnInit {
     }
   }
 
+  //deletes message from firestore
   deleteMessage(messageId: string): void {
     if (!this.channelId || !this.currentUser.isAdmin) return;
     const messageRef = doc(
@@ -382,6 +392,8 @@ export class ChannelAreaComponent implements OnInit {
       console.error('Error logging out:', error);
     }
   }
+
+  //invite a user
   async inviteUser() {
     if (!this.channelId || !this.selectedUserToInvite) {
       alert('Please select a user to invite.');
@@ -403,6 +415,7 @@ export class ChannelAreaComponent implements OnInit {
       console.error('Error sending invite:', error);
     }
   }
+
   loadInvitations(): void {
     const channelsRef = collection(this.firestore, 'channels');
     onSnapshot(channelsRef, (snapshot) => {
@@ -415,6 +428,7 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+  //accept invitations
   async acceptInvite(channelId: string) {
     const channelRef = doc(this.firestore, `channels/${channelId}`);
     const channelSnap = await docData(channelRef).toPromise();
@@ -436,6 +450,7 @@ export class ChannelAreaComponent implements OnInit {
     alert('You have joined the channel!');
   }
 
+  //decline invitation
   async declineInvite(channelId: string) {
     const channelRef = doc(this.firestore, `channels/${channelId}`);
     const channelSnap = await docData(channelRef).toPromise();
@@ -467,6 +482,7 @@ export class ChannelAreaComponent implements OnInit {
     return mentions;
   }
 
+  //send a notification to user when mentioned
   async sendMentionNotification(username: string, messageContent: string) {
     console.log(
       `Attempting to notify user: ${username} from channel ${this.channelId}`
