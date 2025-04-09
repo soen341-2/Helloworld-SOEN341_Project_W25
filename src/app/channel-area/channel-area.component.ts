@@ -105,6 +105,8 @@ export class ChannelAreaComponent implements OnInit {
       }
     });
   }
+
+  //get list of users allowed in channel
   loadChannelUsers(): void {
     if (!this.channelId) return;
 
@@ -147,6 +149,7 @@ export class ChannelAreaComponent implements OnInit {
     });
   }
 
+  //get status of user through an emoji
   getUserStatusEmoji(username: string): string {
     const user = this.channelUsers.find((u) => u.username === username);
     console.log('Checking status for:', username, 'Found:', user?.status);
@@ -164,12 +167,14 @@ export class ChannelAreaComponent implements OnInit {
     }
   }
 
+  //get channel background color depending on channel chat name
   get channelBackgroundColor(): string {
     return this.channelName && this.channelBackgroundColors[this.channelName]
       ? this.channelBackgroundColors[this.channelName]
       : '#ffffff';
   }
 
+  //updates channel's background color & saves
   onChannelColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
     if (this.channelName) {
@@ -181,14 +186,17 @@ export class ChannelAreaComponent implements OnInit {
     }
   }
 
+  //emoji picker that user can toggle
   toggleEmojiPicker(): void {
     this.showEmojiPicker = !this.showEmojiPicker;
   }
 
+  //retrieves emoji picked by user
   addEmoji(event: any): void {
     this.newMessage += event.detail.unicode;
   }
 
+  
   fetchUserData(userId: string): void {
     const userDocRef = doc(this.firestore, `users/${userId}`);
     docData(userDocRef).subscribe((userDoc: any) => {
