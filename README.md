@@ -27,11 +27,8 @@ To complete this project, our team is divided into two distinct groups. The Scru
 - HTML
 - CSS
 - Bootstrap
-- Firebase SDK
 
 #### Backend
-- Node.js
-- Express.js
 - Firebase Admin SDK
 
 #### Database
@@ -46,7 +43,7 @@ You can view a detailed record of the meetings conducted by the team through the
 
 - [x] Sprint 1
 - [x] Sprint 2
-- [ ] Sprint 3
+- [x] Sprint 3
 - [ ] Sprint 4
 
 
