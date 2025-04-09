@@ -59,8 +59,18 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   newChannelPrivacy = false;
   pendingInvites: {
     id: any;
-    username: any; channelId: string; channelTitle: string
+    username: any; 
+    channelId: string; 
+    channelTitle: string
     }[] = [];
+
+    joinRequests: { 
+      userId: string; 
+      username: string; 
+      channelId: string; 
+      channelTitle: string 
+    }[] = [];
+
  
   showEmojiPickerDirect = false;
  
@@ -79,52 +89,81 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     if (savedColors) {
       this.chatBackgroundColors = JSON.parse(savedColors);
     }
-
+  
     const darkModePreference = localStorage.getItem('darkMode');
     if (darkModePreference === 'enabled') {
-       this.isDarkMode = true;
-     document.body.classList.add('dark-mode');
-     }
+      this.isDarkMode = true;
+      document.body.classList.add('dark-mode');
+    }
+  
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
-        console.log("Logged-in User:", this.currentUser);
-         console.log("Current User UID:", this.currentUser.uid);
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-        this.listenToNotifications();
- 
+  
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          this.isAdmin = !!userData['isAdmin'] || false;
-          this.currentUsername = userData['username'] || [];
+          this.isAdmin = !!userData['isAdmin'];
+          this.currentUsername = userData['username'] || '';
           this.assignedChannels = userData['assignedChannels'] || [];
           this.activeConversations = userData['activeConversations'] || [];
           this.currentUserStatus = userData['status'] || "offline";
+  
           this.listenToUserStatus();
           await this.updateUserStatus("online");
           this.startInactivityTimer();
+          this.listenToNotifications();
+  
+          // Load pending invites for non-admins
           if (!this.isAdmin) {
             this.loadPendingInvites();
           }
-
+  
+          // Load join requests if user is a creator or admin
+          const channelsRef = collection(db, 'channels');
+          onSnapshot(channelsRef, (snapshot) => {
+            this.joinRequests = [];
+            snapshot.docs.forEach(docSnap => {
+              const data = docSnap.data();
+              if (data['creatorId'] === this.currentUser?.uid) {
+                const requests = data['joinRequests'] || [];
+                for (const userId of requests) {
+                  this.findUsernameById(userId).then(username => {
+                    if (username) {
+                      this.joinRequests.push({
+                        userId,
+                        username,
+                        channelId: docSnap.id,
+                        channelTitle: data['title'] || 'Untitled'
+                      });
+                    }
+                  });
+                }
+              }
+            });
+          });
         }
+  
         this.showChannels();
       }
     });
- 
+  
     this.usernames$ = this.getAllUsernames();
     this.filteredUsernames$ = this.searchControl.valueChanges.pipe(
       startWith(''),
       switchMap(searchTerm =>
         this.usernames$.pipe(
           map(usernames =>
-            usernames.filter(username => username.toLowerCase().includes(searchTerm.toLowerCase()))
+            usernames.filter(username =>
+              username.toLowerCase().includes(searchTerm.toLowerCase())
+            )
           )
         )
       )
     );
   }
+  
  
   async updateUserStatus(status: string) {
     if (this.currentUser) {
@@ -686,31 +725,22 @@ async selectChannel(channelIndex: number): Promise<void> {
              (id: string) => id !== channelId
  
            );
- 
            return updateDoc(userRef, {
  
              assignedChannels: updatedAssignedChannels
- 
            });
- 
          }
  
          return Promise.resolve();
- 
        });
- 
        await Promise.all(updatePromises);
  
        console.log("All users updated after channel deletion");
- 
        const messagesRef = collection(db, `channels/${channelId}/messages`);
- 
        const messagesSnapshot = await getDocs(messagesRef);
- 
        const deleteMessagePromises = messagesSnapshot.docs.map(doc =>
  
          deleteDoc(doc.ref)
- 
        );
  
        await Promise.all(deleteMessagePromises);
@@ -718,25 +748,18 @@ async selectChannel(channelIndex: number): Promise<void> {
      } else {
  
        const updatedAllowedUsers = (channelData['allowedUsers'] || []).filter(
- 
          (uid: string) => uid !== this.currentUser!.uid
  
        );
- 
        await updateDoc(channelRef, {
  
          allowedUsers: updatedAllowedUsers
- 
        });
- 
        console.log(`User ${this.currentUser.uid} has left channel ${channelId}`);
  
      }
- 
      this.channels = this.channels.filter(channel => channel.id !== channelId);
- 
      console.log("Updated channel list after leaving:", this.channels);
- 
      this.router.navigate(['/channels']);
  
    } catch (error) {
