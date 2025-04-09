@@ -25,8 +25,6 @@ channels: any[] = [];
   newPrivateChannelTitle = "";
   invitedUsers = "";
 
-
- 
   constructor(private firestore: Firestore, private auth: Auth, private router: Router) {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
@@ -54,7 +52,7 @@ channels: any[] = [];
     await this.loadJoinRequests();
   }
   
-
+  //loads users from firestore
   async loadUsers() {
     const usersRef = collection(this.firestore, 'users');
     const usersSnapshot = await getDocs(usersRef);
@@ -63,19 +61,21 @@ channels: any[] = [];
     console.log("Users from Firestore:", this.users); // Debugging log
   }
   
- 
+  //load channels from firestore
   async loadChannels() {
     const channelsRef = collection(this.firestore, 'channels');
     const channelsSnapshot = await getDocs(channelsRef);
     this.channels = channelsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
  
+  //load join requests from firestore
   async loadJoinRequests() {
     const joinRequestsRef = collection(this.firestore, 'joinRequests');
     const requestsSnapshot = await getDocs(joinRequestsRef);
     this.joinRequests = requestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
  
+  //creates a public channel where all users are welcome
   async createPublicChannel(title: string) {
     if (!this.currentUser?.isAdmin) return;
  
@@ -88,6 +88,7 @@ channels: any[] = [];
     await this.loadChannels();
   }
  
+  //creates a private channel where assigned users are welcome
   async createPrivateChannel(title: string, invitedUsers: string[]) {
     if (!this.currentUser) return;
  
@@ -100,6 +101,7 @@ channels: any[] = [];
     await this.loadChannels();
   }
  
+  //requests to join a channel
   async requestToJoin(channelId: string) {
     if (!this.currentUser) return;
  
@@ -111,6 +113,7 @@ channels: any[] = [];
     });
   }
  
+  //allows user to leave channel
   async leaveChannel(channelId: string) {
     if (!this.currentUser) return;
  
@@ -124,6 +127,7 @@ channels: any[] = [];
     }
   }
  
+  //accepts a join channel request
   async acceptJoinRequest(requestId: string, userId: string, channelId: string) {
     const requestRef = doc(this.firestore, 'joinRequests', requestId);
     await updateDoc(requestRef, { status: 'accepted' });
@@ -139,6 +143,7 @@ channels: any[] = [];
     }
   }
  
+  //declines a join channel request
   async declineJoinRequest(requestId: string) {
     const requestRef = doc(this.firestore, 'joinRequests', requestId);
     await updateDoc(requestRef, { status: 'declined' });
@@ -159,9 +164,6 @@ channels: any[] = [];
   
     console.log("Filtered Users:", this.filteredUsers); // Debugging log
   }
-  
-
-  
   
 }
  

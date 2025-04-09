@@ -1,4 +1,3 @@
-
 <nav class="navbar navbar-light bg-light px-3">
   <a class="navbar-brand fw-bold text-primary">ChatHaven</a>
   <div>
@@ -12,9 +11,7 @@
 </nav>
 
 <div class="container">
-  
   <h2>Channel Chat: {{ channelName }}</h2>
-    <!--Invite User Section -->
     <div *ngIf="isPrivate===true" class="invite-user-section">
       <div class="channel-users">
         <ul class="list-group">
@@ -40,28 +37,20 @@
     </div>
     <div *ngIf="creatorId==currentUser.uid && isPrivate==true" class="invite-user-section">
 
-      
       <h5>Invite a User to this Channel</h5>
   
-  
-      <!-- Dropdown for selecting users -->
       <select class="form-select mb-2" [(ngModel)]="selectedUserToInvite">
         <option *ngFor="let user of users$ | async" [value]="user.id">
           {{ user.username }}
         </option>
         
-  
       </select>
 
       <button (click)="inviteUser()" class="btn btn-outline-primary me-2">
         Invite User
       </button>
-      
-        
     </div>
   
-    
-
   <div class="form-group mt-3">
     <label for="channelBgColor">Channel Background Color:</label>
     <input 
@@ -73,7 +62,6 @@
     />
   </div>    
   <div class="messages" [ngStyle]="{ 'background-color': channelBackgroundColor }">
-    <!-- Scrollable message area -->
     <div class="message-list flex-grow-1 overflow-auto mb-3">
       <div class="messages-wrapper">
         <div class="messages-scrollable">
