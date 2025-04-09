@@ -17,17 +17,17 @@ import 'emoji-picker-element';
 })
 export class ChannelAreaComponent implements OnInit {
   channelId: string | null = null;
-  channelName: string = '';
-  isPrivate: boolean = false;
-  creatorId: string = '';
+  channelName = '';
+  isPrivate = false;
+  creatorId = '';
   messages: { id:string; sender: string; message: string; timestamp: string; replyId?: string | null; }[] = [];
-  newMessage: string = '';
+  newMessage = '';
   channels: any;
   currentChannel: any;
   messageService: any;
   replyingToMessage: { id: string; sender: string; message: string } | null = null;
   channelUsers: { id: string; username: string; status: string; lastSeen?: Date }[] = [];
-  users$: Observable<any[]> = new Observable();
+  users$ = new Observable<any[]>();
   selectedUserToInvite: string | null = null;
   allowedUsers: string[] = [];
   currentUser: { uid: string; username: string; isAdmin: boolean } = {
@@ -36,9 +36,9 @@ export class ChannelAreaComponent implements OnInit {
     isAdmin: false
   };
  
-  channelBackgroundColors: { [channelName: string]: string } = {};
+  channelBackgroundColors: Record<string, string> = {};
  
-  showEmojiPicker: boolean = false;
+  showEmojiPicker = false;
   pendingInvites: string[] = [];
  
   constructor(

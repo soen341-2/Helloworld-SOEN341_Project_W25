@@ -16,9 +16,9 @@ const db = getFirestore(app);
   styleUrl: './user-auth.component.css'
 })
 export class UserAuthComponent {
-  email: string = "";
-  password: string = "";
-  username: string = "";
+  email = "";
+  password = "";
+  username = "";
   currentUser: User | null = null;
 
   constructor(private router: Router) {
@@ -36,7 +36,7 @@ export class UserAuthComponent {
       return;
     }
 
-    let username = prompt("Please enter a username:");
+    const username = prompt("Please enter a username:");
     if (!username || username.trim() === "") {
       alert("Username is required for signup.");
       return;

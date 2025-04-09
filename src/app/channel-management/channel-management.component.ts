@@ -16,14 +16,14 @@ throw new Error('Method not implemented.');
 }
     users: any[] = [];
 filteredUsers: any[] = [];
-searchTerm: string = '';
+searchTerm = '';
 
 channels: any[] = [];
   currentUser: any = null;
   joinRequests: any[] = [];
-  newPublicChannelTitle: string = "";
-  newPrivateChannelTitle: string = "";
-  invitedUsers: string = "";
+  newPublicChannelTitle = "";
+  newPrivateChannelTitle = "";
+  invitedUsers = "";
 
 
  
@@ -131,7 +131,7 @@ channels: any[] = [];
     const channelRef = doc(this.firestore, 'channels', channelId);
     const channelSnap = await getDoc(channelRef);
     if (channelSnap.exists()) {
-      let allowedUsers = channelSnap.data()['allowedUsers'] || [];
+      const allowedUsers = channelSnap.data()['allowedUsers'] || [];
       if (!allowedUsers.includes(userId)) {
         allowedUsers.push(userId);
         await updateDoc(channelRef, { allowedUsers });
