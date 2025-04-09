@@ -1001,7 +1001,47 @@ private scrollToBottom(): void {
     console.error('Error scrolling to bottom:', err);
   }
 }
+async requestToJoin(channel: Channel) {
+  if (!this.currentUser) return;
 
- 
+  const channelRef = doc(db, "channels", channel.id);
+  const channelSnap = await getDoc(channelRef);
+
+  if (!channelSnap.exists()) {
+    console.error("Channel not found!");
+    return;
+  }
+
+  const channelData = channelSnap.data();
+
+  // ✅ Use bracket notation for joinRequests
+  if (channelData['joinRequests']?.includes(this.currentUser.uid)) {
+    alert("You've already requested to join this channel.");
+    return;
+  }
+
+  try {
+    // ✅ Use bracket notation here too
+    const updatedJoinRequests = [...(channelData['joinRequests'] || []), this.currentUser.uid];
+    await updateDoc(channelRef, { joinRequests: updatedJoinRequests });
+
+    // ✅ Use bracket notation for creatorId and title
+    const adminId = channelData['creatorId'];
+    const notifRef = collection(db, `users/${adminId}/notifications`);
+    await addDoc(notifRef, {
+      from: this.currentUsername,
+      message: `${this.currentUsername} requested to join ${channelData['title']}`,
+      timestamp: Timestamp.now(),
+      read: false,
+      isFromChannel: true,
+      channelId: channel.id
+    });
+
+    alert("Your request to join has been sent.");
+  } catch (err) {
+    console.error("Error handling join request:", err);
+  }
+}
+
  
 }
