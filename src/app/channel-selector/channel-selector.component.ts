@@ -16,18 +16,11 @@ import { ChatMessage } from '../models/chat-message';
 import { Notification } from '../models/notification';
 import { AfterViewChecked} from '@angular/core';
 
- 
- 
- 
 import 'emoji-picker-element';
 import { ChangeDetectorRef } from '@angular/core';
  
- 
- 
 const app = initializeApp(environment.firebaseConfig);
 const db=getFirestore(app);
- 
- 
  
 @Component({
   selector: 'app-channel-selector',
@@ -61,9 +54,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   isDarkMode = false;
   showNotificationPanel = false;
  
- 
- 
-  // Default background color (can be any valid hex color)
   chatBackgroundColors: Record<string, string> = {};
  
   newChannelPrivacy = false;
@@ -79,40 +69,9 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
  
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
-  //sarah part
+
   searchControl=new FormControl;
   constructor(private router: Router, private cdRef: ChangeDetectorRef) {}
- 
-  /*async createDefaultChannelsIfMissing() {
-    const defaultChannelTitles = ['#all-general', '#announcements'];
-    const channelsRef = collection(db, "channels");
-    const snapshot = await getDocs(channelsRef);
- 
-    const existingTitles = snapshot.docs.map(doc => (doc.data() as Channel).title);
- 
-    for (const title of defaultChannelTitles) {
-      if (!existingTitles.includes(title)) {
-        const newChannel: Channel = {
-          title,
-          id: uuidv4(),
-          isPrivate: false,
-          allowedUsers: [], // public means all users can see it
-          creatorId: ""
-        };
- 
-        const channelRef = doc(db, "channels", newChannel.id);
-        await setDoc(channelRef, newChannel);
-        console.log(`Default channel created: ${title}`);
-      } else {
-        console.log(`Default channel "${title}" already exists.`);
-      }
-    }
-  }
- 
-  isDefaultChannel(channelTitle: string): boolean {
-    const defaultChannels = ['#all-general', '#announcements'];
-    return defaultChannels.includes(channelTitle);
-  }  */
  
   async ngOnInit() {
     const auth = getAuth();
@@ -120,7 +79,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     if (savedColors) {
       this.chatBackgroundColors = JSON.parse(savedColors);
     }
-    // Add this to your existing ngOnInit method
+
     const darkModePreference = localStorage.getItem('darkMode');
     if (darkModePreference === 'enabled') {
        this.isDarkMode = true;
@@ -148,16 +107,12 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
           if (!this.isAdmin) {
             this.loadPendingInvites();
           }
-   
-         /* if (this.isAdmin) {
-            await this.createDefaultChannelsIfMissing();
-          }*/
+
         }
         this.showChannels();
       }
     });
  
-   
     this.usernames$ = this.getAllUsernames();
     this.filteredUsernames$ = this.searchControl.valueChanges.pipe(
       startWith(''),
@@ -238,7 +193,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         allowedUsers: [this.currentUser!.uid, userId]
       });
     }
- 
     this.loadMessages(userId);
    
     if (!this.activeConversations.some(convo => convo.username === username)) {
@@ -265,7 +219,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     this.replyingToMessage = message;
   }
    
-  //ADDED RN
   onColorChange(event: Event): void {
     const newColor = (event.target as HTMLInputElement).value;
  
@@ -274,25 +227,20 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       localStorage.setItem('dmBgColors', JSON.stringify(this.chatBackgroundColors));
     }
   }
- 
- 
- 
   get chatBackgroundColor(): string {
     return this.selectedUsername && this.chatBackgroundColors[this.selectedUsername]
       ? this.chatBackgroundColors[this.selectedUsername]
-      : '#ffffff'; // default
+      : '#ffffff';
   }
  
   saveBackgroundColors(): void {
     localStorage.setItem('dmBgColors', JSON.stringify(this.chatBackgroundColors));
   }
  
- 
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
     this.showEmojiPickerDirect = !this.showEmojiPickerDirect;
   }
- 
  
   addEmojiDirect(event: any): void {
     this.newMessage += event.detail.unicode;
@@ -393,8 +341,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       .catch(error => console.error("Error:", error));
   }
  
- 
- 
   goToAdminDashboard() {
     this.router.navigate(['/admin-dashboard']);
   }
@@ -438,7 +384,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
  
       console.log("User logged out successfully.");
    
-       
        this.currentUser = null;
        this.isAdmin = false;
        this.currentUsername = "Guest";
@@ -460,8 +405,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     });
   }
 }
- 
- 
+
   newChannelTitle  = "";
  
   currentChannel: activeChannel = {
@@ -476,16 +420,14 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
        alert("Channels must have a name");
        return;
      }
- 
-      //Users can only create private channels, Admins can choose
+
       const isPrivate = this.isAdmin ? this.newChannelPrivacy : true;
- 
  
       const newChannel: Channel = {
         title: this.newChannelTitle,
         id: uuidv4(),
-        isPrivate: isPrivate, //Users can ONLY create private channels
-        allowedUsers: [this.currentUser!.uid], // Ensure creator is added
+        isPrivate: isPrivate, 
+        allowedUsers: [this.currentUser!.uid], 
         creatorId: this.currentUser!.uid
       };
      
@@ -517,7 +459,6 @@ getChatBoxStyle(): any {
   return { 'background-color': '#ffffff' };
 }
  
- 
   showChannels() {
     const channelRef = collection(db, "channels");
  
@@ -540,9 +481,6 @@ getChatBoxStyle(): any {
       console.error("Error fetching channels:", error);
     });
 }
- 
- 
- 
  
   async deleteChannel(index: number) {
     const channelId = this.channels[index].id;
@@ -578,14 +516,13 @@ getChatBoxStyle(): any {
  
 async selectChannel(channelIndex: number): Promise<void> {
   this.currentChannel = this.channels[channelIndex];
-   // Fetch latest channel data from Firestore
+
    const channelRef = doc(db, "channels", this.currentChannel.id);
    const channelSnap = await getDoc(channelRef);
  
    if (channelSnap.exists()) {
      const channelData = channelSnap.data() as Channel;
  
-     // If channel is private, check if the current user is allowed
      if (channelData.isPrivate && !this.isAdmin && (!channelData.allowedUsers || !channelData.allowedUsers.includes(this.currentUser!.uid))) {
        alert("You don't have permission to access this private channel.");
        return;
@@ -607,10 +544,9 @@ async selectChannel(channelIndex: number): Promise<void> {
    const channelsRef = collection(db, 'channels');
  
    onSnapshot(channelsRef, (snapshot) => {
-     // Clear previous pending invites to avoid duplications
+
      this.pendingInvites = [];
      
-     // Get only channels where current user is in pendingInvites but NOT the creator
      snapshot.docs.forEach(docSnap => {
        const data = docSnap.data();
        
@@ -618,7 +554,6 @@ async selectChannel(channelIndex: number): Promise<void> {
            data['pendingInvites'].includes(this.currentUser!.uid) &&
            data['creatorId'] !== this.currentUser!.uid) {
          
-         // Add to pendingInvites array with just the properties in your type definition
          this.pendingInvites.push({
            id: docSnap.id,
            channelId: docSnap.id,
@@ -662,7 +597,7 @@ async selectChannel(channelIndex: number): Promise<void> {
    }
  }
  async declineInvite(channelId: string) {
-   if (!this.currentUser?.uid) {  // Vérifie si l'utilisateur est connecté
+   if (!this.currentUser?.uid) {  
      console.error("No user logged in.");
      return;
    }
@@ -698,11 +633,9 @@ async selectChannel(channelIndex: number): Promise<void> {
      console.error("No user logged in.");
  
      return;
- 
    }
  
    const channelRef = doc(db, `channels/${channelId}`);
- 
    const channelSnap = await getDoc(channelRef);
  
    if (!channelSnap.exists()) {
@@ -710,7 +643,6 @@ async selectChannel(channelIndex: number): Promise<void> {
      console.error("Channel not found!");
  
      return;
- 
    }
  
    try {
@@ -721,45 +653,19 @@ async selectChannel(channelIndex: number): Promise<void> {
  
      if (channelCreator === this.currentUser.uid) {
  
-       // If user is the creator, delete the entire channel
- 
-       // First, notify all channel members that the channel is being deleted
- 
        const allowedUsers = channelData['allowedUsers'] || [];
  
        for (const userId of allowedUsers) {
  
          if (userId !== this.currentUser.uid) {
  
-           // You could implement a notification system here
- 
            console.log(`Notifying user ${userId} about channel deletion`);
- 
-           // Optional: Add the notification to a notifications collection
- 
-           // await addDoc(collection(db, "notifications"), {
- 
-           //   userId: userId,
- 
-           //   message: `Channel "${channelData['title']}" has been deleted by the creator`,
- 
-           //   timestamp: Timestamp.now(),
- 
-           //   read: false
- 
-           // });
- 
          }
- 
        }
- 
-       // Delete the channel document
  
        await deleteDoc(channelRef);
  
        console.log(`Channel ${channelId} deleted because creator left.`);
- 
-       // Remove the channel from all users' assignedChannels lists
  
        const usersRef = collection(db, "users");
  
@@ -797,10 +703,6 @@ async selectChannel(channelIndex: number): Promise<void> {
  
        console.log("All users updated after channel deletion");
  
-       // Also delete all channel messages if you have them in a subcollection
- 
-       // This depends on your data structure
- 
        const messagesRef = collection(db, `channels/${channelId}/messages`);
  
        const messagesSnapshot = await getDocs(messagesRef);
@@ -814,8 +716,6 @@ async selectChannel(channelIndex: number): Promise<void> {
        await Promise.all(deleteMessagePromises);
  
      } else {
- 
-       // If user is not the creator, just remove them from the channel
  
        const updatedAllowedUsers = (channelData['allowedUsers'] || []).filter(
  
@@ -833,20 +733,15 @@ async selectChannel(channelIndex: number): Promise<void> {
  
      }
  
-     // Update local channels list
- 
      this.channels = this.channels.filter(channel => channel.id !== channelId);
  
      console.log("Updated channel list after leaving:", this.channels);
- 
-     // Navigate to channels list
  
      this.router.navigate(['/channels']);
  
    } catch (error) {
  
      console.error("Error leaving channel:", error);
- 
    }
  
    this.showChannels();
@@ -855,7 +750,6 @@ async selectChannel(channelIndex: number): Promise<void> {
  toggleDarkMode() {
   this.isDarkMode = !this.isDarkMode;
  
-  // Apply dark mode to document body
   if (this.isDarkMode) {
     document.body.classList.add('dark-mode');
     localStorage.setItem('darkMode', 'enabled');
@@ -863,14 +757,12 @@ async selectChannel(channelIndex: number): Promise<void> {
     document.body.classList.remove('dark-mode');
     localStorage.setItem('darkMode', 'disabled');
   }
-   // Fix text colors in dark mode
   this.updateDarkModeTextColors();
 }
 
-// Add this new method to update text colors in dark mode
 updateDarkModeTextColors() {
   setTimeout(() => {
-    // Target all headers in dm-header
+
     const dmHeaders = document.querySelectorAll('.dm-header h4, .dm-header h5');
     
     dmHeaders.forEach(header => {
@@ -881,7 +773,6 @@ updateDarkModeTextColors() {
       }
     });
     
-    // Force change detection
     this.cdRef.detectChanges();
   }, 0);
 }
@@ -896,7 +787,6 @@ updateDarkModeTextColors() {
        this.currentUserStatus = userData['status'] || "offline";
        console.log("User status updated in real-time:", this.currentUserStatus);
  
-     
        if (this.currentUserStatus === "offline") {
          this.router.navigate(['/login']);
        }
@@ -925,7 +815,6 @@ listenToNotifications() {
   });
 }
  
- 
 markAllNotificationsAsRead() {
   const notifRef = collection(db, `users/${this.currentUser!.uid}/notifications`);
   this.unreadNotifications.forEach(async notif => {
@@ -947,6 +836,7 @@ getMentions(message: string): string[] {
   }
   return mentions;
 }
+
 async deleteNotification(notifId: string) {
   const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notifId}`);
   try {
@@ -969,7 +859,6 @@ handleNotificationClick(notification: Notification) {
       }
     });
   }
- 
   const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notification.id}`);
   updateDoc(notifRef, { read: true });
 }
@@ -991,7 +880,7 @@ ngAfterViewChecked(): void {
 private scrollToBottom(): void {
   try {
     if (this.scrollContainer && this.scrollContainer.nativeElement) {
-      // Use setTimeout to ensure DOM has finished updating
+ 
       setTimeout(() => {
         this.scrollContainer.nativeElement.scrollTop = 
           this.scrollContainer.nativeElement.scrollHeight;
@@ -1001,6 +890,7 @@ private scrollToBottom(): void {
     console.error('Error scrolling to bottom:', err);
   }
 }
+
 async requestToJoin(channel: Channel) {
   if (!this.currentUser) return;
 
@@ -1011,21 +901,17 @@ async requestToJoin(channel: Channel) {
     console.error("Channel not found!");
     return;
   }
-
   const channelData = channelSnap.data();
 
-  // ✅ Use bracket notation for joinRequests
   if (channelData['joinRequests']?.includes(this.currentUser.uid)) {
     alert("You've already requested to join this channel.");
     return;
   }
 
   try {
-    // ✅ Use bracket notation here too
     const updatedJoinRequests = [...(channelData['joinRequests'] || []), this.currentUser.uid];
     await updateDoc(channelRef, { joinRequests: updatedJoinRequests });
 
-    // ✅ Use bracket notation for creatorId and title
     const adminId = channelData['creatorId'];
     const notifRef = collection(db, `users/${adminId}/notifications`);
     await addDoc(notifRef, {
@@ -1038,7 +924,8 @@ async requestToJoin(channel: Channel) {
     });
 
     alert("Your request to join has been sent.");
-  } catch (err) {
+  } 
+  catch (err) {
     console.error("Error handling join request:", err);
   }
 }
