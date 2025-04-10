@@ -11,7 +11,7 @@
 - Added scrollable windows for the chat and the list of channels in channel selector.
 - Made private channel area bigger.
 - Unified font accross the platform. 
-- **March 14, 12:00PM - 1:00PM**  
+- **April 3 7:00PM to April 5  
   
 ### Developed feature allowing users to create private channels
 - Users can specify a name and invite specific members.
