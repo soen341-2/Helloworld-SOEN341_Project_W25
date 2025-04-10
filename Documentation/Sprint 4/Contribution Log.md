@@ -11,30 +11,29 @@
 - Added scrollable windows for the chat and the list of channels in channel selector.
 - Made private channel area bigger.
 - Unified font accross the platform. 
-- **April 3 7:00PM to April 5  
+- **April 3 7:00PM to April 5 11:00PM**
   
-### Developed feature allowing users to create private channels
-- Users can specify a name and invite specific members.
-- Worked alongside Prathiksha.
-- **March 14, 1:00PM - 3:00PM**  
+### Fixed bugs related to UI enhancements
+- Fixed issue with scrollable chat.
+- Helped Sarah with mentions bugs.
+- **April 6, 6:00PM - 9:00PM**  
    
-### Added option for users to leave any joined channel
-- **March 14, 3PM - 7PM**
+### Wrote final report part
+- Wrote Infrastructure part of the report.
+- Wrote reflective component.
+- **April 7, 2:00PM - 5:00PM** 
 
-### Designed UI elements to visually distinguish public vs private channels
-- Worked alongside Prathiksha.
-- **March 19, 12PM - 1PM**
+### Made final presentation slide
+- Process overview slide completed for presentation.
+- **April 8, 6:00PM - 8:00PM**
 
-### Debugging
--Worked alongside Sarah and Marco to debug issues with the code. 
-- **March 19, 3:00PM – 6:00PM**  
-
-### Implemented functionality to accept or decline join requests
-- **March 20, 4:30PM - 9PM**  
-
-### Ensured access control for private channels
-- **March 21, 11:30AM - 3:00PM**  
-  
+### Created and filled out documentation for Sprint 4 in GitHub
+- Create Sprint 4 folder.
+- Created and filled out meeting minutes file.
+- Created and filled out user stories file.
+- Create and filled out my contributions and contribution log file.
+- Create and filled out burndown chart for sprint 4.
+- **April 10, 6:00PM - 7:30PM** 
   
 ---
 
