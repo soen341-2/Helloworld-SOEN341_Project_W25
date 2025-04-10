@@ -1056,4 +1056,131 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       console.error('Error scrolling to bottom:', err);
     }
   }
+
+  async requestToJoin(channel: Channel) {
+    if (!this.currentUser) return;
+  
+    const channelRef = doc(db, "channels", channel.id);
+    const channelSnap = await getDoc(channelRef);
+  
+    if (!channelSnap.exists()) {
+      console.error("Channel not found!");
+      return;
+    }
+  
+    const channelData = channelSnap.data();
+  
+    if (channelData['joinRequests']?.includes(this.currentUser.uid)) {
+      alert("You've already requested to join this channel.");
+      return;
+    }
+  
+    try {
+      const updatedJoinRequests = [...(channelData['joinRequests'] || []), this.currentUser.uid];
+      await updateDoc(channelRef, { joinRequests: updatedJoinRequests });
+  
+      const adminId = channelData['creatorId'];
+      const notifRef = collection(db, `users/${adminId}/notifications`);
+      await addDoc(notifRef, {
+        from: this.currentUsername,
+        message: `${this.currentUsername} requested to join ${channelData['title']}`,
+        timestamp: Timestamp.now(),
+        read: false,
+        isFromChannel: true,
+        channelId: channel.id
+      });
+  
+      alert("Your request to join has been sent.");
+    } 
+    catch (err) {
+      console.error("Error handling join request:", err);
+    }
+  }
+  async acceptJoinRequest(channelId: string, requesterUsername: string) {
+    if (!this.currentUser) return;
+  
+    const channelRef = doc(db, 'channels', channelId);
+    const channelSnap = await getDoc(channelRef);
+    if (!channelSnap.exists()) return;
+  
+    const channelData = channelSnap.data();
+    const requesterId = await this.getUserIdByUsername(requesterUsername);
+    if (!requesterId) return;
+  
+    const updatedAllowedUsers = [...(channelData['allowedUsers'] || []), requesterId];
+    const updatedJoinRequests = (channelData['joinRequests'] || []).filter((id: string) => id !== requesterId);
+  
+    await updateDoc(channelRef, {
+      allowedUsers: updatedAllowedUsers,
+      joinRequests: updatedJoinRequests
+    });
+  
+    // Optional: send a notification to the user
+    const notifRef = collection(db, `users/${requesterId}/notifications`);
+    await addDoc(notifRef, {
+      from: this.currentUsername,
+      message: `You have been accepted into ${channelData['title']}`,
+      timestamp: Timestamp.now(),
+      read: false,
+      isFromChannel: true,
+      channelId: channelId
+    });
+  
+    this.deleteNotificationByChannel(channelId, requesterUsername);
+  }
+  
+  
+  async denyJoinRequest(channelId: string, requesterUsername: string) {
+    if (!this.currentUser) return;
+  
+    const channelRef = doc(db, 'channels', channelId);
+    const channelSnap = await getDoc(channelRef);
+    if (!channelSnap.exists()) return;
+  
+    const channelData = channelSnap.data();
+    const requesterId = await this.getUserIdByUsername(requesterUsername);
+    if (!requesterId) return;
+  
+    const updatedJoinRequests = (channelData['joinRequests'] || []).filter((id: string) => id !== requesterId);
+  
+    await updateDoc(channelRef, {
+      joinRequests: updatedJoinRequests
+    });
+  
+    // Optional: send a notification to the user
+    const notifRef = collection(db, `users/${requesterId}/notifications`);
+    await addDoc(notifRef, {
+      from: this.currentUsername,
+      message: `Your request to join ${channelData['title']} was denied.`,
+      timestamp: Timestamp.now(),
+      read: false,
+      isFromChannel: true,
+      channelId: channelId
+    });
+  
+    this.deleteNotificationByChannel(channelId, requesterUsername);
+  }
+  async getUserIdByUsername(username: string): Promise<string | null> {
+    const usersRef = collection(db, 'users');
+    const snapshot = await getDocs(usersRef);
+  
+    for (const docSnap of snapshot.docs) {
+      if (docSnap.data()['username'] === username) {
+        return docSnap.id;
+      }
+    }
+    return null;
+  }
+  deleteNotificationByChannel(channelId: string, username: string) {
+    const notifToDelete = this.unreadNotifications.find(n => n.channelId === channelId && n.from === username);
+    if (notifToDelete) {
+      this.deleteNotification(notifToDelete.id);
+    }
+  }
+  isChannelCreator(channelId: string): boolean {
+    const channel = this.channels.find(c => c.id === channelId);
+    return channel?.creatorId === this.currentUser?.uid;
+  }
+  
+  
 }
