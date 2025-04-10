@@ -104,4 +104,10 @@ export class UserAuthComponent {
     this.password = "";
     this.username = "";
   }
+  showPassword = false;
+
+togglePasswordVisibility() {
+  this.showPassword = !this.showPassword;
+}
+
 }
