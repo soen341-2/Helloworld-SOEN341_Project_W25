@@ -38,13 +38,21 @@ import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
 import { ChatMessage } from '../models/chat-message';
 import { Notification } from '../models/notification';
-import { AfterViewChecked } from '@angular/core';
+import { AfterViewChecked} from '@angular/core';
+
+ 
+ 
+ 
 import 'emoji-picker-element';
 import { ChangeDetectorRef } from '@angular/core';
-
+ 
+ 
+ 
 const app = initializeApp(environment.firebaseConfig);
-const db = getFirestore(app);
-
+const db=getFirestore(app);
+ 
+ 
+ 
 @Component({
   selector: 'app-channel-selector',
   standalone: false,
@@ -78,18 +86,18 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   >();
   isDarkMode = false;
   showNotificationPanel = false;
-
+ 
+ 
+ 
   // Default background color (can be any valid hex color)
   chatBackgroundColors: Record<string, string> = {};
 
   newChannelPrivacy = false;
   pendingInvites: {
     id: any;
-    username: any;
-    channelId: string;
-    channelTitle: string;
-  }[] = [];
-
+    username: any; channelId: string; channelTitle: string
+    }[] = [];
+ 
   showEmojiPickerDirect = false;
 
   @ViewChild('emojiPickerContainer', { static: false })
@@ -98,9 +106,9 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   //sarah part
-  searchControl = new FormControl();
+  searchControl=new FormControl;
   constructor(private router: Router, private cdRef: ChangeDetectorRef) {}
-
+ 
   /*async createDefaultChannelsIfMissing() {
     const defaultChannelTitles = ['#all-general', '#announcements'];
     const channelsRef = collection(db, "channels");
@@ -131,65 +139,67 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     const defaultChannels = ['#all-general', '#announcements'];
     return defaultChannels.includes(channelTitle);
   }  */
-
+ 
   async ngOnInit() {
     const auth = getAuth();
     const savedColors = localStorage.getItem('dmBgColors');
     if (savedColors) {
       this.chatBackgroundColors = JSON.parse(savedColors);
     }
-    // Add this to your existing ngOnInit method
+  
     const darkModePreference = localStorage.getItem('darkMode');
     if (darkModePreference === 'enabled') {
-      this.isDarkMode = true;
-      document.body.classList.add('dark-mode');
-    }
+       this.isDarkMode = true;
+     document.body.classList.add('dark-mode');
+     }
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         this.currentUser = user;
-        console.log('Logged-in User:', this.currentUser);
-        console.log('Current User UID:', this.currentUser.uid);
-        const userRef = doc(db, 'users', user.uid);
+        console.log("Logged-in User:", this.currentUser);
+         console.log("Current User UID:", this.currentUser.uid);
+        const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         this.listenToNotifications();
-
+ 
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          this.isAdmin = !!userData['isAdmin'] || false;
-          this.currentUsername = userData['username'] || [];
+          this.isAdmin = !!userData['isAdmin'];
+          this.currentUsername = userData['username'] || '';
           this.assignedChannels = userData['assignedChannels'] || [];
           this.activeConversations = userData['activeConversations'] || [];
-          this.currentUserStatus = userData['status'] || 'offline';
+          this.currentUserStatus = userData['status'] || "offline";
           this.listenToUserStatus();
           await this.updateUserStatus('online');
           this.startInactivityTimer();
+          this.listenToNotifications();
+  
+          // Load pending invites for non-admins
           if (!this.isAdmin) {
             this.loadPendingInvites();
           }
-
-          /* if (this.isAdmin) {
+   
+         /* if (this.isAdmin) {
             await this.createDefaultChannelsIfMissing();
           }*/
         }
         this.showChannels();
       }
     });
-
+ 
+   
     this.usernames$ = this.getAllUsernames();
     this.filteredUsernames$ = this.searchControl.valueChanges.pipe(
       startWith(''),
       switchMap((searchTerm) =>
         this.usernames$.pipe(
-          map((usernames) =>
-            usernames.filter((username) =>
-              username.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+          map(usernames =>
+            usernames.filter(username => username.toLowerCase().includes(searchTerm.toLowerCase()))
           )
         )
       )
     );
   }
-
+ 
   async updateUserStatus(status: string) {
     if (this.currentUser) {
       const userRef = doc(db, 'users', this.currentUser.uid);
@@ -262,7 +272,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         allowedUsers: [this.currentUser!.uid, userId],
       });
     }
-
+ 
     this.loadMessages(userId);
 
     if (
@@ -290,7 +300,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   reply(message: ChatMessage) {
     this.replyingToMessage = message;
   }
-
+   
   //ADDED RN
   onColorChange(event: Event): void {
     const newColor = (event.target as HTMLInputElement).value;
@@ -303,12 +313,14 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       );
     }
   }
-
+ 
+ 
+ 
   get chatBackgroundColor(): string {
     return this.selectedUsername &&
       this.chatBackgroundColors[this.selectedUsername]
       ? this.chatBackgroundColors[this.selectedUsername]
-      : '#ffffff'; // default
+      : '#ffffff';
   }
 
   saveBackgroundColors(): void {
@@ -317,12 +329,14 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       JSON.stringify(this.chatBackgroundColors)
     );
   }
-
+ 
+ 
   toggleEmojiPickerDirect(event: MouseEvent): void {
     event.stopPropagation();
     this.showEmojiPickerDirect = !this.showEmojiPickerDirect;
   }
-
+ 
+ 
   addEmojiDirect(event: any): void {
     this.newMessage += event.detail.unicode;
   }
@@ -429,7 +443,9 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       })
       .catch((error) => console.error('Error:', error));
   }
-
+ 
+ 
+ 
   goToAdminDashboard() {
     this.router.navigate(['/admin-dashboard']);
   }
@@ -469,118 +485,115 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
 
       const auth = getAuth();
       await signOut(auth);
-
-      console.log('User logged out successfully.');
-
-      this.currentUser = null;
-      this.isAdmin = false;
-      this.currentUsername = 'Guest';
-      this.currentUserStatus = 'offline';
-      this.cdRef.detectChanges();
-
+ 
+      console.log("User logged out successfully.");
+   
+       
+       this.currentUser = null;
+       this.isAdmin = false;
+       this.currentUsername = "Guest";
+       this.currentUserStatus = "offline";
+       this.cdRef.detectChanges();
+ 
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('Error logging out:', error);
     }
   }
-  @HostListener('window:beforeunload', ['$event'])
-  async handleBeforeUnload(event: Event) {
-    if (this.currentUser) {
-      const userRef = doc(db, 'users', this.currentUser.uid);
-      await updateDoc(userRef, {
-        status: 'offline',
-        lastSeen: new Date(),
-      });
-    }
+ @HostListener('window:beforeunload', ['$event'])
+ async handleBeforeUnload(event: Event) {
+  if (this.currentUser) {
+    const userRef = doc(db, "users", this.currentUser.uid);
+    await updateDoc(userRef, {
+      status: "offline",
+      lastSeen: new Date()
+    });
   }
-
-  newChannelTitle = '';
-
+}
+ 
+ 
+  newChannelTitle  = "";
+ 
   currentChannel: activeChannel = {
-    id: '0',
-    title: '',
-  };
-
-  channels: Channel[] = [];
-
-  async addChannel() {
-    if (this.newChannelTitle.trim().length === 0) {
-      alert('Channels must have a name');
-      return;
-    }
-
-    //Users can only create private channels, Admins can choose
-    const isPrivate = this.isAdmin ? this.newChannelPrivacy : true;
-
-    const newChannel: Channel = {
-      title: this.newChannelTitle,
-      id: uuidv4(),
-      isPrivate: isPrivate, //Users can ONLY create private channels
-      allowedUsers: [this.currentUser!.uid], // Ensure creator is added
-      creatorId: this.currentUser!.uid,
-    };
-
-    console.log('Creating Channel:', newChannel);
-
-    try {
-      const channelRef = doc(db, 'channels', newChannel.id);
-      await setDoc(channelRef, newChannel);
-
-      console.log(
-        `Channel created: ${newChannel.title} (Private: ${newChannel.isPrivate})`
-      );
-      console.log(`Allowed Users: `, newChannel.allowedUsers);
-
-      this.newChannelTitle = '';
-      this.newChannelPrivacy = false;
-    } catch (error) {
-      console.error('Error creating channel:', error);
-    }
+    id: "0",
+    title: ""
   }
-  getChatBoxStyle(): any {
-    const bgColor = this.chatBackgroundColor;
-    if (bgColor !== '#ffffff') {
-      return { 'background-color': bgColor };
-    }
-
-    if (this.isDarkMode) {
-      return { 'background-color': 'rgba(0, 0, 0, 0.65)' };
-    }
-
-    return { 'background-color': '#ffffff' };
-  }
-
-  showChannels() {
-    const channelRef = collection(db, 'channels');
-
-    onSnapshot(
-      channelRef,
-      (snapshot) => {
-        this.channels = snapshot.docs
-          .map((doc) => {
-            const channelData = doc.data() as Channel;
-            return {
-              ...channelData,
-              id: channelData.id ?? doc.id,
-              isAccessible:
-                !channelData.isPrivate ||
-                this.isAdmin ||
-                (Array.isArray(channelData.allowedUsers) &&
-                  channelData.allowedUsers.includes(
-                    this.currentUser?.uid ?? ''
-                  )),
-            };
-          })
-          .filter((channel: Channel & { isAccessible: boolean }) => {
-            return !channel.isDM;
-          });
-      },
-      (error) => {
-        console.error('Error fetching channels:', error);
+ 
+  channels: Channel[] = []
+ 
+   async addChannel() {
+     if (this.newChannelTitle.trim().length === 0) {
+       alert("Channels must have a name");
+       return;
+     }
+ 
+      //Users can only create private channels, Admins can choose
+      const isPrivate = this.isAdmin ? this.newChannelPrivacy : true;
+ 
+ 
+      const newChannel: Channel = {
+        title: this.newChannelTitle,
+        id: uuidv4(),
+        isPrivate: isPrivate, //Users can ONLY create private channels
+        allowedUsers: [this.currentUser!.uid], // Ensure creator is added
+        creatorId: this.currentUser!.uid
+      };
+     
+      console.log("Creating Channel:", newChannel);
+   
+      try {
+        const channelRef = doc(db, "channels", newChannel.id);
+        await setDoc(channelRef, newChannel);
+   
+        console.log(`Channel created: ${newChannel.title} (Private: ${newChannel.isPrivate})`);
+        console.log(`Allowed Users: `, newChannel.allowedUsers);
+   
+        this.newChannelTitle = "";
+        this.newChannelPrivacy = false;
+      } catch (error) {
+        console.error("Error creating channel:", error);
       }
-    );
   }
-
+getChatBoxStyle(): any {
+  const bgColor = this.chatBackgroundColor;
+  if (bgColor !== '#ffffff') {
+    return { 'background-color': bgColor };
+  }
+ 
+  if (this.isDarkMode) {
+    return { 'background-color': 'rgba(0, 0, 0, 0.65)' };
+  }
+ 
+  return { 'background-color': '#ffffff' };
+}
+ 
+ 
+  showChannels() {
+    const channelRef = collection(db, "channels");
+ 
+    onSnapshot(channelRef, (snapshot) => {
+      this.channels = snapshot.docs
+      .map(doc => {
+        const channelData = doc.data() as Channel;
+        return {
+          ...channelData,
+          id: channelData.id ?? doc.id,
+          isAccessible: !channelData.isPrivate || this.isAdmin ||
+                        (Array.isArray(channelData.allowedUsers) && channelData.allowedUsers.includes(this.currentUser?.uid ?? ""))
+        };
+      })
+      .filter((channel: Channel & {isAccessible: boolean}) => {
+        return !channel.isDM;
+      });
+       
+    }, (error) => {
+      console.error("Error fetching channels:", error);
+    });
+}
+ 
+ 
+ 
+ 
   async deleteChannel(index: number) {
     const channelId = this.channels[index].id;
     const channelRef = doc(db, 'channels', channelId);
@@ -612,449 +625,387 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     } catch (error) {
       console.error('Error deleting channel:', error);
     }
+}
+ 
+async selectChannel(channelIndex: number): Promise<void> {
+  this.currentChannel = this.channels[channelIndex];
+   // Fetch latest channel data from Firestore
+   const channelRef = doc(db, "channels", this.currentChannel.id);
+   const channelSnap = await getDoc(channelRef);
+ 
+   if (channelSnap.exists()) {
+     const channelData = channelSnap.data() as Channel;
+ 
+     // If channel is private, check if the current user is allowed
+     if (channelData.isPrivate && !this.isAdmin && (!channelData.allowedUsers || !channelData.allowedUsers.includes(this.currentUser!.uid))) {
+       alert("You don't have permission to access this private channel.");
+       return;
+     }
+   } else {
+     console.error("Channel not found!");
+     return;
+   }
+ 
+   try {
+     this.router.navigate(['/channel-area', this.currentChannel.id]);
+   } catch (error) {
+     console.error("Error selecting channel:", error);
+   }
+ }
+ loadPendingInvites(): void {
+   if (!this.currentUser) return;
+ 
+   const channelsRef = collection(db, 'channels');
+ 
+   onSnapshot(channelsRef, (snapshot) => {
+     // Clear previous pending invites to avoid duplications
+     this.pendingInvites = [];
+     
+     // Get only channels where current user is in pendingInvites but NOT the creator
+     snapshot.docs.forEach(docSnap => {
+       const data = docSnap.data();
+       
+       if (Array.isArray(data['pendingInvites']) &&
+           data['pendingInvites'].includes(this.currentUser!.uid) &&
+           data['creatorId'] !== this.currentUser!.uid) {
+         
+         // Add to pendingInvites array with just the properties in your type definition
+         this.pendingInvites.push({
+           id: docSnap.id,
+           channelId: docSnap.id,
+           channelTitle: data['title'],
+           username: this.currentUsername || 'Unknown'
+         });
+       }
+     });
+ 
+     console.log("Pending invites (only for current user):", this.currentUser?.uid, this.pendingInvites);
+   });
+ }
+ 
+ async acceptInvite(channelId: string) {
+   if (!this.currentUser) return;
+ 
+   const channelRef = doc(db, `channels/${channelId}`);
+   const channelSnap = await getDoc(channelRef);
+ 
+   if (!channelSnap.exists()) {
+     console.error("Channel not found!");
+     return;
+   }
+ 
+   try {
+     const channelData = channelSnap.data();
+     const updatedAllowedUsers = [...(channelData['allowedUsers'] || []), this.currentUser.uid];
+     const updatedPendingInvites = (channelData['pendingInvites'] || []).filter((uid: string) => uid !== this.currentUser!.uid);
+ 
+     await updateDoc(channelRef, {
+       allowedUsers: updatedAllowedUsers,
+       pendingInvites: updatedPendingInvites
+     });
+ 
+     console.log(`User ${this.currentUser.uid} has joined channel ${channelId}`);
+     this.pendingInvites = this.pendingInvites.filter(invite => invite.channelId !== channelId);
+     this.loadPendingInvites();
+     alert("You have joined the channel!");
+   } catch (error) {
+     console.error("Error accepting invite:", error);
+   }
+ }
+ async declineInvite(channelId: string) {
+   if (!this.currentUser?.uid) {  // Vérifie si l'utilisateur est connecté
+     console.error("No user logged in.");
+     return;
+   }
+ 
+   const channelRef = doc(db, `channels/${channelId}`);
+   const channelSnap = await getDoc(channelRef);
+ 
+   if (!channelSnap.exists()) {
+     console.error("Channel not found!");
+     return;
+   }
+ 
+   try {
+     const channelData = channelSnap.data();
+     const updatedPendingInvites = (channelData['pendingInvites'] || []).filter((uid: string) => uid !== this.currentUser!.uid);
+ 
+     await updateDoc(channelRef, {
+       pendingInvites: updatedPendingInvites
+     });
+ 
+     console.log(`User ${this.currentUser.uid} has declined invitation to channel ${channelId}`);
+     this.pendingInvites = this.pendingInvites.filter(invite => invite.channelId !== channelId);
+     this.loadPendingInvites();
+     alert("You declined the invitation.");
+   } catch (error) {
+     console.error("Error declining invite:", error);
+   }
+ }
+ async leaveChannel(channelId: string) {
+ 
+   if (!this.currentUser?.uid) {
+ 
+     console.error("No user logged in.");
+ 
+     return;
+ 
+   }
+ 
+   const channelRef = doc(db, `channels/${channelId}`);
+ 
+   const channelSnap = await getDoc(channelRef);
+ 
+   if (!channelSnap.exists()) {
+ 
+     console.error("Channel not found!");
+ 
+     return;
+ 
+   }
+ 
+   try {
+ 
+     const channelData = channelSnap.data();
+ 
+     const channelCreator = channelData['creatorId'];
+ 
+     if (channelCreator === this.currentUser.uid) {
+ 
+       // If user is the creator, delete the entire channel
+ 
+       // First, notify all channel members that the channel is being deleted
+ 
+       const allowedUsers = channelData['allowedUsers'] || [];
+ 
+       for (const userId of allowedUsers) {
+ 
+         if (userId !== this.currentUser.uid) {
+ 
+           // You could implement a notification system here
+ 
+           console.log(`Notifying user ${userId} about channel deletion`);
+ 
+           // Optional: Add the notification to a notifications collection
+ 
+           // await addDoc(collection(db, "notifications"), {
+ 
+           //   userId: userId,
+ 
+           //   message: `Channel "${channelData['title']}" has been deleted by the creator`,
+ 
+           //   timestamp: Timestamp.now(),
+ 
+           //   read: false
+ 
+           // });
+ 
+         }
+ 
+       }
+ 
+       // Delete the channel document
+ 
+       await deleteDoc(channelRef);
+ 
+       console.log(`Channel ${channelId} deleted because creator left.`);
+ 
+       // Remove the channel from all users' assignedChannels lists
+ 
+       const usersRef = collection(db, "users");
+ 
+       const usersSnapshot = await getDocs(usersRef);
+ 
+       const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
+ 
+         const userData = userDoc.data();
+ 
+         const userAssignedChannels = userData['assignedChannels'] || [];
+ 
+         if (userAssignedChannels.includes(channelId)) {
+ 
+           const userRef = doc(db, "users", userDoc.id);
+ 
+           const updatedAssignedChannels = userAssignedChannels.filter(
+ 
+             (id: string) => id !== channelId
+ 
+           );
+ 
+           return updateDoc(userRef, {
+ 
+             assignedChannels: updatedAssignedChannels
+ 
+           });
+ 
+         }
+ 
+         return Promise.resolve();
+ 
+       });
+ 
+       await Promise.all(updatePromises);
+ 
+       console.log("All users updated after channel deletion");
+ 
+       // Also delete all channel messages if you have them in a subcollection
+ 
+       // This depends on your data structure
+ 
+       const messagesRef = collection(db, `channels/${channelId}/messages`);
+ 
+       const messagesSnapshot = await getDocs(messagesRef);
+ 
+       const deleteMessagePromises = messagesSnapshot.docs.map(doc =>
+ 
+         deleteDoc(doc.ref)
+ 
+       );
+ 
+       await Promise.all(deleteMessagePromises);
+ 
+     } else {
+ 
+       // If user is not the creator, just remove them from the channel
+ 
+       const updatedAllowedUsers = (channelData['allowedUsers'] || []).filter(
+ 
+         (uid: string) => uid !== this.currentUser!.uid
+ 
+       );
+ 
+       await updateDoc(channelRef, {
+ 
+         allowedUsers: updatedAllowedUsers
+ 
+       });
+ 
+       console.log(`User ${this.currentUser.uid} has left channel ${channelId}`);
+ 
+     }
+ 
+     // Update local channels list
+ 
+     this.channels = this.channels.filter(channel => channel.id !== channelId);
+ 
+     console.log("Updated channel list after leaving:", this.channels);
+ 
+     // Navigate to channels list
+ 
+     this.router.navigate(['/channels']);
+ 
+   } catch (error) {
+ 
+     console.error("Error leaving channel:", error);
+ 
+   }
+ 
+   this.showChannels();
+ 
+ }
+ toggleDarkMode() {
+  this.isDarkMode = !this.isDarkMode;
+ 
+  // Apply dark mode to document body
+  if (this.isDarkMode) {
+    document.body.classList.add('dark-mode');
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem('darkMode', 'disabled');
   }
+   // Fix text colors in dark mode
+  this.updateDarkModeTextColors();
+}
 
-  async selectChannel(channelIndex: number): Promise<void> {
-    this.currentChannel = this.channels[channelIndex];
-    // Fetch latest channel data from Firestore
-    const channelRef = doc(db, 'channels', this.currentChannel.id);
-    const channelSnap = await getDoc(channelRef);
-
-    if (channelSnap.exists()) {
-      const channelData = channelSnap.data() as Channel;
-
-      // If channel is private, check if the current user is allowed
-      if (
-        channelData.isPrivate &&
-        !this.isAdmin &&
-        (!channelData.allowedUsers ||
-          !channelData.allowedUsers.includes(this.currentUser!.uid))
-      ) {
-        alert("You don't have permission to access this private channel.");
-        return;
-      }
-    } else {
-      console.error('Channel not found!');
-      return;
-    }
-
-    try {
-      this.router.navigate(['/channel-area', this.currentChannel.id]);
-    } catch (error) {
-      console.error('Error selecting channel:', error);
-    }
-  }
-  loadPendingInvites(): void {
-    if (!this.currentUser) return;
-
-    const channelsRef = collection(db, 'channels');
-
-    onSnapshot(channelsRef, (snapshot) => {
-      // Clear previous pending invites to avoid duplications
-      this.pendingInvites = [];
-
-      // Get only channels where current user is in pendingInvites but NOT the creator
-      snapshot.docs.forEach((docSnap) => {
-        const data = docSnap.data();
-
-        if (
-          Array.isArray(data['pendingInvites']) &&
-          data['pendingInvites'].includes(this.currentUser!.uid) &&
-          data['creatorId'] !== this.currentUser!.uid
-        ) {
-          // Add to pendingInvites array with just the properties in your type definition
-          this.pendingInvites.push({
-            id: docSnap.id,
-            channelId: docSnap.id,
-            channelTitle: data['title'],
-            username: this.currentUsername || 'Unknown',
-          });
-        }
-      });
-
-      console.log(
-        'Pending invites (only for current user):',
-        this.currentUser?.uid,
-        this.pendingInvites
-      );
-    });
-  }
-
-  async acceptInvite(channelId: string) {
-    if (!this.currentUser) return;
-
-    const channelRef = doc(db, `channels/${channelId}`);
-    const channelSnap = await getDoc(channelRef);
-
-    if (!channelSnap.exists()) {
-      console.error('Channel not found!');
-      return;
-    }
-
-    try {
-      const channelData = channelSnap.data();
-      const updatedAllowedUsers = [
-        ...(channelData['allowedUsers'] || []),
-        this.currentUser.uid,
-      ];
-      const updatedPendingInvites = (
-        channelData['pendingInvites'] || []
-      ).filter((uid: string) => uid !== this.currentUser!.uid);
-
-      await updateDoc(channelRef, {
-        allowedUsers: updatedAllowedUsers,
-        pendingInvites: updatedPendingInvites,
-      });
-
-      console.log(
-        `User ${this.currentUser.uid} has joined channel ${channelId}`
-      );
-      this.pendingInvites = this.pendingInvites.filter(
-        (invite) => invite.channelId !== channelId
-      );
-      this.loadPendingInvites();
-      alert('You have joined the channel!');
-    } catch (error) {
-      console.error('Error accepting invite:', error);
-    }
-  }
-  async declineInvite(channelId: string) {
-    if (!this.currentUser?.uid) {
-      // Vérifie si l'utilisateur est connecté
-      console.error('No user logged in.');
-      return;
-    }
-
-    const channelRef = doc(db, `channels/${channelId}`);
-    const channelSnap = await getDoc(channelRef);
-
-    if (!channelSnap.exists()) {
-      console.error('Channel not found!');
-      return;
-    }
-
-    try {
-      const channelData = channelSnap.data();
-      const updatedPendingInvites = (
-        channelData['pendingInvites'] || []
-      ).filter((uid: string) => uid !== this.currentUser!.uid);
-
-      await updateDoc(channelRef, {
-        pendingInvites: updatedPendingInvites,
-      });
-
-      console.log(
-        `User ${this.currentUser.uid} has declined invitation to channel ${channelId}`
-      );
-      this.pendingInvites = this.pendingInvites.filter(
-        (invite) => invite.channelId !== channelId
-      );
-      this.loadPendingInvites();
-      alert('You declined the invitation.');
-    } catch (error) {
-      console.error('Error declining invite:', error);
-    }
-  }
-  async leaveChannel(channelId: string) {
-    if (!this.currentUser?.uid) {
-      console.error('No user logged in.');
-
-      return;
-    }
-
-    const channelRef = doc(db, `channels/${channelId}`);
-
-    const channelSnap = await getDoc(channelRef);
-
-    if (!channelSnap.exists()) {
-      console.error('Channel not found!');
-
-      return;
-    }
-
-    try {
-      const channelData = channelSnap.data();
-
-      const channelCreator = channelData['creatorId'];
-
-      if (channelCreator === this.currentUser.uid) {
-        // If user is the creator, delete the entire channel
-
-        // First, notify all channel members that the channel is being deleted
-
-        const allowedUsers = channelData['allowedUsers'] || [];
-
-        for (const userId of allowedUsers) {
-          if (userId !== this.currentUser.uid) {
-            // You could implement a notification system here
-
-            console.log(`Notifying user ${userId} about channel deletion`);
-
-            // Optional: Add the notification to a notifications collection
-
-            // await addDoc(collection(db, "notifications"), {
-
-            //   userId: userId,
-
-            //   message: `Channel "${channelData['title']}" has been deleted by the creator`,
-
-            //   timestamp: Timestamp.now(),
-
-            //   read: false
-
-            // });
-          }
-        }
-
-        // Delete the channel document
-
-        await deleteDoc(channelRef);
-
-        console.log(`Channel ${channelId} deleted because creator left.`);
-
-        // Remove the channel from all users' assignedChannels lists
-
-        const usersRef = collection(db, 'users');
-
-        const usersSnapshot = await getDocs(usersRef);
-
-        const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
-          const userData = userDoc.data();
-
-          const userAssignedChannels = userData['assignedChannels'] || [];
-
-          if (userAssignedChannels.includes(channelId)) {
-            const userRef = doc(db, 'users', userDoc.id);
-
-            const updatedAssignedChannels = userAssignedChannels.filter(
-              (id: string) => id !== channelId
-            );
-
-            return updateDoc(userRef, {
-              assignedChannels: updatedAssignedChannels,
-            });
-          }
-
-          return Promise.resolve();
-        });
-
-        await Promise.all(updatePromises);
-
-        console.log('All users updated after channel deletion');
-
-        // Also delete all channel messages if you have them in a subcollection
-
-        // This depends on your data structure
-
-        const messagesRef = collection(db, `channels/${channelId}/messages`);
-
-        const messagesSnapshot = await getDocs(messagesRef);
-
-        const deleteMessagePromises = messagesSnapshot.docs.map((doc) =>
-          deleteDoc(doc.ref)
-        );
-
-        await Promise.all(deleteMessagePromises);
+// Add this new method to update text colors in dark mode
+updateDarkModeTextColors() {
+  setTimeout(() => {
+    // Target all headers in dm-header
+    const dmHeaders = document.querySelectorAll('.dm-header h4, .dm-header h5');
+    
+    dmHeaders.forEach(header => {
+      if (this.isDarkMode) {
+        (header as HTMLElement).style.color = '#FFFFFF';
       } else {
-        // If user is not the creator, just remove them from the channel
-
-        const updatedAllowedUsers = (channelData['allowedUsers'] || []).filter(
-          (uid: string) => uid !== this.currentUser!.uid
-        );
-
-        await updateDoc(channelRef, {
-          allowedUsers: updatedAllowedUsers,
-        });
-
-        console.log(
-          `User ${this.currentUser.uid} has left channel ${channelId}`
-        );
-      }
-
-      // Update local channels list
-
-      this.channels = this.channels.filter(
-        (channel) => channel.id !== channelId
-      );
-
-      console.log('Updated channel list after leaving:', this.channels);
-
-      // Navigate to channels list
-
-      this.router.navigate(['/channels']);
-    } catch (error) {
-      console.error('Error leaving channel:', error);
-    }
-
-    this.showChannels();
-  }
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-
-    // Apply dark mode to document body
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('darkMode', 'enabled');
-    } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('darkMode', 'disabled');
-    }
-    // Fix text colors in dark mode
-    this.updateDarkModeTextColors();
-  }
-
-  // Add this new method to update text colors in dark mode
-  updateDarkModeTextColors() {
-    setTimeout(() => {
-      // Target all headers in dm-header
-      const dmHeaders = document.querySelectorAll(
-        '.dm-header h4, .dm-header h5'
-      );
-
-      dmHeaders.forEach((header) => {
-        if (this.isDarkMode) {
-          (header as HTMLElement).style.color = '#FFFFFF';
-        } else {
-          (header as HTMLElement).style.color = '#333333';
-        }
-      });
-
-      // Force change detection
-      this.cdRef.detectChanges();
-    }, 0);
-  }
-
-  listenToUserStatus() {
-    if (!this.currentUser) return;
-
-    const userRef = doc(db, 'users', this.currentUser.uid);
-    onSnapshot(userRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-        this.currentUserStatus = userData['status'] || 'offline';
-        console.log(
-          'User status updated in real-time:',
-          this.currentUserStatus
-        );
-
-        if (this.currentUserStatus === 'offline') {
-          this.router.navigate(['/login']);
-        }
+        (header as HTMLElement).style.color = '#333333';
       }
     });
+    
+    // Force change detection
+    this.cdRef.detectChanges();
+  }, 0);
+}
+ 
+ listenToUserStatus() {
+   if (!this.currentUser) return;
+ 
+   const userRef = doc(db, "users", this.currentUser.uid);
+   onSnapshot(userRef, (docSnap) => {
+     if (docSnap.exists()) {
+       const userData = docSnap.data();
+       this.currentUserStatus = userData['status'] || "offline";
+       console.log("User status updated in real-time:", this.currentUserStatus);
+ 
+     
+       if (this.currentUserStatus === "offline") {
+         this.router.navigate(['/login']);
+       }
+     }
+   });
+   
+}
+unreadNotifications: any[] = [];
+ 
+listenToNotifications() {
+  if (!this.currentUser) return;
+ 
+  const notifRef = collection(db, `users/${this.currentUser.uid}/notifications`);
+ 
+  onSnapshot(notifRef, (snapshot) => {
+    this.unreadNotifications = snapshot.docs
+      .map(doc => {
+        const data = doc.data() as Notification;
+        return { id: doc.id, ...data };
+      })
+      .filter(notif => !notif.read);
+   
+    console.log("All unread notifications:", this.unreadNotifications);
+    const channelNotifs = this.unreadNotifications.filter(n => n.isFromChannel === true);
+    console.log("Channel notifications:", channelNotifs);
+  });
+}
+ 
+ 
+markAllNotificationsAsRead() {
+  const notifRef = collection(db, `users/${this.currentUser!.uid}/notifications`);
+  this.unreadNotifications.forEach(async notif => {
+    const notifDoc = doc(notifRef, notif.id);
+    await updateDoc(notifDoc, { read: true });
+  });
+}
+ 
+openNotifications() {
+  this.showNotificationPanel = !this.showNotificationPanel;
+}
+ 
+getMentions(message: string): string[] {
+  const mentionRegex = /@(\w+)/g;
+  const mentions = [];
+  let match;
+  while ((match = mentionRegex.exec(message)) !== null) {
+    mentions.push(match[1]);
   }
-  unreadNotifications: any[] = [];
-
-  listenToNotifications() {
-    if (!this.currentUser) return;
-
-    const notifRef = collection(
-      db,
-      `users/${this.currentUser.uid}/notifications`
-    );
-
-    onSnapshot(notifRef, (snapshot) => {
-      this.unreadNotifications = snapshot.docs
-        .map((doc) => {
-          const data = doc.data() as Notification;
-          return { id: doc.id, ...data };
-        })
-        .filter((notif) => !notif.read);
-
-      console.log('All unread notifications:', this.unreadNotifications);
-      const channelNotifs = this.unreadNotifications.filter(
-        (n) => n.isFromChannel === true
-      );
-      console.log('Channel notifications:', channelNotifs);
-    });
-  }
-
-  markAllNotificationsAsRead() {
-    const notifRef = collection(
-      db,
-      `users/${this.currentUser!.uid}/notifications`
-    );
-    this.unreadNotifications.forEach(async (notif) => {
-      const notifDoc = doc(notifRef, notif.id);
-      await updateDoc(notifDoc, { read: true });
-    });
-  }
-
-  openNotifications() {
-    this.showNotificationPanel = !this.showNotificationPanel;
-  }
-
-  getMentions(message: string): string[] {
-    const mentionRegex = /@(\w+)/g;
-    const mentions = [];
-    let match;
-    while ((match = mentionRegex.exec(message)) !== null) {
-      mentions.push(match[1]);
-    }
-    return mentions;
-  }
-  async deleteNotification(notifId: string) {
-    const notifRef = doc(
-      db,
-      `users/${this.currentUser!.uid}/notifications/${notifId}`
-    );
-    try {
-      await deleteDoc(notifRef);
-      this.unreadNotifications = this.unreadNotifications.filter(
-        (n) => n.id !== notifId
-      );
-      console.log(`Notification ${notifId} supprimée.`);
-    } catch (error) {
-      console.error('Erreur suppression notification :', error);
-    }
-  }
-  handleNotificationClick(notification: Notification) {
-    if (notification.isFromChannel && notification.channelId) {
-      this.router.navigate(['/channel-area', notification.channelId]);
-    } else if (notification.chatId) {
-      const userIds = notification.chatId.split('_');
-      const otherUserId =
-        userIds[0] === this.currentUser!.uid ? userIds[1] : userIds[0];
-      this.findUsernameById(otherUserId).then((username) => {
-        if (username) {
-          this.selectUser(username);
-        }
-      });
-    }
-
-    const notifRef = doc(
-      db,
-      `users/${this.currentUser!.uid}/notifications/${notification.id}`
-    );
-    updateDoc(notifRef, { read: true });
-  }
-
-  async findUsernameById(userId: string): Promise<string | null> {
-    const userRef = doc(db, 'users', userId);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-      return userSnap.data()['username'] || null;
-    }
-    return null;
-  }
-
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
-  }
-
-  private scrollToBottom(): void {
-    try {
-      if (this.scrollContainer && this.scrollContainer.nativeElement) {
-        // Use setTimeout to ensure DOM has finished updating
-        setTimeout(() => {
-          this.scrollContainer.nativeElement.scrollTop =
-            this.scrollContainer.nativeElement.scrollHeight;
-        }, 0);
-      }
-    } catch (err) {
-      console.error('Error scrolling to bottom:', err);
-    }
+  return mentions;
+}
+async deleteNotification(notifId: string) {
+  const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notifId}`);
+  try {
+    await deleteDoc(notifRef);
+    this.unreadNotifications = this.unreadNotifications.filter(n => n.id !== notifId);
+    console.log(`Notification ${notifId} supprimée.`);
+  } catch (error) {
+    console.error("Erreur suppression notification :", error);
   }
 
   async requestToJoin(channel: Channel) {
@@ -1183,4 +1134,52 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   }
   
   
+}
+handleNotificationClick(notification: Notification) {
+  if (notification.isFromChannel && notification.channelId) {
+    this.router.navigate(['/channel-area', notification.channelId]);
+  } else if (notification.chatId) {
+    const userIds = notification.chatId.split('_');
+    const otherUserId = userIds[0] === this.currentUser!.uid ? userIds[1] : userIds[0];
+    this.findUsernameById(otherUserId).then(username => {
+      if (username) {
+        this.selectUser(username);
+      }
+    });
+  }
+ 
+  const notifRef = doc(db, `users/${this.currentUser!.uid}/notifications/${notification.id}`);
+  updateDoc(notifRef, { read: true });
+}
+ 
+async findUsernameById(userId: string): Promise<string | null> {
+  const userRef = doc(db, "users", userId);
+  const userSnap = await getDoc(userRef);
+ 
+  if (userSnap.exists()) {
+    return userSnap.data()['username'] || null;
+  }
+  return null;
+}
+ 
+ngAfterViewChecked(): void {
+  this.scrollToBottom();
+}
+
+private scrollToBottom(): void {
+  try {
+    if (this.scrollContainer && this.scrollContainer.nativeElement) {
+      // Use setTimeout to ensure DOM has finished updating
+      setTimeout(() => {
+        this.scrollContainer.nativeElement.scrollTop = 
+          this.scrollContainer.nativeElement.scrollHeight;
+      }, 0);
+    }
+  } catch (err) {
+    console.error('Error scrolling to bottom:', err);
+  }
+}
+
+ 
+ 
 }
