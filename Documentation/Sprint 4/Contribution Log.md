@@ -39,19 +39,19 @@
 
 ## Alexia Mucciacciaro (40250572)
 
-## Implemented Feature #2: Color Changing Background
+### Implemented Feature #2: Color Changing Background
 - Users can select a custom background color for each channel's chat area.
 - Users can select a custom background color for each direct message chat area.
 - colors are stored accordingly.
 -**March 30, 5:00PM-11:00PM**
 -**March 31, 12:00PM-2:00PM**
 
-## Final Report
+### Final Report
 - Wrote project summary of the report.
 - Listed velocity and list of user stories.
 **April 7, 3:00PM-5:00PM**
 
-## Powerpoint slide
+### Powerpoint slide
 -Problem statement slide
 **April 9, 1:30PM-2:45PM**
 
