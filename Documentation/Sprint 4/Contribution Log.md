@@ -6,9 +6,11 @@
 
 ## Liyan Al-mosaria (40251099)
 
-### Implemented functionality for admins to create default public channels
-- e.g., #all-general, accessible to all registered users by default.
-- Worked alongside Prathiksha.
+### Implemented UI enhancements
+- Fixed issue with message bubbles going to the left and having the same color.
+- Added scrollable windows for the chat and the list of channels in channel selector.
+- Made private channel area bigger.
+- Unified font accross the platform. 
 - **March 14, 12:00PM - 1:00PM**  
   
 ### Developed feature allowing users to create private channels
