@@ -34,13 +34,24 @@
         <ul *ngIf="unreadNotifications.length > 0; else noNotif">
           <li *ngFor="let notif of unreadNotifications">
             <span>
-              <strong>{{ notif.from }}</strong
-              >: "{{ notif.message }}"
-              <span *ngIf="notif.isFromChannel" class="channel-badge"
-                >Channel</span
-              >
+              <strong>{{ notif.from }}</strong>: "{{ notif.message }}"
+              <span *ngIf="notif.isFromChannel" class="channel-badge">Channel</span>
               <span *ngIf="!notif.isFromChannel" class="dm-badge">Direct</span>
             </span>
+        
+            <!-- Accept/Deny buttons (only for creator or admin) -->
+<div *ngIf="notif.isFromChannel && notif.channelId && (isAdmin || isChannelCreator(notif.channelId))" class="mt-1">
+  <button class="btn btn-success btn-sm me-1"
+          (click)="acceptJoinRequest(notif.channelId, notif.from)">
+    Accept
+  </button>
+  <button class="btn btn-danger btn-sm"
+          (click)="denyJoinRequest(notif.channelId, notif.from)">
+    Deny
+  </button>
+</div>
+
+        
             <br />
             <small>{{ notif.timestamp?.toDate() | date : "short" }}</small>
             <br />
@@ -49,6 +60,7 @@
             </button>
           </li>
         </ul>
+        
         <ng-template #noNotif>
           <p class="notif-empty">No new notifications</p>
         </ng-template>
@@ -135,6 +147,20 @@
                         {{ channel.isPrivate ? "Private" : "Public" }}
                       </span>
                     </button>
+                    <!-- Request to Join button -->
+<button
+*ngIf="channel.isPrivate &&
+        !isAdmin &&
+        currentUser?.uid &&
+        !(channel.allowedUsers?.includes(currentUser?.uid || ''))
+"
+
+(click)="requestToJoin(channel)"
+class="btn btn-outline-warning btn-sm ms-2"
+>
+Join
+</button>
+
                     <button
                       *ngIf="isAdmin"
                       (click)="deleteChannel(i)"
