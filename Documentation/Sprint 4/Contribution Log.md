@@ -11,7 +11,7 @@
 - Added scrollable windows for the chat and the list of channels in channel selector.
 - Made private channel area bigger.
 - Unified font accross the platform. 
-- **April 3 7:00PM to April 5 11:00PM**
+- **April 3, 7:00PM to April 5, 11:00PM**
   
 ### Fixed bugs related to UI enhancements
 - Fixed issue with scrollable chat.
