@@ -27,7 +27,6 @@ import {
   onAuthStateChanged,
   signOut,
   User,
-  UserProfile,
 } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { v4 as uuidv4 } from 'uuid';
@@ -38,7 +37,6 @@ import { Observable } from 'rxjs';
 import { startWith, map, switchMap } from 'rxjs/operators';
 import { ChatMessage } from '../models/chat-message';
 import { Notification } from '../models/notification';
-import { AfterViewChecked } from '@angular/core';
 import 'emoji-picker-element';
 import { ChangeDetectorRef } from '@angular/core';
 

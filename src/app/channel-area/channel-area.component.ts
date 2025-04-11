@@ -14,13 +14,12 @@ import {
   deleteDoc,
   getDoc,
   getDocs,
-  DocumentData,
 } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { Auth, getAuth, signOut } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import 'emoji-picker-element';
-import { ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-channel-area',
