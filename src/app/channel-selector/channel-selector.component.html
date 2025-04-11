@@ -36,7 +36,7 @@
             <span>
               <strong>{{ notif.from }}</strong>
               <strong>
-                mentioned you in
+                <strong>: </strong>
                 {{ getChannelNameFromId(notif.channelId) }}</strong
               >
               <span *ngIf="notif.isFromChannel" class="channel-badge"
