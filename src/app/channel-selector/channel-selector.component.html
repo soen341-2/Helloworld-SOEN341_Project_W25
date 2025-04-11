@@ -39,22 +39,25 @@
               <span *ngIf="!notif.isFromChannel" class="dm-badge">Direct</span>
             </span>
         
-            <!-- Accept/Deny buttons (only for creator or admin) -->
-<div *ngIf="notif.isFromChannel && notif.channelId && (isAdmin || isChannelCreator(notif.channelId))" class="mt-1">
-  <button class="btn btn-success btn-sm me-1"
-          (click)="acceptJoinRequest(notif.channelId, notif.from)">
-    Accept
-  </button>
-  <button class="btn btn-danger btn-sm"
-          (click)="denyJoinRequest(notif.channelId, notif.from)">
-    Deny
-  </button>
-</div>
+            <!-- for user trying to join a private chat-->
+            <!-- accept/deny buttons (only for creator of the private channel) -->
+            <div *ngIf="notif.isFromChannel && notif.channelId && (isAdmin || isChannelCreator(notif.channelId))" class="mt-1">
+              <button class="btn btn-success btn-sm me-1"
+                (click)="acceptJoinRequest(notif.channelId, notif.from)">
+                  Accept
+              </button>
+             <button class="btn btn-danger btn-sm"
+               (click)="denyJoinRequest(notif.channelId, notif.from)">
+                  Deny
+            </button>
+            </div>
 
         
             <br />
             <small>{{ notif.timestamp?.toDate() | date : "short" }}</small>
             <br />
+
+            <!-- delete notifcation from notification drop down-->
             <button (click)="deleteNotification(notif.id)" class="notif-delete">
               Delete
             </button>
@@ -64,6 +67,8 @@
         <ng-template #noNotif>
           <p class="notif-empty">No new notifications</p>
         </ng-template>
+
+        <!-- will make notification disapear-->
         <button (click)="markAllNotificationsAsRead()" class="notif-read-all">
           Marked as read
         </button>
@@ -93,6 +98,7 @@
           <h4>Channels</h4>
         </div>
 
+        <!-- after user send the request-->
         <div class="card mt-4" *ngIf="pendingInvites.length > 0">
           <div class="card-header text-center bg-warning text-dark">
             <h5>Pending Invitations</h5>
@@ -147,25 +153,26 @@
                         {{ channel.isPrivate ? "Private" : "Public" }}
                       </span>
                     </button>
-                    <!-- Request to Join button -->
-<button
-*ngIf="channel.isPrivate &&
-        !isAdmin &&
-        currentUser?.uid &&
-        !(channel.allowedUsers?.includes(currentUser?.uid || ''))
-"
 
-(click)="requestToJoin(channel)"
-class="btn btn-outline-warning btn-sm ms-2"
->
-Join
-</button>
+                    <!-- request to Join button -->
+                      <button
+                        *ngIf="channel.isPrivate &&
+                        !isAdmin &&
+                          currentUser?.uid &&
+                              !(channel.allowedUsers?.includes(currentUser?.uid || ''))"
 
+                                    (click)="requestToJoin(channel)"
+                                            class="btn btn-outline-warning btn-sm ms-2"
+                                                  >
+                                                  <!-- for user to join private channel button-->
+                                                    Join
+                                                    </button>
                     <button
                       *ngIf="isAdmin"
                       (click)="deleteChannel(i)"
                       class="btn btn-outline-light btn-sm ms-2"
                     >
+                    <!--delete channel button-->
                       Delete
                     </button>
                     <button
@@ -177,6 +184,7 @@ Join
                       (click)="leaveChannel(channel.id!)"
                       class="btn btn-outline-danger btn-sm ms-2"
                     >
+                    <!--leave channel button-->
                       Leave
                     </button>
                   </div>
@@ -197,6 +205,7 @@ Join
                           ● {{ user.username }} ({{ user.status }})
                         </span>
                         <small *ngIf="user.lastSeen">
+                          <!--updates last time active-->
                           - Last seen: {{ user.lastSeen | date : "short" }}
                         </small>
                       </li>
@@ -210,6 +219,7 @@ Join
 
         <!-- Channel creation section -->
         <div class="channel-creation-section">
+          
           <!-- Input field for channel name (always visible) -->
           <input
             class="form-control mb-2"
@@ -222,6 +232,7 @@ Join
             [(ngModel)]="newChannelPrivacy"
             aria-label="Select Privacy Type"
           >
+          <!--when creating a channel (anyone)-->
             <option [ngValue]="'placeholder'" disabled selected>
               Select Privacy Type
             </option>
@@ -238,12 +249,13 @@ Join
             Create Channel
           </button>
 
-          <!-- Informational text for non-admins -->
+          <!-- non-admins (regular user) -->
           <p *ngIf="!isAdmin" class="text-muted mt-2 small">
             Note: Regular users can only create private channels
           </p>
         </div>
 
+        <!--cvonversations-->
         <div class="card-header text-center">
           <h4>Active Chats</h4>
         </div>
@@ -267,6 +279,7 @@ Join
       </div>
     </div>
 
+    <!-- button to chnage background colour (for chat only)-->
     <div class="col-md-9">
       <div class="form-group mt-3">
         <label for="dmBgColor">Chat Background Color:</label>
@@ -281,7 +294,7 @@ Join
           class="dm-wrapper mat-elevation-z5"
           [ngStyle]="{ 'background-color': chatBackgroundColor }"
         >
-          <!-- Header -->
+          <!-- header -->
           <div class="dm-header">
             <h4>Chat with {{ selectedUsername }}</h4>
             <h5 *ngIf="selectedUsername">
@@ -310,7 +323,7 @@ Join
             </h5>
           </div>
 
-          <!-- Search input -->
+          <!-- search input -->
           <div class="search-input mb-3">
             <mat-form-field appearance="fill">
               <mat-label>Search for users</mat-label>
@@ -334,7 +347,7 @@ Join
             </mat-autocomplete>
           </div>
 
-          <!-- Message list scrollable -->
+          <!-- message list scrollable -->
           <div class="dm-messages-scrollable">
             <div
               *ngFor="let msg of messages"
@@ -375,7 +388,7 @@ Join
             </div>
           </div>
 
-          <!-- Reply context -->
+          <!-- reply context -->
           <div *ngIf="replyingToMessage" class="reply-context mb-2">
             <p>Replying to: {{ replyingToMessage.message }}</p>
             <button
@@ -386,7 +399,7 @@ Join
             </button>
           </div>
 
-          <!-- Input area pinned to bottom -->
+          <!-- input area pinned to bottom -->
           <div class="input-container">
             <input
               type="text"
