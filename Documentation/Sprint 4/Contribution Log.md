@@ -2,18 +2,18 @@
 
 ## Marco Greco (40285114)
 
-###Added Unit Tests
+### Added Unit Tests
 - Tested functionality of each component
 - Ensured tests pass on push / merge
 - **April 8, 3:00PM to 9:00PM
 
-###Fixed Bugs with Mentioning Feature
+### Fixed Bugs with Mentioning Feature
 - Added which channel user was mentioned from
 - Removed empty message in notification
 - Reformatted code using Prettier VSCode Extension
 - **April 10, 7:00PM to 9:30PM
 
-###Fixed Bugs with Quoting and Scrolling
+### Fixed Bugs with Quoting and Scrolling
 - Quoting prompt was hidden
 - Removed bugged autoscroll
 - **April 10, 10:00PM to 11:30PM
