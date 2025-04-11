@@ -264,14 +264,6 @@
 
     <div class="col-md-9">
       <div class="form-group mt-3">
-        <label for="dmBgColor">Chat Background Color:</label>
-        <input
-          type="color"
-          id="dmBgColor"
-          [value]="chatBackgroundColor"
-          (change)="onColorChange($event)"
-          class="form-control form-control-color mt-2"
-        />
         <div
           class="dm-wrapper mat-elevation-z5"
           [ngStyle]="{ 'background-color': chatBackgroundColor }"
@@ -409,6 +401,14 @@
           <emoji-picker (emoji-click)="addEmojiDirect($event)"></emoji-picker>
         </div>
       </div>
+      <label for="dmBgColor">Chat Background Color:</label>
+        <input
+          type="color"
+          id="dmBgColor"
+          [value]="chatBackgroundColor"
+          (change)="onColorChange($event)"
+          class="form-control form-control-color mt-2"
+        />
     </div>
   </div>
 </div>
