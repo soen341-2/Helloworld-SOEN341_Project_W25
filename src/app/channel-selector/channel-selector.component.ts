@@ -101,37 +101,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   searchControl = new FormControl();
   constructor(private router: Router, private cdRef: ChangeDetectorRef) {}
 
-  /*async createDefaultChannelsIfMissing() {
-    const defaultChannelTitles = ['#all-general', '#announcements'];
-    const channelsRef = collection(db, "channels");
-    const snapshot = await getDocs(channelsRef);
- 
-    const existingTitles = snapshot.docs.map(doc => (doc.data() as Channel).title);
- 
-    for (const title of defaultChannelTitles) {
-      if (!existingTitles.includes(title)) {
-        const newChannel: Channel = {
-          title,
-          id: uuidv4(),
-          isPrivate: false,
-          allowedUsers: [], // public means all users can see it
-          creatorId: ""
-        };
- 
-        const channelRef = doc(db, "channels", newChannel.id);
-        await setDoc(channelRef, newChannel);
-        console.log(`Default channel created: ${title}`);
-      } else {
-        console.log(`Default channel "${title}" already exists.`);
-      }
-    }
-  }
- 
-  isDefaultChannel(channelTitle: string): boolean {
-    const defaultChannels = ['#all-general', '#announcements'];
-    return defaultChannels.includes(channelTitle);
-  }  */
-
   async ngOnInit() {
     const auth = getAuth();
     const savedColors = localStorage.getItem('dmBgColors');
@@ -423,11 +392,18 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         this.cdRef.detectChanges();
         this.scrollToBottom();
 
-        for (const mentionedUsername of mentionedUsernames) {
-          await this.sendMentionNotification(mentionedUsername, newChatMessage);
+        if (!this.isDMConversation()) {
+          for (const mentionedUsername of mentionedUsernames) {
+            await this.sendMentionNotification(
+              mentionedUsername,
+              newChatMessage
+            );
+          }
         }
       })
       .catch((error) => console.error('Error:', error));
+    this.cdRef.detectChanges();
+    this.scrollToBottom();
   }
 
   goToAdminDashboard() {
@@ -454,7 +430,13 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       timestamp: Timestamp.now(),
       read: false,
       chatId: this.getChatId(this.currentUser!.uid, targetUserId),
+      channelTitle: this.currentChannel.id,
     });
+  }
+
+  isDMConversation(): boolean {
+    const chatId = this.getChatId(this.currentUser!.uid, this.selectedUser!);
+    return this.channels.every((channel) => channel.id !== chatId);
   }
 
   async logOut() {
@@ -579,6 +561,11 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         console.error('Error fetching channels:', error);
       }
     );
+  }
+
+  getChannelNameFromId(channelId: string): string | null {
+    const channel = this.channels.find((c) => c.id === channelId);
+    return channel ? channel.title : null;
   }
 
   async deleteChannel(index: number) {
@@ -1044,41 +1031,39 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   }
 
   private scrollToBottom(): void {
-    try {
-      if (this.scrollContainer && this.scrollContainer.nativeElement) {
-        // Use setTimeout to ensure DOM has finished updating
-        setTimeout(() => {
-          this.scrollContainer.nativeElement.scrollTop =
-            this.scrollContainer.nativeElement.scrollHeight;
-        }, 0);
+    setTimeout(() => {
+      if (this.scrollContainer?.nativeElement) {
+        const container = this.scrollContainer.nativeElement;
+        container.scrollTop = container.scrollHeight;
       }
-    } catch (err) {
-      console.error('Error scrolling to bottom:', err);
-    }
+    }, 50); // Delay ensures DOM has finished updating
   }
 
   async requestToJoin(channel: Channel) {
     if (!this.currentUser) return;
-  
-    const channelRef = doc(db, "channels", channel.id);
+
+    const channelRef = doc(db, 'channels', channel.id);
     const channelSnap = await getDoc(channelRef);
-  
+
     if (!channelSnap.exists()) {
-      console.error("Channel not found!");
+      console.error('Channel not found!');
       return;
     }
-  
+
     const channelData = channelSnap.data();
-  
+
     if (channelData['joinRequests']?.includes(this.currentUser.uid)) {
       alert("You've already requested to join this channel.");
       return;
     }
-  
+
     try {
-      const updatedJoinRequests = [...(channelData['joinRequests'] || []), this.currentUser.uid];
+      const updatedJoinRequests = [
+        ...(channelData['joinRequests'] || []),
+        this.currentUser.uid,
+      ];
       await updateDoc(channelRef, { joinRequests: updatedJoinRequests });
-  
+
       const adminId = channelData['creatorId'];
       const notifRef = collection(db, `users/${adminId}/notifications`);
       await addDoc(notifRef, {
@@ -1087,34 +1072,38 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         timestamp: Timestamp.now(),
         read: false,
         isFromChannel: true,
-        channelId: channel.id
+        channelId: channel.id,
       });
-  
-      alert("Your request to join has been sent.");
-    } 
-    catch (err) {
-      console.error("Error handling join request:", err);
+
+      alert('Your request to join has been sent.');
+    } catch (err) {
+      console.error('Error handling join request:', err);
     }
   }
   async acceptJoinRequest(channelId: string, requesterUsername: string) {
     if (!this.currentUser) return;
-  
+
     const channelRef = doc(db, 'channels', channelId);
     const channelSnap = await getDoc(channelRef);
     if (!channelSnap.exists()) return;
-  
+
     const channelData = channelSnap.data();
     const requesterId = await this.getUserIdByUsername(requesterUsername);
     if (!requesterId) return;
-  
-    const updatedAllowedUsers = [...(channelData['allowedUsers'] || []), requesterId];
-    const updatedJoinRequests = (channelData['joinRequests'] || []).filter((id: string) => id !== requesterId);
-  
+
+    const updatedAllowedUsers = [
+      ...(channelData['allowedUsers'] || []),
+      requesterId,
+    ];
+    const updatedJoinRequests = (channelData['joinRequests'] || []).filter(
+      (id: string) => id !== requesterId
+    );
+
     await updateDoc(channelRef, {
       allowedUsers: updatedAllowedUsers,
-      joinRequests: updatedJoinRequests
+      joinRequests: updatedJoinRequests,
     });
-  
+
     // Optional: send a notification to the user
     const notifRef = collection(db, `users/${requesterId}/notifications`);
     await addDoc(notifRef, {
@@ -1123,30 +1112,31 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       timestamp: Timestamp.now(),
       read: false,
       isFromChannel: true,
-      channelId: channelId
+      channelId: channelId,
     });
-  
+
     this.deleteNotificationByChannel(channelId, requesterUsername);
   }
-  
-  
+
   async denyJoinRequest(channelId: string, requesterUsername: string) {
     if (!this.currentUser) return;
-  
+
     const channelRef = doc(db, 'channels', channelId);
     const channelSnap = await getDoc(channelRef);
     if (!channelSnap.exists()) return;
-  
+
     const channelData = channelSnap.data();
     const requesterId = await this.getUserIdByUsername(requesterUsername);
     if (!requesterId) return;
-  
-    const updatedJoinRequests = (channelData['joinRequests'] || []).filter((id: string) => id !== requesterId);
-  
+
+    const updatedJoinRequests = (channelData['joinRequests'] || []).filter(
+      (id: string) => id !== requesterId
+    );
+
     await updateDoc(channelRef, {
-      joinRequests: updatedJoinRequests
+      joinRequests: updatedJoinRequests,
     });
-  
+
     // Optional: send a notification to the user
     const notifRef = collection(db, `users/${requesterId}/notifications`);
     await addDoc(notifRef, {
@@ -1155,15 +1145,15 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       timestamp: Timestamp.now(),
       read: false,
       isFromChannel: true,
-      channelId: channelId
+      channelId: channelId,
     });
-  
+
     this.deleteNotificationByChannel(channelId, requesterUsername);
   }
   async getUserIdByUsername(username: string): Promise<string | null> {
     const usersRef = collection(db, 'users');
     const snapshot = await getDocs(usersRef);
-  
+
     for (const docSnap of snapshot.docs) {
       if (docSnap.data()['username'] === username) {
         return docSnap.id;
@@ -1172,15 +1162,15 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     return null;
   }
   deleteNotificationByChannel(channelId: string, username: string) {
-    const notifToDelete = this.unreadNotifications.find(n => n.channelId === channelId && n.from === username);
+    const notifToDelete = this.unreadNotifications.find(
+      (n) => n.channelId === channelId && n.from === username
+    );
     if (notifToDelete) {
       this.deleteNotification(notifToDelete.id);
     }
   }
   isChannelCreator(channelId: string): boolean {
-    const channel = this.channels.find(c => c.id === channelId);
+    const channel = this.channels.find((c) => c.id === channelId);
     return channel?.creatorId === this.currentUser?.uid;
   }
-  
-  
 }

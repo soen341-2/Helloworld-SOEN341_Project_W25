@@ -14,9 +14,7 @@ describe('UserAuthComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [UserAuthComponent],
       imports: [FormsModule],
-      providers: [
-        { provide: Router, useValue: routerSpy }
-      ]
+      providers: [{ provide: Router, useValue: routerSpy }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserAuthComponent);
@@ -35,7 +33,9 @@ describe('UserAuthComponent', () => {
     component.email = '';
     component.password = '';
     await component.signUp();
-    expect(window.alert).toHaveBeenCalledWith('Email, username and password are required');
+    expect(window.alert).toHaveBeenCalledWith(
+      'Email, username and password are required'
+    );
   });
 
   // test if log in is blocked if fields are left empty
@@ -44,6 +44,8 @@ describe('UserAuthComponent', () => {
     component.email = '';
     component.password = '';
     await component.logIn();
-    expect(window.alert).toHaveBeenCalledWith('Email and password are required');
+    expect(window.alert).toHaveBeenCalledWith(
+      'Email and password are required'
+    );
   });
 });
