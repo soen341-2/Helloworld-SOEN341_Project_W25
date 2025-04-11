@@ -75,7 +75,31 @@
 
 ## Prathiksha Kandiah (40190782)
 
-
+### Join channel request button
+- created button next to private channel to request to the creator
+- added the request in the notification to the creator
+- added notification of acceptance or rejection to join channel to the user who requested
+**April 2nd, 5PM-8PM**
+**April 4th, 8PM-12AM**
+**April 7th, 8:30PM-10:30PM**
+**April 9th, 12PM-3PM**
+  
+### login/signup authentification page
+- created 2 different sides: for login and sing up without box pop up for username
+- added title, font, colour change and welcome message
+- Error to compile and too late to debug so this change was removed
+**April 10th, 6PM-7:30PM**
+  
+### Powerpoint
+- added dynamic collaboration
+- added robust privacy
+- added efficient communnication
+- added competitive edge: functional and non functional
+**April 10th, 8PM-9PM**
+  
+### Final report
+- naming convinction about angular
+**April 11th, 4PM-6PM**
 ---
 
 ## Sarah Amani (40226234)
