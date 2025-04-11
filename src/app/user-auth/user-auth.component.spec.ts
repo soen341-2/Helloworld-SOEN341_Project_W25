@@ -22,12 +22,12 @@ describe('UserAuthComponent', () => {
     fixture.detectChanges();
   });
 
-  // test component creation
+  //creating test component 
   it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  // test if sign up is blocked if fields are left empty
+  //empty fields for sign up -> fail (something is missing)
   it('should not sign up with empty fields', async () => {
     spyOn(window, 'alert');
     component.email = '';
@@ -38,7 +38,7 @@ describe('UserAuthComponent', () => {
     );
   });
 
-  // test if log in is blocked if fields are left empty
+  //empty fields for login -> fail (something is missing)
   it('should not log in with empty fields', async () => {
     spyOn(window, 'alert');
     component.email = '';

@@ -22,6 +22,7 @@ const db = getFirestore(app);
   templateUrl: './user-auth.component.html',
   styleUrl: './user-auth.component.css',
 })
+
 export class UserAuthComponent {
   email = '';
   password = '';
@@ -37,15 +38,18 @@ export class UserAuthComponent {
     });
   }
 
+  /*email and password required to sign up*/
   async signUp() {
     if (this.email.trim() === '' || this.password.trim() === '') {
       alert('Email, username and password are required');
       return;
     }
 
+
     const username = prompt('Please enter a username:');
     if (!username || username.trim() === '') {
       alert('Username is required for signup.');
+
       return;
     }
 
@@ -70,12 +74,15 @@ export class UserAuthComponent {
 
       this.clearFields();
       this.router.navigate(['/channels']);
+
     } catch (error: any) {
       console.error('Error signing up:', error);
+
       alert(error.message);
     }
   }
 
+  /*loging in rquires email and password*/
   async logIn() {
     if (this.email.trim() === '' || this.password.trim() === '') {
       alert('Email and password are required');
@@ -102,6 +109,7 @@ export class UserAuthComponent {
     }
   }
 
+  /*logout from current account*/
   logOut() {
     signOut(auth)
       .then(() => {
@@ -120,7 +128,9 @@ export class UserAuthComponent {
   }
   showPassword = false;
 
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
+
 }
