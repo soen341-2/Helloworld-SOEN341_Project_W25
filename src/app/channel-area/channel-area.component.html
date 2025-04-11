@@ -1,158 +1,104 @@
 <nav class="navbar navbar-light bg-light px-3">
   <a class="navbar-brand fw-bold text-primary">ChatHaven</a>
   <div>
-    <button
-      (click)="goToChannelSelector()"
-      class="btn btn-outline-primary me-2"
-    >
+    <button (click)="goToChannelSelector()" class="btn btn-outline-primary me-2">
       Channel Selector
     </button>
-    <button (click)="logOut()" class="btn btn-outline-danger">Log Out</button>
+    <button (click)="logOut()" class="btn btn-outline-danger">
+      Log Out
+    </button>
   </div>
 </nav>
 
 <div class="container">
   <h2>Channel Chat: {{ channelName }}</h2>
-  <div *ngIf="isPrivate === true" class="invite-user-section">
-    <div class="channel-users">
-      <ul class="list-group">
-        <li
-          *ngFor="let user of channelUsers"
-          class="list-group-item d-flex justify-content-between align-items-center"
-        >
-          <span>
-            <strong>{{ user.username }}</strong>
-            <small *ngIf="user.lastSeen"
-              >- Last seen: {{ user.lastSeen | date : "short" }}</small
-            >
-          </span>
-          <span
-            [ngClass]="{
+    <div *ngIf="isPrivate===true" class="invite-user-section">
+      <div class="channel-users">
+        <ul class="list-group">
+          <li *ngFor="let user of channelUsers" class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              <strong>{{ user.username }}</strong> 
+              <small *ngIf="user.lastSeen">- Last seen: {{ user.lastSeen | date:'short' }}</small>
+            </span>
+            <span [ngClass]="{
               'text-success': user.status === 'online',
               'text-warning': user.status === 'away',
               'text-danger': user.status === 'offline'
-            }"
-          >
-            ● {{ user.status }}
-            <span *ngIf="user.status === 'away' || user.status === 'offline'">
-              ({{
-                user.lastSeen ? (user.lastSeen | date : "short") : "unknown"
-              }})
+            }">
+              ● {{ user.status }}
+              <span *ngIf="user.status === 'away' || user.status === 'offline'">
+                ({{ user.lastSeen ? (user.lastSeen | date:'short') : 'unknown' }})
+              </span>
             </span>
-          </span>
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </div>
+      <br>
     </div>
-    <br />
-  </div>
-  <div
-    *ngIf="creatorId === currentUser.uid && isPrivate === true"
-    class="invite-user-section"
-  >
-    <h5>Invite a User to this Channel</h5>
+    <div *ngIf="creatorId==currentUser.uid && isPrivate==true" class="invite-user-section">
 
-    <select class="form-select mb-2" [(ngModel)]="selectedUserToInvite">
-      <option *ngFor="let user of users$ | async" [value]="user.id">
-        {{ user.username }}
-      </option>
-    </select>
-
-    <button (click)="inviteUser()" class="btn btn-outline-primary me-2">
-      Invite User
-    </button>
-  </div>
-
-  <div
-    class="messages"
-    [ngStyle]="{ 'background-color': channelBackgroundColor }"
-  >
-    <div class="message-list flex-grow-1 overflow-auto mb-3">
-      <div class="messages-wrapper">
-        <div class="scroll-container">
-          <div
-            *ngFor="let msg of messages"
-            class="message-wrapper"
-            [ngClass]="{ sent: msg.sender === currentUser.username }"
-          >
-            <div
-              class="message-bubble"
-              [ngClass]="{ sent: msg.sender === currentUser.username }"
-            >
-              <strong
-                >{{ msg.sender }}
-                <span>{{ getUserStatusEmoji(msg.sender) }}</span
-                >:</strong
-              >
-
-              <div *ngIf="msg.replyId" class="quoted-message">
-                <em
-                  >Replying to: {{ getRepliedMessageContent(msg.replyId) }}</em
-                >
-              </div>
-
-              <p>{{ msg.message }}</p>
-              <span class="timestamp">{{
-                msg.timestamp | date : "h:mm a"
-              }}</span>
-
-              <button
-                (click)="reply(msg)"
-                class="btn btn-outline-dark btn-sm ms-0"
-              >
-                Quote
-              </button>
-              <button
-                *ngIf="currentUser.isAdmin"
-                (click)="deleteMessage(msg.id)"
-                class="delete-btn p-0 me-2"
-              >
-                ❌
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="replyingToMessage" class="reply-context">
-          <p>Replying to: {{ replyingToMessage.message }}</p>
-          <button
-            (click)="replyingToMessage = null"
-            class="btn btn-sm btn-outline-secondary"
-          >
-            Cancel Reply
-          </button>
-        </div>
-
+      <h5>Invite a User to this Channel</h5>
+  
+      <select class="form-select mb-2" [(ngModel)]="selectedUserToInvite">
+        <option *ngFor="let user of users$ | async" [value]="user.id">
+          {{ user.username }}
+        </option>
         
-      </div>
-    </div>
-    <div class="input-container-wrapper position-relative">
-      <div class="input-container">
-        <input
-          type="text"
-          [(ngModel)]="newMessage"
-          placeholder="Type a message..."
-        />
-        <button (click)="toggleEmojiPicker()" class="btn btn-secondary">
-          😊
-        </button>
-        <button (click)="sendMessage()" class="btn btn-primary">
-          Send
-        </button>
-      </div>
+      </select>
 
-      <div *ngIf="showEmojiPicker" class="emoji-picker-container">
-        <emoji-picker (emoji-click)="addEmoji($event)"></emoji-picker>
-      </div>
+      <button (click)="inviteUser()" class="btn btn-outline-primary me-2">
+        Invite User
+      </button>
     </div>
-  </div>
+  
   <div class="form-group mt-3">
     <label for="channelBgColor">Channel Background Color:</label>
-    <input
+    <input 
       type="color"
       id="channelBgColor"
       [value]="channelBackgroundColor"
       (change)="onChannelColorChange($event)"
       class="form-control form-control-color mt-2"
     />
-  </div>
-</div>
+  </div>    
+  <div class="messages" [ngStyle]="{ 'background-color': channelBackgroundColor }">
+    <div class="message-list flex-grow-1 overflow-auto mb-3">
+      <div class="messages-wrapper">
+        <div class="messages-scrollable">
+          <div *ngFor="let msg of messages"
+               class="message-wrapper"
+               [ngClass]="{ 'sent': msg.sender === currentUser.username }">
+            <div class="message-bubble" [ngClass]="{ 'sent': msg.sender === currentUser.username }">
+              <strong>{{ msg.sender }} <span>{{ getUserStatusEmoji(msg.sender) }}</span>:</strong>
+      
+              <div *ngIf="msg.replyId" class="quoted-message">
+                <em>Replying to: {{ getRepliedMessageContent(msg.replyId) }}</em>
+              </div>
+      
+              <p>{{ msg.message }}</p>
+              <span class="timestamp">{{ msg.timestamp | date:'h:mm a' }}</span>
+      
+              <button (click)="reply(msg)" class="btn btn-outline-dark btn-sm ms-0">Quote</button>
+              <button *ngIf="currentUser.isAdmin" (click)="deleteMessage(msg.id)" class="delete-btn p-0 me-2">❌</button>
+            </div>
+          </div>
+        </div>
+      
+        <div *ngIf="replyingToMessage" class="reply-context">
+          <p>Replying to: {{ replyingToMessage.message }}</p>
+          <button (click)="replyingToMessage = null" class="btn btn-sm btn-outline-secondary">Cancel Reply</button>
+        </div>
+      
+        <div class="input-container-wrapper position-relative">
+          <div class="input-container">
+            <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." />
+            <button (click)="toggleEmojiPicker()" class="btn btn-secondary">😊</button>
+            <button (click)="sendMessage()" class="btn btn-primary">Send</button>
+          </div>
+        
+          <div *ngIf="showEmojiPicker" class="emoji-picker-container">
+            <emoji-picker (emoji-click)="addEmoji($event)"></emoji-picker>
+          </div>
+        </div>
+        
+      
