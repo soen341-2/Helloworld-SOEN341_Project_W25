@@ -46,6 +46,7 @@ describe('ChannelSelectorComponent', () => {
     expect(component.showEmojiPickerDirect).toBeTrue();
   });
 
+  
   // test if emoji is added to message
   it('should add emoji to newMessage', () => {
     component.newMessage = 'Hello';

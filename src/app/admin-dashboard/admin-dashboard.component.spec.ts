@@ -57,6 +57,14 @@ describe('AdminDashboardComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 
+  // test router
+  it('should navigate to channel selector', () => {
+    const router = TestBed.inject(Router);
+    component.goToChannelSelector();
+    expect(router.navigate).toHaveBeenCalledWith(['/channels']);
+  });
+  
+
   // test if non-admin can assign users to channels
   it('should alert if user tries to assign user to channel', async () => {
     spyOn(window, 'alert');

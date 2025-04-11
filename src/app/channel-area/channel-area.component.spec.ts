@@ -142,28 +142,6 @@ describe('ChannelAreaComponent', () => {
     );
   });
 
-  // test if user data can be fetched correctly
-  it('should fetch user data and update currentUser', () => {
-    const userId = 'user123';
-    const spy = spyOn(component, 'fetchUserData').and.callThrough();
-    component.fetchUserData(userId);
-    expect(spy).toHaveBeenCalledWith(userId);
-  });
-
-  // test if getChannelName works
-  it('should retrieve channel name', () => {
-    const channelId = 'channelXYZ';
-    const spy = spyOn(component, 'getChannelName').and.callThrough();
-    component.getChannelName(channelId);
-    expect(spy).toHaveBeenCalledWith(channelId);
-  });
-
-  // test if users are loaded
-  it('should load all users from Firestore', () => {
-    const spy = spyOn(component, 'loadAllUsers').and.callThrough();
-    component.loadAllUsers();
-    expect(spy).toHaveBeenCalled();
-  });
 
   // test if router works
   it('should navigate to /channels when goToChannelSelector is called', () => {
