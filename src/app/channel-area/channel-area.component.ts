@@ -73,8 +73,9 @@ export class ChannelAreaComponent implements OnInit, AfterViewChecked {
     private router: Router
   ) {}
   ngAfterViewChecked(): void {
-    throw new Error('Method not implemented.');
+    this.scrollToBottom();
   }
+  
 
   ngOnInit(): void {
     const savedColors = localStorage.getItem('channelBgColors');

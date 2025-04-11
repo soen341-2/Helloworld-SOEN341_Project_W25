@@ -10,6 +10,7 @@ import {
 } from '@angular/fire/firestore';
 import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { onSnapshot } from '@angular/fire/firestore';
 
 @Component({

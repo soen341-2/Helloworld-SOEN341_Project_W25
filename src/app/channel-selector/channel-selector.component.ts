@@ -1032,12 +1032,18 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
 
   private scrollToBottom(): void {
     setTimeout(() => {
-      if (this.scrollContainer?.nativeElement) {
-        const container = this.scrollContainer.nativeElement;
+      if (!this.scrollContainer?.nativeElement) return;
+  
+      const container = this.scrollContainer.nativeElement;
+      const isAtBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+  
+      if (isAtBottom) {
         container.scrollTop = container.scrollHeight;
       }
-    }, 50); // Delay ensures DOM has finished updating
+    }, 50); // Delay ensures DOM updates finish
   }
+  
 
   async requestToJoin(channel: Channel) {
     if (!this.currentUser) return;
