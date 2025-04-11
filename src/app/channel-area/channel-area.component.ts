@@ -20,6 +20,7 @@ import { collectionData } from '@angular/fire/firestore';
 import { Auth, getAuth, signOut } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import 'emoji-picker-element';
+import { ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 
 @Component({
   selector: 'app-channel-area',
@@ -27,7 +28,9 @@ import 'emoji-picker-element';
   templateUrl: './channel-area.component.html',
   styleUrl: './channel-area.component.css',
 })
-export class ChannelAreaComponent implements OnInit {
+export class ChannelAreaComponent implements OnInit, AfterViewChecked {
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+
   channelId: string | null = null;
   channelName = '';
   isPrivate = false;
@@ -69,6 +72,9 @@ export class ChannelAreaComponent implements OnInit {
     private auth: Auth,
     private router: Router
   ) {}
+  ngAfterViewChecked(): void {
+    throw new Error('Method not implemented.');
+  }
 
   ngOnInit(): void {
     const savedColors = localStorage.getItem('channelBgColors');
@@ -104,6 +110,19 @@ export class ChannelAreaComponent implements OnInit {
         this.channelName = 'Unknown Channel';
       }
     });
+  }
+
+  private scrollToBottom(): void {
+    try {
+      setTimeout(() => {
+        const container = this.scrollContainer?.nativeElement;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      }, 50); // slight delay for DOM update
+    } catch (err) {
+      console.error('Scroll error:', err);
+    }
   }
 
   //get list of users allowed in channel
@@ -200,7 +219,7 @@ export class ChannelAreaComponent implements OnInit {
   fetchUserData(userId: string): void {
     const userDocRef = doc(this.firestore, `users/${userId}`);
     docData(userDocRef).subscribe((userDoc: any) => {
-      console.log('Fetched userDoc:', userDoc); 
+      console.log('Fetched userDoc:', userDoc);
       if (userDoc) {
         this.currentUser = {
           uid: userId,
@@ -289,6 +308,7 @@ export class ChannelAreaComponent implements OnInit {
           );
 
           this.messages = updatedMessages;
+          this.scrollToBottom();
         }
       );
     });
@@ -329,6 +349,7 @@ export class ChannelAreaComponent implements OnInit {
         .then(async () => {
           this.newMessage = '';
           this.replyingToMessage = null;
+          this.scrollToBottom();
 
           //mention notification
           for (const username of mentionedUsernames) {

@@ -20,7 +20,7 @@
 
   <div class="d-flex align-items-center">
     <div style="position: relative; display: inline-block">
-      <button (click)="openNotifications()" class="notif-btn">
+      <button (click)="openNotifications()" class="notif-btn me-2">
         🔔
         <span *ngIf="unreadNotifications.length > 0" class="notif-badge">
           {{
@@ -34,25 +34,40 @@
         <ul *ngIf="unreadNotifications.length > 0; else noNotif">
           <li *ngFor="let notif of unreadNotifications">
             <span>
-              <strong>{{ notif.from }}</strong>: "{{ notif.message }}"
-              <span *ngIf="notif.isFromChannel" class="channel-badge">Channel</span>
+              <strong>{{ notif.from }}</strong>
+              <strong>
+                mentioned you in
+                {{ getChannelNameFromId(notif.channelId) }}</strong
+              >
+              <span *ngIf="notif.isFromChannel" class="channel-badge"
+                >Channel</span
+              >
               <span *ngIf="!notif.isFromChannel" class="dm-badge">Direct</span>
             </span>
-        
-            <!-- for user trying to join a private chat-->
-            <!-- accept/deny buttons (only for creator of the private channel) -->
-            <div *ngIf="notif.isFromChannel && notif.channelId && (isAdmin || isChannelCreator(notif.channelId))" class="mt-1">
-              <button class="btn btn-success btn-sm me-1"
-                (click)="acceptJoinRequest(notif.channelId, notif.from)">
-                  Accept
+
+            <!-- Accept/Deny buttons (only for creator or admin) -->
+            <div
+              *ngIf="
+                notif.isFromChannel &&
+                notif.channelId &&
+                (isAdmin || isChannelCreator(notif.channelId))
+              "
+              class="mt-1"
+            >
+              <button
+                class="btn btn-success btn-sm me-1"
+                (click)="acceptJoinRequest(notif.channelId, notif.from)"
+              >
+                Accept
               </button>
-             <button class="btn btn-danger btn-sm"
-               (click)="denyJoinRequest(notif.channelId, notif.from)">
-                  Deny
-            </button>
+              <button
+                class="btn btn-danger btn-sm"
+                (click)="denyJoinRequest(notif.channelId, notif.from)"
+              >
+                Deny
+              </button>
             </div>
 
-        
             <br />
             <small>{{ notif.timestamp?.toDate() | date : "short" }}</small>
             <br />
@@ -63,7 +78,7 @@
             </button>
           </li>
         </ul>
-        
+
         <ng-template #noNotif>
           <p class="notif-empty">No new notifications</p>
         </ng-template>
@@ -83,7 +98,7 @@
       Admin Dashboard
     </button>
     <button (click)="toggleDarkMode()" class="btn btn-outline-secondary me-2">
-      {{ isDarkMode ? "light mode" : "dark mode" }}
+      {{ isDarkMode ? "Light Mode" : "Dark Mode" }}
     </button>
 
     <button (click)="logOut()" class="btn btn-outline-danger">Log Out</button>
@@ -154,12 +169,20 @@
                       </span>
                     </button>
 
-                    <!-- request to Join button -->
-                      <button
-                        *ngIf="channel.isPrivate &&
+                    <!-- Request to Join button -->
+                    <button
+                      *ngIf="
+                        channel.isPrivate &&
                         !isAdmin &&
-                          currentUser?.uid &&
-                              !(channel.allowedUsers?.includes(currentUser?.uid || ''))"
+                        currentUser?.uid &&
+                        !channel.allowedUsers?.includes(currentUser?.uid || '')
+                      "
+                      (click)="requestToJoin(channel)"
+                      class="btn btn-outline-warning btn-sm ms-2"
+                    >
+                      Request
+                    </button>
+
 
                                     (click)="requestToJoin(channel)"
                                             class="btn btn-outline-warning btn-sm ms-2"
@@ -255,27 +278,6 @@
           </p>
         </div>
 
-        <!--cvonversations-->
-        <div class="card-header text-center">
-          <h4>Active Chats</h4>
-        </div>
-        <div class="card-body">
-          <ul class="list-group">
-            <li
-              *ngFor="let convo of activeConversations; index as i"
-              class="list-group-item bg-dark border-0"
-            >
-              <div class="d-flex justify-content-between align-items-center">
-                <button
-                  (click)="selectUser(convo.username)"
-                  class="btn btn-primary btn-sm w-100"
-                >
-                  {{ convo.username }}
-                </button>
-              </div>
-            </li>
-          </ul>
-        </div>
       </div>
     </div>
 
@@ -347,8 +349,9 @@
             </mat-autocomplete>
           </div>
 
-          <!-- message list scrollable -->
-          <div class="dm-messages-scrollable">
+          <!-- Message list scrollable -->
+          <div class="dm-messages-scrollable" #scrollContainer>
+
             <div
               *ngFor="let msg of messages"
               [ngClass]="{

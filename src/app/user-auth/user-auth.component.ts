@@ -2,7 +2,14 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { initializeApp } from '@angular/fire/app';
 import { environment } from '../../environments/environment.development';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from '@angular/fire/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from '@angular/fire/auth';
 import { getFirestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
 
 const app = initializeApp(environment.firebaseConfig);
@@ -13,13 +20,13 @@ const db = getFirestore(app);
   selector: 'app-user-auth',
   standalone: false,
   templateUrl: './user-auth.component.html',
-  styleUrl: './user-auth.component.css'
+  styleUrl: './user-auth.component.css',
 })
 
 export class UserAuthComponent {
-  email = "";
-  password = "";
-  username = "";
+  email = '';
+  password = '';
+  username = '';
   currentUser: User | null = null;
 
   constructor(private router: Router) {
@@ -33,63 +40,71 @@ export class UserAuthComponent {
 
   /*email and password required to sign up*/
   async signUp() {
-    if (this.email.trim() === "" || this.password.trim() === "") {
-      alert("Email, username and password are required");
+    if (this.email.trim() === '' || this.password.trim() === '') {
+      alert('Email, username and password are required');
       return;
     }
 
-    /*username required for sign up*/
-    const username = prompt("Please enter a username:");
-    if (!username || username.trim() === "") {
-      alert("Username is required for signup.");
+
+    const username = prompt('Please enter a username:');
+    if (!username || username.trim() === '') {
+      alert('Username is required for signup.');
+
       return;
     }
 
     this.username = username.trim();
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, this.email, this.password);
-      console.log("User signed up:", userCredential.user);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        this.email,
+        this.password
+      );
+      console.log('User signed up:', userCredential.user);
 
-      const userRef = doc(db, "users", userCredential.user.uid);
+      const userRef = doc(db, 'users', userCredential.user.uid);
       await setDoc(userRef, {
         email: this.email,
         username: this.username,
         isAdmin: false,
         isSuperAdmin: false,
-        createdAt: new Date()
-        
+        createdAt: new Date(),
       });
 
       this.clearFields();
       this.router.navigate(['/channels']);
-    } 
-    catch (error: any) {
-      console.error("Error signing up:", error);
+
+    } catch (error: any) {
+      console.error('Error signing up:', error);
+
       alert(error.message);
     }
   }
 
   /*loging in rquires email and password*/
   async logIn() {
-    if (this.email.trim() === "" || this.password.trim() === "") {
-      alert("Email and password are required");
+    if (this.email.trim() === '' || this.password.trim() === '') {
+      alert('Email and password are required');
       return;
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, this.email, this.password);
-      console.log("User logged in:", userCredential.user);
-      const userRef = doc(db, "users", userCredential.user.uid);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        this.email,
+        this.password
+      );
+      console.log('User logged in:', userCredential.user);
+      const userRef = doc(db, 'users', userCredential.user.uid);
       const userSnapshot = await getDoc(userRef);
       if (userSnapshot.exists()) {
         this.username = userSnapshot.data()['username'];
       }
       this.clearFields();
       this.router.navigate(['/channels']);
-    } 
-    catch (error: any) {
-      console.error("Error logging in:", error);
+    } catch (error: any) {
+      console.error('Error logging in:', error);
       alert(error.message);
     }
   }
@@ -98,24 +113,24 @@ export class UserAuthComponent {
   logOut() {
     signOut(auth)
       .then(() => {
-        console.log("User logged out");
+        console.log('User logged out');
         this.router.navigate(['/login']);
       })
-      .catch(error => {
-        console.error("Error logging out:", error);
+      .catch((error) => {
+        console.error('Error logging out:', error);
       });
   }
 
   clearFields() {
-    this.email = "";
-    this.password = "";
-    this.username = "";
+    this.email = '';
+    this.password = '';
+    this.username = '';
   }
   showPassword = false;
 
-  /*show/hide password when signing up or loggin in*/
-togglePasswordVisibility() {
-  this.showPassword = !this.showPassword;
-}
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
 
 }

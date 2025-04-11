@@ -1,13 +1,13 @@
 
-<div class="container d-flex flex-column justify-content-center align-items-center vh-100">
-  <!--adding main title-->
+<div
+  class="container d-flex flex-column justify-content-center align-items-center vh-100"
+>
   <h1 class="chat-title">ChatHaven</h1>
 
-  <!--authentification box-->
-  <div class="card glass-card p-4 shadow-lg" style="width: 400px;">
+  <div class="card glass-card p-4 shadow-lg" style="width: 400px">
     <h2 class="text-center mb-3 welcome-title">Welcome</h2>
 
-    <!--asking for email-->
+
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
       <input
@@ -38,21 +38,25 @@
           class="btn btn-outline-secondary"
           (click)="togglePasswordVisibility()"
         >
-          <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+          <i
+            class="bi"
+            [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+          ></i>
         </button>
       </div>
     </div>
+
+
     <div class="d-flex justify-content-between">
       <button (click)="signUp()" class="btn btn-signup w-45">Sign Up</button>
       <button (click)="logIn()" class="btn btn-login w-45">Log In</button>
-
     </div>
 
-    <!--user-->
     <div *ngIf="currentUser" class="text-center mt-3">
-      <p class="text-muted">Logged in as: <strong>{{ currentUser.email }}</strong></p>
+      <p class="text-muted">
+        Logged in as: <strong>{{ currentUser.email }}</strong>
+      </p>
 
-      <!--logout button-->
       <button (click)="logOut()" class="btn btn-danger w-100">Log Out</button>
     </div>
   </div>

@@ -1,61 +1,53 @@
 .w-45 {
-    width: 48%;
-  }
+  width: 48%;
+}
 
-  /*front page TITLE*/
-  .chat-title {
-    color: #082d64;
-    font-size: 4rem;           
-    font-family: 'Roboto', sans-serif;
-    font-weight: 800;           
-    text-align: center;
-    margin-bottom: 2rem;        
-    position: absolute;        
-    top: 10%;                   
-    left: 50%;                   
-    transform: translateX(-50%); 
-  }
-  /*auth box*/
-  .glass-card {
-    background: rgba(255, 255, 255, 0.25); 
-    backdrop-filter: blur(10px);          
-    -webkit-backdrop-filter: blur(8px);  
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  }
 
-  /*button colour8*/
-  .btn-signup {
-    background-color: #4a96e1;
-    color: white;
-    border: none;
-  }
-  
-  /*hover colour for signup button*/
-  .btn-signup:hover {
-    background-color: #0056b3;
-  }
-  
-  /*button colour*/
-  .btn-login {
-    background-color: #4a96e1; 
-    color: rgb(255, 255, 255);
-    border: none;
-  }
-  
-  /*hover colour for login button*/
-  .btn-login:hover {
-    background-color: #0056b3;
-  }
-  
-  /*title for block*/
-  .welcome-title {
-    color: #4a96e1; 
-    font-size: 2rem; 
-    font-family: 'Special Gothic Expanded One', sans-serif;
-    font-weight: 600;
-  }
-  
-  
-  
+.chat-title {
+  color: #082d64;
+  font-size: 4rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+.btn-signup {
+  background-color: #4a96e1;
+  color: white;
+  border: none;
+}
+
+.btn-signup:hover {
+  background-color: #0056b3;
+}
+
+.btn-login {
+  background-color: #4a96e1;
+  color: rgb(255, 255, 255);
+  border: none;
+}
+
+.btn-login:hover {
+  background-color: #0056b3;
+}
+
+.welcome-title {
+  color: #4a96e1;
+  font-size: 2rem;
+  font-family: "Special Gothic Expanded One", sans-serif;
+  font-weight: 600;
+}
+

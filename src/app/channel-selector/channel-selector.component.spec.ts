@@ -18,11 +18,14 @@ describe('ChannelSelectorComponent', () => {
         ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
-        MatAutocompleteModule
+        MatAutocompleteModule,
       ],
       providers: [
-        { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } }
-      ]
+        {
+          provide: Router,
+          useValue: { navigate: jasmine.createSpy('navigate') },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChannelSelectorComponent);
@@ -58,7 +61,9 @@ describe('ChannelSelectorComponent', () => {
 
   // test if mentions are correctly extracted from message
   it('should extract mentioned usernames from message', () => {
-    const mentions = component.getMentions('Hey @testuser @bob, check this out!');
+    const mentions = component.getMentions(
+      'Hey @testuser @bob, check this out!'
+    );
     expect(mentions).toEqual(['testuser', 'bob']);
   });
 
@@ -74,20 +79,38 @@ describe('ChannelSelectorComponent', () => {
     spyOn(localStorage, 'setItem');
     component.chatBackgroundColors = { John: '#abcdef' };
     component.saveBackgroundColors();
-    expect(localStorage.setItem).toHaveBeenCalledWith('dmBgColors', JSON.stringify({ John: '#abcdef' }));
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      'dmBgColors',
+      JSON.stringify({ John: '#abcdef' })
+    );
   });
 
   // test if quoting works
   it('should reply to a message', () => {
-    const msg = { id: '1', senderId: 'user1', receiverId: 'user2', message: 'Hello', timestamp: 0, replyId: '', mentions: [] };
+    const msg = {
+      id: '1',
+      senderId: 'user1',
+      receiverId: 'user2',
+      message: 'Hello',
+      timestamp: 0,
+      replyId: '',
+      mentions: [],
+    };
     component.reply(msg);
     expect(component.replyingToMessage).toEqual(msg);
   });
 
-
   // test if getMessagebyId works
   it('should return the message by ID', () => {
-    const message = { id: 'msg1', senderId: 'u1', receiverId: 'u2', message: 'test', timestamp: 0, replyId: '', mentions: [] };
+    const message = {
+      id: 'msg1',
+      senderId: 'u1',
+      receiverId: 'u2',
+      message: 'test',
+      timestamp: 0,
+      replyId: '',
+      mentions: [],
+    };
     component.messages = [message];
     expect(component.getMessageById('msg1')).toEqual(message);
   });

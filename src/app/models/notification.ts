@@ -6,6 +6,7 @@ export interface Notification {
     read: boolean;
     chatId?: string;
     channelId?: string;
+    channelTitle?: string;
     isFromChannel?: boolean;
   }
  
