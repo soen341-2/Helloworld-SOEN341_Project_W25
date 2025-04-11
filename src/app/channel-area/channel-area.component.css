@@ -10,12 +10,14 @@
   padding: 16px;
 }
 
+
 .container h2 {
   text-align: center;
   color: #333;
   font-size: 1.5em;
   margin-bottom: 16px;
 }
+
 
 .messages {
   flex-grow: 1;
@@ -29,15 +31,17 @@
 }
 
 .message-bubble {
-  background-color: #e0e0e0;
-  border-radius: 12px;
-  padding: 6px 10px;
-  margin-bottom: 10px;
-  position: relative;
-  max-width: 40%;
-  min-width: 200px;
-  word-wrap: break-word;
-  font-size: 0.9em;
+
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    padding: 6px 10px; 
+    margin-bottom: 10px;
+    position: relative;
+    max-width: 40%; 
+    min-width: 200px;
+    word-wrap: break-word;
+    font-size: 0.9em; 
+  
 }
 
 .messages-wrapper {
@@ -51,26 +55,31 @@
 }
 
 .messages-scrollable {
-  max-height: 60vh; /* Or whatever fits your layout */
+  flex-grow: 1;
   overflow-y: auto;
+  margin-bottom: 12px;
 }
 
 /* Keep your existing styles for .message-bubble, .timestamp, .input-container, etc. */
+
 
 .message-wrapper.sent {
   justify-content: flex-end;
 }
 
 .message-bubble.sent {
-  background-color: #cce5ff;
-  margin-left: auto;
-  border: 1px solid #007bff;
-  color: #003366;
+  
+    background-color: #cce5ff; 
+    margin-left: auto; 
+    border: 1px solid #007bff;
+    color: #003366;
+  
 }
 
 .message-bubble strong {
   color: #444;
 }
+
 
 .message-bubble p {
   margin: 6px 0;
@@ -115,17 +124,19 @@
   background-color: #0056b3;
 }
 
-.delete-btn {
+.delete-btn{
   background: none;
-  border: none;
-  color: red;
-  cursor: pointer;
-  font-size: 14px;
+  border:none;
+  color:red;
+  cursor:pointer;
+  font-size:14px;
+
 }
 
-.delete-btn:hover {
+.delete-btn:hover{
   text-decoration: underline;
 }
+
 
 .invite-user-section {
   margin-top: 15px;
@@ -142,6 +153,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   color: #333;
 }
+
 
 .input-container-wrapper {
   position: relative;

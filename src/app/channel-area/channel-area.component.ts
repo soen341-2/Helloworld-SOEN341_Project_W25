@@ -28,7 +28,7 @@ import { ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
   templateUrl: './channel-area.component.html',
   styleUrl: './channel-area.component.css',
 })
-export class ChannelAreaComponent implements OnInit, AfterViewChecked {
+export class ChannelAreaComponent implements OnInit {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   channelId: string | null = null;
@@ -72,9 +72,7 @@ export class ChannelAreaComponent implements OnInit, AfterViewChecked {
     private auth: Auth,
     private router: Router
   ) {}
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
-  }
+
   
 
   ngOnInit(): void {
@@ -113,18 +111,6 @@ export class ChannelAreaComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  private scrollToBottom(): void {
-    try {
-      setTimeout(() => {
-        const container = this.scrollContainer?.nativeElement;
-        if (container) {
-          container.scrollTop = container.scrollHeight;
-        }
-      }, 50); // slight delay for DOM update
-    } catch (err) {
-      console.error('Scroll error:', err);
-    }
-  }
 
   //get list of users allowed in channel
   loadChannelUsers(): void {
@@ -309,7 +295,6 @@ export class ChannelAreaComponent implements OnInit, AfterViewChecked {
           );
 
           this.messages = updatedMessages;
-          this.scrollToBottom();
         }
       );
     });
@@ -350,7 +335,6 @@ export class ChannelAreaComponent implements OnInit, AfterViewChecked {
         .then(async () => {
           this.newMessage = '';
           this.replyingToMessage = null;
-          this.scrollToBottom();
 
           //mention notification
           for (const username of mentionedUsernames) {
