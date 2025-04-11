@@ -24,10 +24,16 @@ const db = getFirestore(app);
 })
 
 export class UserAuthComponent {
-  email = '';
-  password = '';
-  username = '';
+  loginEmail = "";
+  loginPassword = "";
+  
+  signupUsername = "";
+  signupEmail = "";
+  signupPassword = "";
+  
   currentUser: User | null = null;
+  showPassword = false;
+  
 
   constructor(private router: Router) {
     onAuthStateChanged(auth, (user) => {
@@ -40,74 +46,70 @@ export class UserAuthComponent {
 
   /*email and password required to sign up*/
   async signUp() {
-    if (this.email.trim() === '' || this.password.trim() === '') {
-      alert('Email, username and password are required');
+    if (
+      this.signupEmail.trim() === "" ||
+      this.signupPassword.trim() === "" ||
+      this.signupUsername.trim() === ""
+    ) {
+      alert("Email, username and password are required");
       return;
     }
-
-
-    const username = prompt('Please enter a username:');
-    if (!username || username.trim() === '') {
-      alert('Username is required for signup.');
-
-      return;
-    }
-
-    this.username = username.trim();
-
+  
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        this.email,
-        this.password
+        this.signupEmail,
+        this.signupPassword
       );
-      console.log('User signed up:', userCredential.user);
-
-      const userRef = doc(db, 'users', userCredential.user.uid);
+      console.log("User signed up:", userCredential.user);
+  
+      const userRef = doc(db, "users", userCredential.user.uid);
       await setDoc(userRef, {
-        email: this.email,
-        username: this.username,
+        email: this.signupEmail,
+        username: this.signupUsername,
         isAdmin: false,
         isSuperAdmin: false,
         createdAt: new Date(),
       });
-
+  
       this.clearFields();
-      this.router.navigate(['/channels']);
-
+      this.router.navigate(["/channels"]);
     } catch (error: any) {
-      console.error('Error signing up:', error);
-
+      console.error("Error signing up:", error);
       alert(error.message);
     }
   }
+  
 
   /*loging in rquires email and password*/
   async logIn() {
-    if (this.email.trim() === '' || this.password.trim() === '') {
-      alert('Email and password are required');
+    if (this.loginEmail.trim() === "" || this.loginPassword.trim() === "") {
+      alert("Email and password are required");
       return;
     }
-
+  
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        this.email,
-        this.password
+        this.loginEmail,
+        this.loginPassword
       );
-      console.log('User logged in:', userCredential.user);
-      const userRef = doc(db, 'users', userCredential.user.uid);
+      console.log("User logged in:", userCredential.user);
+  
+      const userRef = doc(db, "users", userCredential.user.uid);
       const userSnapshot = await getDoc(userRef);
       if (userSnapshot.exists()) {
-        this.username = userSnapshot.data()['username'];
+        this.signupUsername = userSnapshot.data()["username"];
       }
+  
       this.clearFields();
-      this.router.navigate(['/channels']);
+      this.router.navigate(["/channels"]);
     } catch (error: any) {
-      console.error('Error logging in:', error);
+      console.error("Error logging in:", error);
       alert(error.message);
     }
   }
+  
 
   /*logout from current account*/
   logOut() {
@@ -122,11 +124,13 @@ export class UserAuthComponent {
   }
 
   clearFields() {
-    this.email = '';
-    this.password = '';
-    this.username = '';
-  }
-  showPassword = false;
+      this.loginEmail = "";
+      this.loginPassword = "";
+      this.signupEmail = "";
+      this.signupPassword = "";
+      this.signupUsername = "";
+    }
+  
 
 
   togglePasswordVisibility() {
