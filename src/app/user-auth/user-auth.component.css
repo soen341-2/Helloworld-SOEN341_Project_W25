@@ -3,6 +3,7 @@
 }
 
 
+<<<<<<< HEAD
 .chat-title {
   color: #082d64;
   font-size: 4rem;
@@ -51,3 +52,51 @@
   font-weight: 600;
 }
 
+=======
+  /*button colour8*/
+  .btn-signup {
+    background-color: #4a96e1;
+    color: white;
+    border: none;
+  }
+  
+  /*hover colour for signup button*/
+  .btn-signup:hover {
+    background-color: #0056b3;
+  }
+  
+  /*button colour*/
+  .btn-login {
+    background-color: #4a96e1; 
+    color: rgb(255, 255, 255);
+    border: none;
+  }
+  
+  /*hover colour for login button*/
+  .btn-login:hover {
+    background-color: #0056b3;
+  }
+  
+  /*title for block*/
+  .welcome-title {
+    color: #4a96e1; 
+    font-size: 2rem; 
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-weight: 600;
+  }
+
+  /* Add a light border or shadow to your input for extra visibility */
+.form-control {
+  border-radius: 8px;
+}
+
+/* Add transition to hover effects */
+.btn-signup:hover,
+.btn-login:hover {
+  transition: background-color 0.3s ease;
+}
+
+  
+  
+  
+>>>>>>> 32145d5 (login and sign up seperation)
