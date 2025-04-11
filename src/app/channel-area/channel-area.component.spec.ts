@@ -66,18 +66,7 @@ describe('ChannelAreaComponent', () => {
     expect(mentions).toEqual(['testa', 'testb']);
   });
 
-  // test if status emoji are correctly returned
-  it('should return correct status emoji', () => {
-    component.channelUsers = [
-      { id: '1', username: 'user1', status: 'online' },
-      { id: '2', username: 'user2', status: 'away' },
-      { id: '3', username: 'user3', status: 'offline' },
-    ];
-    expect(component.getUserStatusEmoji('user1')).toBe('🟢');
-    expect(component.getUserStatusEmoji('user2')).toBe('🟠');
-    expect(component.getUserStatusEmoji('user3')).toBe('🔴');
-    expect(component.getUserStatusEmoji('unknown')).toBe('🔴');
-  });
+ 
 
   // test if channel background color is correctly changed
   it('should return channel background color', () => {

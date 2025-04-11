@@ -159,16 +159,16 @@ export class ChannelAreaComponent implements OnInit {
     const user = this.channelUsers.find((u) => u.username === username);
     console.log('Checking status for:', username, 'Found:', user?.status);
 
-    if (!user) return '🔴';
+    if (!user) return '';
 
     switch (user.status) {
       case 'online':
-        return '🟢';
+        return '';
       case 'away':
-        return '🟠';
+        return '';
       case 'offline':
       default:
-        return '🔴';
+        return '';
     }
   }
 
