@@ -52,7 +52,7 @@ const db = getFirestore(app);
   templateUrl: './channel-selector.component.html',
   styleUrl: './channel-selector.component.css',
 })
-export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
+export class ChannelSelectorComponent implements OnInit {
   private inactivityTimer: any;
   private INACTIVITY_DELAY = 30000;
 
@@ -95,7 +95,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
   @ViewChild('emojiPickerContainer', { static: false })
   emojiPickerContainer!: ElementRef;
 
-  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   //sarah part
   searchControl = new FormControl();
@@ -331,7 +330,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         );
       console.log('load messages :', this.messages);
       this.cdRef.detectChanges();
-      this.scrollToBottom();
     });
   }
   getChatId(user1: string, user2: string): string {
@@ -390,7 +388,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
         this.replyingToMessage = null;
 
         this.cdRef.detectChanges();
-        this.scrollToBottom();
 
         if (!this.isDMConversation()) {
           for (const mentionedUsername of mentionedUsernames) {
@@ -403,7 +400,6 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
       })
       .catch((error) => console.error('Error:', error));
     this.cdRef.detectChanges();
-    this.scrollToBottom();
   }
 
   goToAdminDashboard() {
@@ -1026,23 +1022,7 @@ export class ChannelSelectorComponent implements OnInit, AfterViewChecked {
     return null;
   }
 
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
-  }
 
-  private scrollToBottom(): void {
-    setTimeout(() => {
-      if (!this.scrollContainer?.nativeElement) return;
-  
-      const container = this.scrollContainer.nativeElement;
-      const isAtBottom =
-        container.scrollHeight - container.scrollTop - container.clientHeight < 50;
-  
-      if (isAtBottom) {
-        container.scrollTop = container.scrollHeight;
-      }
-    }, 50); // Delay ensures DOM updates finish
-  }
   
 
   async requestToJoin(channel: Channel) {
