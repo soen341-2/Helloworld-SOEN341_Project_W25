@@ -103,5 +103,20 @@
 ---
 
 ## Sarah Amani (40226234)
+### Added Real-Time Notifications
+- Displayed notifications for mentions in channels and DMs  
+- Notifications ordered chronologically  
+- Users can delete notifications  
+- **April 7, 4:00PM to 9:00PM**
+
+### Implemented Theme Toggle
+- Added light/dark mode switch  
+- Stored user preference and reapplied on login  
+- **April 8, 2:00PM to 6:00PM**
+
+### Fixed Notification Bugs
+- Removed duplicate notifications  
+- Fixed deleted notifications still appearing  
+- **April 9, 6:00PM to 7:30PM**
 
 
