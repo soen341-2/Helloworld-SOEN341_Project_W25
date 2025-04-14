@@ -119,4 +119,13 @@
 - Fixed deleted notifications still appearing  
 - **April 9, 6:00PM to 7:30PM**
 
+### Wrote final report part
+- Wrote Code.
+-Wrote  Overall Arch and Design
+- **April 7, 2:00PM - 5:00PM** 
+
+### Made final presentation slide
+- Product overview slide completed for presentation.
+- **April 8, 6:00PM - 8:00PM**
+
 
