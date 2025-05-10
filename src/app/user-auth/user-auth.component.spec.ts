@@ -30,8 +30,8 @@ describe('UserAuthComponent', () => {
   //empty fields for sign up -> fail (something is missing)
   it('should not sign up with empty fields', async () => {
     spyOn(window, 'alert');
-    component.email = '';
-    component.password = '';
+    component.signupEmail = '';
+    component.signupPassword = '';
     await component.signUp();
     expect(window.alert).toHaveBeenCalledWith(
       'Email, username and password are required'
@@ -41,8 +41,8 @@ describe('UserAuthComponent', () => {
   //empty fields for login -> fail (something is missing)
   it('should not log in with empty fields', async () => {
     spyOn(window, 'alert');
-    component.email = '';
-    component.password = '';
+    component.loginEmail = '';
+    component.loginPassword = '';
     await component.logIn();
     expect(window.alert).toHaveBeenCalledWith(
       'Email and password are required'
